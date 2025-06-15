@@ -130,7 +130,7 @@ export STORAGE_CLASS="fast-ssd"
 
 # Advanced installation with custom options
 ./llmd-installer.sh \
-  --namespace llm-d-production \
+  --namespace production \
   --storage-size 1Ti \
   --storage-class fast-ssd \
   --values-file custom-values.yaml
@@ -245,9 +245,12 @@ sampleApplication:
     resources:
       limits:
         nvidia.com/gpu: 1
-        memory: "16Gi"
+        memory: "24Gi"
+        cpu: "8"
       requests:
         nvidia.com/gpu: 1
+        memory: "16Gi"
+        cpu: "4"
         memory: "16Gi"
   
   decode:
@@ -255,9 +258,12 @@ sampleApplication:
     resources:
       limits:
         nvidia.com/gpu: 1
-        memory: "16Gi"
+        memory: "24Gi"
+        cpu: "8"
       requests:
         nvidia.com/gpu: 1
+        memory: "16Gi"
+        cpu: "4"
         memory: "16Gi"
 
 monitoring:
@@ -275,7 +281,7 @@ For production deployments, customize resource allocation, scaling, and monitori
 ```yaml
 # production-config.yaml
 global:
-  namespace: llm-d-production
+  namespace: production
   storageClass: "nvme-ssd"
   
 sampleApplication:
@@ -617,5 +623,6 @@ You now have a fully functional llm-d installation ready for production LLM work
 - [llm-d Main Repository](https://github.com/llm-d/llm-d)
 - [Kubernetes GPU Support](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/)
 - [Helm Documentation](https://helm.sh/docs/)
+- [Shared Configuration Reference](./appendix/shared-config.md)
 
 :::

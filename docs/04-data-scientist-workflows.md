@@ -1226,5 +1226,6 @@ Continue your journey with:
 - [Hugging Face Model Hub](https://huggingface.co/models)
 - [vLLM Performance Optimization](https://docs.vllm.ai/en/latest/performance.html)
 - [MLOps Best Practices](https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning)
+- [Shared Configuration Reference](./appendix/shared-config.md)
 
 :::

@@ -54,6 +54,7 @@ graph TD
 ```
 
 **Reference Documentation:**
+
 - [Kubernetes Security Documentation](https://kubernetes.io/docs/concepts/security/)
 - [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/)
 - [NIST AI Risk Management Framework (AI RMF 1.0)](https://www.nist.gov/itl/ai-risk-management-framework)
@@ -157,7 +158,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: llama3-inference-sa
-  namespace: llm-d-production
+  namespace: production
   annotations:
     # Disable automatic token mounting for security
     kubernetes.io/enforce-mountable-secrets: "true"
@@ -168,7 +169,7 @@ automountServiceAccountToken: false
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: llm-d-production
+  namespace: production
   name: inference-service-role
 rules:
 - apiGroups: [""]
@@ -186,11 +187,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: inference-service-binding
-  namespace: llm-d-production
+  namespace: production
 subjects:
 - kind: ServiceAccount
   name: llama3-inference-sa
-  namespace: llm-d-production
+  namespace: production
 roleRef:
   kind: Role
   name: inference-service-role
@@ -202,7 +203,7 @@ apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
   name: llama3-8b-secure
-  namespace: llm-d-production
+  namespace: production
 spec:
   model:
     name: "meta-llama/Meta-Llama-3-8B-Instruct"
@@ -243,7 +244,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: llm-d-api-keys
-  namespace: llm-d-production
+  namespace: production
 type: Opaque
 data:
   # Base64 encoded API keys
@@ -257,7 +258,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: llm-d-auth-config
-  namespace: llm-d-production
+  namespace: production
 data:
   auth_config.yaml: |
     authentication:
@@ -287,7 +288,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: llm-d-secure-ingress
-  namespace: llm-d-production
+  namespace: production
   annotations:
     # NGINX ingress authentication
     nginx.ingress.kubernetes.io/auth-type: "basic"
@@ -335,6 +336,7 @@ spec:
 10. **Audit Trail Gaps**: Ensure all authentication events are logged and monitored
 
 **Mitigation Strategies:**
+
 - Regular RBAC reviews and access audits
 - Implementation of just-in-time (JIT) access for administrative functions
 - Multi-factor authentication for all human access
@@ -352,7 +354,7 @@ apiVersion: serving.llm-d.ai/v1alpha1
 kind: ModelAccessPolicy
 metadata:
   name: production-model-policy
-  namespace: llm-d-production
+  namespace: production
 spec:
   # Model-specific access controls
   models:
@@ -388,7 +390,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: model-isolation-policy
-  namespace: llm-d-production
+  namespace: production
 spec:
   podSelector:
     matchLabels:
@@ -647,7 +649,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: llm-d-input-validation
-  namespace: llm-d-production
+  namespace: production
 data:
   validation_config.yaml: |
     input_validation:
@@ -740,7 +742,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: llm-d-tls-certificates
-  namespace: llm-d-production
+  namespace: production
 type: kubernetes.io/tls
 data:
   tls.crt: LS0tLS1CRUdJTi... # Base64 encoded certificate
@@ -752,7 +754,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: llm-d-secure-service
-  namespace: llm-d-production
+  namespace: production
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:region:account:certificate/cert-id"
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
@@ -791,7 +793,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: encrypted-model-storage
-  namespace: llm-d-production
+  namespace: production
 spec:
   accessModes:
   - ReadWriteOnce
@@ -811,7 +813,7 @@ apiVersion: serving.llm-d.ai/v1alpha1
 kind: ModelRepository
 metadata:
   name: secure-model-repo
-  namespace: llm-d-production
+  namespace: production
 spec:
   source:
     type: "s3"
@@ -855,7 +857,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: model-repo-credentials
-  namespace: llm-d-production
+  namespace: production
 type: Opaque
 data:
   aws-access-key-id: <base64-encoded-key>
@@ -868,7 +870,7 @@ apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
   name: secure-llama3-service
-  namespace: llm-d-production
+  namespace: production
 spec:
   model:
     name: "llama3-8b-secure"
@@ -893,12 +895,12 @@ spec:
     # Resource constraints
     resources:
       requests:
-        memory: "8Gi"
-        cpu: "2"
-        nvidia.com/gpu: "1"
-      limits:
         memory: "16Gi"
         cpu: "4"
+        nvidia.com/gpu: "1"
+      limits:
+        memory: "24Gi"
+        cpu: "8"
         nvidia.com/gpu: "1"
         
     # Volume mounts for writable areas
@@ -1587,6 +1589,7 @@ data:
    - Incident response plans and testing
 
 **Implementation Example:**
+
 ```yaml
 # SOC 2 compliance monitoring
 apiVersion: v1
@@ -1765,7 +1768,7 @@ apiVersion: external-secrets.io/v1beta1
 kind: SecretStore
 metadata:
   name: vault-backend
-  namespace: llm-d-production
+  namespace: production
 spec:
   provider:
     vault:
@@ -1785,7 +1788,7 @@ apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
   name: model-credentials
-  namespace: llm-d-production
+  namespace: production
 spec:
   refreshInterval: 15s
   secretStoreRef:
@@ -1876,24 +1879,28 @@ echo "Vault configuration complete"
 ### Security Implementation Checklist
 
 **Identity and Access Management:**
+
 - ✅ Implement RBAC with principle of least privilege
 - ✅ Use dedicated ServiceAccounts for each inference service
 - ✅ Enable multi-factor authentication for administrative access
 - ✅ Regular access reviews and permission audits
 
 **Application Security:**
+
 - ✅ Deploy input validation and prompt injection defenses
 - ✅ Implement rate limiting and API abuse protection
 - ✅ Configure model access controls and isolation
 - ✅ Monitor for suspicious usage patterns
 
 **Data Protection:**
+
 - ✅ Encrypt data at rest and in transit
 - ✅ Implement data classification and handling procedures
 - ✅ Configure automated data retention and purging
 - ✅ Protect model weights and intellectual property
 
 **Monitoring and Compliance:**
+
 - ✅ Enable comprehensive audit logging
 - ✅ Configure security alerting and incident response
 - ✅ Implement compliance controls for relevant frameworks
@@ -1910,6 +1917,7 @@ echo "Vault configuration complete"
 This security foundation enables production deployment of llm-d with appropriate enterprise controls. The next chapter will focus on **Troubleshooting Guide**, providing systematic approaches to diagnosing and resolving common operational issues.
 
 **Chapter 8 Preview: Troubleshooting Guide**
+
 - Decision trees for common issues
 - Performance debugging techniques
 - Infrastructure problem resolution
@@ -1918,6 +1926,7 @@ This security foundation enables production deployment of llm-d with appropriate
 ---
 
 **References:**
+
 - [Kubernetes Security Documentation](https://kubernetes.io/docs/concepts/security/)
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
 - [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/)

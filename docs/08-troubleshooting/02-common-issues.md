@@ -13,11 +13,13 @@ This section covers the most frequently encountered issues in llm-d deployments,
 ### Issue: Model Deployment Stuck in Pending State
 
 **Symptoms:**
+
 - LLMDeployment remains in `Pending` status
 - Pods not being created
 - No error messages in deployment status
 
 **Root Causes:**
+
 1. Insufficient GPU resources
 2. Node selector constraints
 3. Taints and tolerations mismatch
@@ -72,11 +74,13 @@ spec:
 ### Issue: Image Pull Errors
 
 **Symptoms:**
+
 - Pod status shows `ErrImagePull` or `ImagePullBackOff`
 - Events show authentication failures
 - Registry unreachable errors
 
 **Root Causes:**
+
 1. Missing image pull secrets
 2. Incorrect registry credentials
 3. Network connectivity to registry
@@ -119,11 +123,13 @@ spec:
 ### Issue: CRD Version Conflicts
 
 **Symptoms:**
+
 - API version errors when applying manifests
 - `no matches for kind "LLMDeployment"`
 - Schema validation failures
 
 **Root Causes:**
+
 1. Outdated CRD definitions
 2. Multiple CRD versions installed
 3. Client/server version mismatch
@@ -150,11 +156,13 @@ kubectl convert -f old-deployment.yaml --output-version=inference.llm-d.io/v1alp
 ### Issue: High Inference Latency
 
 **Symptoms:**
+
 - P95 latency > 5 seconds
 - Inconsistent response times
 - Timeouts under load
 
 **Root Causes:**
+
 1. Cold starts
 2. Insufficient GPU memory
 3. CPU throttling
@@ -207,11 +215,13 @@ spec:
 ### Issue: Memory Leaks
 
 **Symptoms:**
+
 - Gradual memory increase
 - OOMKilled pods after hours/days
 - Degrading performance over time
 
 **Root Causes:**
+
 1. Model caching issues
 2. Request queue buildup
 3. Tensor memory not released
@@ -269,11 +279,13 @@ spec:
 ### Issue: CUDA Out of Memory
 
 **Symptoms:**
+
 - `CUDA out of memory` errors
 - Model loading failures
 - Inference requests rejected
 
 **Root Causes:**
+
 1. Model too large for GPU
 2. Batch size too high
 3. Memory fragmentation
@@ -319,11 +331,13 @@ spec:
 ### Issue: GPU Not Detected
 
 **Symptoms:**
+
 - `nvidia-smi: command not found`
 - No GPU resources in node capacity
 - CUDA library errors
 
 **Root Causes:**
+
 1. Missing NVIDIA drivers
 2. Device plugin not running
 3. Container runtime misconfiguration
@@ -350,11 +364,13 @@ kubectl apply -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.1
 ### Issue: Service Discovery Failures
 
 **Symptoms:**
+
 - DNS resolution failures
 - Service endpoints empty
 - Intermittent connectivity
 
 **Root Causes:**
+
 1. CoreDNS issues
 2. Service selector mismatch
 3. Network policies blocking traffic
@@ -409,11 +425,13 @@ spec:
 ### Issue: Ingress Configuration Problems
 
 **Symptoms:**
+
 - 502/503 errors from load balancer
 - SSL/TLS certificate errors
 - Routing to wrong backend
 
 **Root Causes:**
+
 1. Ingress controller not running
 2. Incorrect backend service
 3. Missing annotations
@@ -456,11 +474,13 @@ spec:
 ### Issue: Model Loading Failures
 
 **Symptoms:**
+
 - "Model file not found" errors
 - Slow model initialization
 - Partial model loads
 
 **Root Causes:**
+
 1. PVC not mounted correctly
 2. Insufficient storage space
 3. Wrong file permissions
@@ -517,11 +537,13 @@ spec:
 ### Issue: Missing Metrics
 
 **Symptoms:**
+
 - Prometheus targets down
 - No metrics in Grafana
 - Incomplete dashboards
 
 **Root Causes:**
+
 1. Metrics port not exposed
 2. Service monitor misconfigured
 3. Prometheus scrape config wrong

@@ -21,6 +21,7 @@ error validating data: ValidationError(LLMDeployment): unknown field "spec.model
 **Cause**: Outdated or missing CRD definitions
 
 **Solution**:
+
 ```bash
 # Update CRDs
 kubectl apply -f https://github.com/llm-d/llm-d/releases/latest/download/crds.yaml
@@ -38,6 +39,7 @@ Error creating: pods "llm-model-5d4b8c" is forbidden: exceeded quota: gpu-quota,
 **Cause**: Namespace resource quota limits reached
 
 **Solution**:
+
 ```bash
 # Check quota
 kubectl describe resourcequota -n <namespace>
@@ -55,6 +57,7 @@ Failed to pull image "registry.example.com/models/llama2:latest": rpc error: cod
 **Cause**: Missing or invalid image pull credentials
 
 **Solution**:
+
 ```bash
 # Create pull secret
 kubectl create secret docker-registry regcred \
@@ -79,6 +82,7 @@ RuntimeError: CUDA out of memory. Tried to allocate 2.00 GiB (GPU 0; 15.78 GiB t
 **Cause**: Model size exceeds GPU memory
 
 **Solutions**:
+
 ```yaml
 # 1. Enable quantization
 spec:
@@ -109,6 +113,7 @@ Readiness probe failed: Get "http://10.244.2.45:8080/health": context deadline e
 **Cause**: Large model taking too long to load
 
 **Solution**:
+
 ```yaml
 spec:
   # Increase timeouts
@@ -133,6 +138,7 @@ RuntimeError: Expected tensor for argument #1 'indices' to have scalar type Long
 **Cause**: Data type mismatch in model inputs
 
 **Solution**:
+
 ```python
 # Ensure correct data types
 input_ids = input_ids.long()  # Convert to Long tensor
@@ -157,6 +163,7 @@ curl: (7) Failed to connect to model-service port 8080: Connection refused
 **Cause**: Service not running or wrong port
 
 **Solution**:
+
 ```bash
 # Check service and endpoints
 kubectl get svc,endpoints model-service -n <namespace>
@@ -177,6 +184,7 @@ nslookup: can't resolve 'model-service.default.svc.cluster.local'
 **Cause**: CoreDNS issues or service doesn't exist
 
 **Solution**:
+
 ```bash
 # Check CoreDNS
 kubectl get pods -n kube-system -l k8s-app=kube-dns
@@ -197,6 +205,7 @@ x509: certificate signed by unknown authority
 **Cause**: Self-signed certificate or missing CA
 
 **Solution**:
+
 ```yaml
 # Add CA certificate to deployment
 spec:
@@ -223,6 +232,7 @@ CUDA driver version is insufficient for CUDA runtime version
 **Cause**: Incompatible CUDA/driver versions
 
 **Solution**:
+
 ```bash
 # Check versions
 nvidia-smi  # Driver version
@@ -244,6 +254,7 @@ RuntimeError: No CUDA GPUs are available
 **Cause**: GPU not allocated or not visible
 
 **Solution**:
+
 ```yaml
 # Ensure GPU request
 spec:
@@ -270,6 +281,7 @@ NCCL WARN transport/net.cc:102 NCCL call failed ret -2 (Internal error)
 **Cause**: Multi-GPU communication issues
 
 **Solution**:
+
 ```bash
 # Set NCCL environment variables
 env:
@@ -294,6 +306,7 @@ Last State: Terminated
 **Cause**: Container exceeded memory limit
 
 **Solution**:
+
 ```yaml
 # Increase memory limits
 spec:
@@ -318,6 +331,7 @@ OSError: [Errno 28] No space left on device: '/dev/shm/...'
 **Cause**: Insufficient shared memory for data loading
 
 **Solution**:
+
 ```yaml
 spec:
   volumes:
@@ -344,6 +358,7 @@ Warning  ProvisioningFailed  Failed to provision volume: "StorageClass not found
 **Cause**: StorageClass doesn't exist or can't provision
 
 **Solution**:
+
 ```bash
 # Check available storage classes
 kubectl get storageclass
@@ -371,6 +386,7 @@ MountVolume.MountDevice failed for volume "pvc-123": rpc error: code = Internal 
 **Cause**: Volume already mounted elsewhere or filesystem issues
 
 **Solution**:
+
 ```bash
 # Check volume attachments
 kubectl get volumeattachments
@@ -394,6 +410,7 @@ Error from server (Forbidden): llmdeployments.inference.llm-d.io is forbidden: U
 **Cause**: Missing RBAC permissions
 
 **Solution**:
+
 ```yaml
 # Create RBAC rules
 apiVersion: rbac.authorization.k8s.io/v1
@@ -428,6 +445,7 @@ Error response from daemon: Get https://registry.example.com/v2/: unauthorized: 
 **Cause**: Invalid registry credentials
 
 **Solution**:
+
 ```bash
 # Test credentials
 docker login registry.example.com

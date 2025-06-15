@@ -36,6 +36,7 @@ graph TD
 ### Resolution Steps
 
 #### Resource Issues
+
 ```bash
 # Check available resources
 kubectl describe nodes | grep -E "Allocatable|Allocated" -A5
@@ -48,6 +49,7 @@ kubectl describe pod <pod-name> -n <namespace> | grep -A5 "Requests"
 ```
 
 #### Image Pull Errors
+
 ```bash
 # Check image pull secrets
 kubectl get secrets -n <namespace>
@@ -89,6 +91,7 @@ graph TD
 ### Diagnostic Commands
 
 #### Performance Metrics
+
 ```bash
 # GPU utilization
 nvidia-smi -l 1

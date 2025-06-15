@@ -574,7 +574,7 @@ data:
   environments.yaml: |
     environments:
       development:
-        namespace: "llm-d-dev"
+        namespace: "development"
         replicas:
           prefill: 1
           decode: 1
@@ -586,7 +586,7 @@ data:
           detailed_logging: true
         
       staging:
-        namespace: "llm-d-staging"
+        namespace: "staging"
         replicas:
           prefill: 2
           decode: 4
@@ -598,7 +598,7 @@ data:
           detailed_logging: false
         
       production:
-        namespace: "llm-d-production"
+        namespace: "production"
         replicas:
           prefill: 4
           decode: 8
@@ -1257,7 +1257,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: llm-d-intelligent-hpa
-  namespace: llm-d-production
+  namespace: production
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -1326,7 +1326,7 @@ apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
 metadata:
   name: llm-d-vpa
-  namespace: llm-d-production
+  namespace: production
 spec:
   targetRef:
     apiVersion: apps/v1

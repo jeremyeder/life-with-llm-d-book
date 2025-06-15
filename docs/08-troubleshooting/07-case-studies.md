@@ -11,6 +11,7 @@ This section presents real-world troubleshooting scenarios encountered in produc
 ## Case Study 1: The Mystery of the Disappearing GPUs
 
 ### Background
+
 **Company**: TechCorp  
 **Environment**: EKS cluster with 20 p3.8xlarge nodes  
 **Model**: GPT-3.5 equivalent (13B parameters)  
@@ -123,6 +124,7 @@ $ kubectl get nodes -o custom-columns=NAME:.metadata.name,GPU:.status.capacity."
 3. **Testing Process**: Test driver compatibility in staging first
 
 **Prevention Measures Implemented**:
+
 ```yaml
 # Added monitoring for driver version drift
 apiVersion: monitoring.coreos.com/v1
@@ -150,6 +152,7 @@ spec:
 ## Case Study 2: The Gradual Performance Degradation
 
 ### Background
+
 **Company**: AIStartup  
 **Environment**: On-premises Kubernetes with V100 GPUs  
 **Model**: Custom fine-tuned BERT-large  
@@ -399,6 +402,7 @@ class ModelServer:
 ## Case Study 3: The Multi-Region Disaster
 
 ### Background
+
 **Company**: GlobalAI  
 **Environment**: Multi-region deployment (us-east-1, eu-west-1, ap-southeast-1)  
 **Model**: Multiple LLMs serving global traffic  
@@ -509,11 +513,13 @@ EOF
 ### Post-Disaster Analysis
 
 **Performance Impact**:
+
 - Latency increased 250% during emergency
 - 12% of requests failed during 1-hour window
 - Revenue loss: $500K estimated
 
 **Recovery Timeline**:
+
 ```mermaid
 gantt
     title Disaster Recovery Timeline
@@ -662,6 +668,7 @@ spec:
 ## Case Study 4: The Kubernetes Upgrade Gone Wrong
 
 ### Background
+
 **Company**: MLPlatform Inc  
 **Environment**: Self-managed Kubernetes 1.25 → 1.28 upgrade  
 **Models**: 50+ different models across multiple namespaces  

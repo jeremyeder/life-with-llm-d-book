@@ -13,24 +13,28 @@ This section provides step-by-step emergency response procedures for critical in
 ### Severity Levels
 
 #### P0 - Critical (Response: Immediate)
+
 - Complete service outage
 - Data loss or corruption
 - Security breach
 - GPU cluster failure
 
 #### P1 - High (Response: 15 minutes)
+
 - Significant performance degradation (>50% latency increase)
 - Partial service outage (>50% requests failing)
 - High error rates (>10%)
 - Resource exhaustion
 
 #### P2 - Medium (Response: 1 hour)
+
 - Minor performance issues
 - Single pod failures
 - Non-critical feature unavailable
 - Warning-level alerts
 
 #### P3 - Low (Response: Next business day)
+
 - Cosmetic issues
 - Documentation problems
 - Non-urgent optimizations

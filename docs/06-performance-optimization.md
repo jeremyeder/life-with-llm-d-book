@@ -335,12 +335,14 @@ if __name__ == "__main__":
 #### Hopper Generation (H100/H200)
 
 **H100 Specifications:**
+
 - **Memory**: 80GB HBM3, 3.35 TB/s bandwidth
 - **Compute**: 1,979 TFLOPS FP8, 989 TFLOPS FP16
 - **Transformer Engine**: 4th-gen with FP8 precision
 - **Power**: 700W TDP
 
 **H200 Enhancements:**
+
 - **Memory**: 141GB HBM3e (+76% capacity), 4.8 TB/s (+43% bandwidth)
 - **Performance**: 37-45% faster inference vs H100
 - **Energy Efficiency**: 50% less energy per inference operation
@@ -412,6 +414,7 @@ spec:
 #### Blackwell Generation (B200)
 
 **Revolutionary Improvements:**
+
 - **Memory**: 192GB HBM3e, 8 TB/s bandwidth (2.4x H100)
 - **Compute**: 20 PFLOPS FP4, 10 PFLOPS FP8 (sparse)
 - **New Precisions**: FP4, FP6 with micro-tensor scaling
@@ -493,12 +496,14 @@ spec:
 #### MI300X/MI350X Advantages
 
 **MI300X Specifications:**
+
 - **Memory**: 192GB HBM3e, 5.2 TB/s bandwidth
 - **Compute**: 1,307 TFLOPS FP8, 2,615 TFLOPS FP16
 - **Architecture**: CDNA 3 with 8 vertically stacked XCDs
 - **Advantage**: 2.4x memory capacity vs H100
 
 **MI350X Next Generation:**
+
 - **Memory**: 288GB HBM3e, 8 TB/s bandwidth
 - **New Features**: FP4/FP6 precision support
 - **Performance**: 4x generation-over-generation AI improvement
@@ -1719,18 +1724,21 @@ RDMA (Remote Direct Memory Access) provides critical performance benefits for la
 ### Why RDMA Matters for LLM Inference
 
 Modern LLM serving requires **high-bandwidth, low-latency communication** between:
+
 - Multi-GPU model sharding (pipeline parallelism)
 - Distributed KV-cache systems (disaggregated inference)
 - Model weight distribution across nodes
 - Real-time metric collection and monitoring
 
 **Traditional TCP/IP Limitations:**
+
 - **CPU overhead**: 10-15% CPU utilization for network processing
 - **Copy overhead**: Multiple memory copies increase latency
 - **Kernel bypassing**: User-space to kernel-space transitions
 - **Buffer management**: Additional memory allocations and deallocations
 
 **RDMA Benefits:**
+
 - **Zero-copy transfers**: Direct memory-to-memory transfers
 - **Kernel bypass**: User-space networking eliminates system calls
 - **Low CPU overhead**: Less than 2% CPU utilization for network operations
@@ -2299,12 +2307,14 @@ Model optimization with quantization, pruning, and distillation can reduce infer
 [Neural Magic's LLM-Compressor](https://github.com/neuralmagic/llm-compressor) provides comprehensive model optimization for production LLM deployments:
 
 **Key Optimization Techniques:**
+
 - **Quantization**: INT8, INT4, and mixed-precision inference
 - **Sparsity**: Structured and unstructured pruning
 - **Knowledge Distillation**: Model compression with quality preservation
 - **Dynamic Quantization**: Runtime optimization based on input characteristics
 
 **Integration Benefits:**
+
 - **Native vLLM Support**: Seamless integration with llm-d's inference engine
 - **Hardware Acceleration**: Optimized for NVIDIA GPUs and future hardware
 - **Quality Preservation**: Advanced calibration techniques maintain model accuracy
@@ -2676,6 +2686,7 @@ The llm-d-benchmark project provides a Kubernetes-native automated workflow for 
 The [llm-d-benchmark](https://github.com/llm-d/llm-d-benchmark) project provides production-ready performance evaluation capabilities specifically designed for llm-d deployments:
 
 **Key Capabilities:**
+
 - **Automated Workflows**: Kubernetes-native orchestration for scalable testing
 - **Multi-Platform Support**: GKE, OpenShift, various GPU configurations  
 - **Real-World Scenarios**: Practical workload patterns and load profiles
@@ -3519,24 +3530,28 @@ Systematic performance optimization requires a balanced approach across hardware
 ### Performance Optimization Checklist
 
 **1. Hardware Foundation**
+
 - ✅ Select GPUs based on model size and performance requirements
 - ✅ Implement RDMA networking for multi-GPU and multi-node deployments
 - ✅ Configure appropriate storage for model loading and caching
 - ✅ Optimize memory allocation and GPU utilization
 
 **2. Model Optimization**
+
 - ✅ Apply quantization (INT8/INT4) using LLM-Compressor
 - ✅ Evaluate model compression vs quality trade-offs
 - ✅ Implement model caching and loading strategies
 - ✅ Test optimized models with production workloads
 
 **3. Systematic Evaluation**
+
 - ✅ Use llm-d-benchmark for reproducible performance testing
 - ✅ Establish baseline metrics and performance targets
 - ✅ Implement continuous performance monitoring
 - ✅ Create automated alerting for performance degradation
 
 **4. Cost Efficiency**
+
 - ✅ Monitor cost per token and GPU utilization
 - ✅ Implement auto-scaling based on demand patterns
 - ✅ Optimize batch sizes and request scheduling
@@ -3547,6 +3562,7 @@ Systematic performance optimization requires a balanced approach across hardware
 This comprehensive performance optimization framework provides the foundation for production-ready LLM deployments. The next chapter will focus on **Security and Compliance**, covering authentication, authorization, network policies, and compliance frameworks essential for enterprise LLM deployments.
 
 **Chapter 7 Preview: Security and Compliance**
+
 - RBAC and authentication strategies
 - Network security and policy enforcement  
 - Secrets management and encryption
