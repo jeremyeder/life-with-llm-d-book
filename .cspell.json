@@ -76,7 +76,16 @@
     "xlabel",
     "ylabel",
     "xticks",
-    "runbooks"
+    "runbooks",
+    "slos",
+    "llmdgpu",
+    "llmdkv",
+    "sklearn",
+    "coef",
+    "promtool",
+    "maxmemory",
+    "mttr",
+    "mtbf"
   ],
   "ignorePaths": [
     "node_modules/**",
