@@ -61,7 +61,22 @@
     "apiextensions",
     "inferenceservices",
     "apiv",
-    "seqs"
+    "seqs",
+    "codellama",
+    "dialo",
+    "blenderbot",
+    "matplotlib",
+    "seaborn",
+    "numpy",
+    "ipynb",
+    "pyplot",
+    "kwargs",
+    "isoformat",
+    "figsize",
+    "xlabel",
+    "ylabel",
+    "xticks",
+    "runbooks"
   ],
   "ignorePaths": [
     "node_modules/**",
