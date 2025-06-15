@@ -1733,7 +1733,7 @@ Modern LLM serving requires **high-bandwidth, low-latency communication** betwee
 **RDMA Benefits:**
 - **Zero-copy transfers**: Direct memory-to-memory transfers
 - **Kernel bypass**: User-space networking eliminates system calls
-- **Low CPU overhead**: <2% CPU utilization for network operations
+- **Low CPU overhead**: Less than 2% CPU utilization for network operations
 - **Predictable latency**: Hardware-level flow control and reliability
 
 ### RDMA Technologies for Kubernetes
