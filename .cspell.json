@@ -54,7 +54,14 @@
     "huggingface",
     "letsencrypt",
     "storageclass",
-    "networkpolicies"
+    "networkpolicies",
+    "cuda",
+    "gptq",
+    "autoregressive",
+    "apiextensions",
+    "inferenceservices",
+    "apiv",
+    "seqs"
   ],
   "ignorePaths": [
     "node_modules/**",
