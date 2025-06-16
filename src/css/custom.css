@@ -130,10 +130,75 @@ h1, h2, h3, h4, h5, h6 {
 
 .theme-code-block {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 [data-theme='dark'] .theme-code-block {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Collapsible code blocks - show first 10 lines by default */
+.prism-code {
+  max-height: 16em; /* Approximately 10 lines */
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  position: relative;
+}
+
+.prism-code.expanded {
+  max-height: none;
+}
+
+/* Fade effect at bottom of collapsed code blocks */
+.theme-code-block:not(.expanded)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3em;
+  background: linear-gradient(transparent, var(--ifm-pre-background));
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme='dark'] .theme-code-block:not(.expanded)::after {
+  background: linear-gradient(transparent, var(--ifm-pre-background));
+}
+
+/* Expand/collapse button */
+.code-expand-button {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: var(--ifm-color-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.2s ease;
+}
+
+.code-expand-button:hover {
+  background: var(--ifm-color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.theme-code-block.expanded .code-expand-button {
+  bottom: 8px;
+  right: 8px;
+}
+
+/* Hide expand button for short code blocks */
+.theme-code-block[data-short="true"] .code-expand-button {
+  display: none;
+}
+
+.theme-code-block[data-short="true"]::after {
+  display: none;
 }
 
 /* Copy button styling */
