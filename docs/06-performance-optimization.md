@@ -351,7 +351,7 @@ if __name__ == "__main__":
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-70b-h100-optimized
+  name: llama-3.1-70b-h100-optimized
   namespace: production
 spec:
   model:
@@ -424,7 +424,7 @@ spec:
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-405b-b200-optimized
+  name: llama-3.1-405b-b200-optimized
   namespace: next-gen-production
 spec:
   model:
@@ -513,7 +513,7 @@ spec:
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-70b-mi300x-efficient
+  name: llama-3.1-70b-mi300x-efficient
   namespace: amd-production
 spec:
   model:
@@ -1193,7 +1193,7 @@ For the largest models, pipeline parallelism enables deployment across multiple 
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-405b-pipeline-parallel
+  name: llama-3.1-405b-pipeline-parallel
   namespace: ultra-large-models
 spec:
   model:
@@ -1955,7 +1955,7 @@ spec:
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-70b-rdma
+  name: llama-3.1-70b-rdma
   namespace: llm-d-production
 spec:
   model:
@@ -1995,7 +1995,7 @@ spec:
         podAffinityTerm:
           labelSelector:
             matchLabels:
-              app: llama3-70b-rdma
+              app: llama-3.1-70b-rdma
           topologyKey: kubernetes.io/hostname
 
   engine:
@@ -2165,7 +2165,7 @@ class RDMAPerformanceTester:
                 response = requests.post(
                     f"{service_url}/v1/completions",
                     json={
-                        "model": "llama3-70b-rdma",
+                        "model": "llama-3.1-70b-rdma",
                         "prompt": prompt,
                         "max_tokens": 150,
                         "temperature": 0.7
@@ -2550,7 +2550,7 @@ if __name__ == "__main__":
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-8b-int8-optimized
+  name: llama-3.1-8b-int8-optimized
   namespace: llm-d-production
   labels:
     optimization.llm-d.ai/type: "quantized"
@@ -2558,7 +2558,7 @@ metadata:
     optimization.llm-d.ai/compressor: "neural-magic"
 spec:
   model:
-    name: "llama3-8b-int8-balanced"
+    name: "llama-3.1-8b-int8-balanced"
     source: "local"
     path: "/optimized-models/llama-3-8b/llama-3-8b-int8-balanced"
     
@@ -2641,7 +2641,7 @@ spec:
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-8b-baseline
+  name: llama-3.1-8b-baseline
   namespace: llm-d-production
   labels:
     optimization.llm-d.ai/type: "baseline"
@@ -2719,7 +2719,7 @@ class BenchmarkConfig:
     platform: str              # gke, ocp, minikube
     hardware: str              # A100, H100, H100MIG, L40
     deployment_method: str     # standalone, deployer
-    model_size: str           # llama-3b, llama-8b, llama-70b
+    model_size: str           # llama-3b, llama-3.1-8b, llama-3.1-70b
     optimization: Optional[str] = None  # int8, int4, sparsity
     rdma_enabled: bool = False
     test_duration_minutes: int = 10
@@ -3041,7 +3041,7 @@ def create_evaluation_scenarios() -> List[BenchmarkConfig]:
     ]
     
     # Model sizes to test
-    model_sizes = ["llama-3b", "llama-8b", "llama-70b"]
+    model_sizes = ["llama-3b", "llama-3.1-8b", "llama-3.1-70b"]
     
     # Optimization strategies
     optimizations = [None, "int8", "int4"]
@@ -3050,7 +3050,7 @@ def create_evaluation_scenarios() -> List[BenchmarkConfig]:
         for model in model_sizes:
             for optimization in optimizations:
                 # Skip combinations that don't make sense
-                if model == "llama-70b" and hardware == "L40":
+                if model == "llama-3.1-70b" and hardware == "L40":
                     continue  # L40 insufficient for 70B
                 if optimization == "int4" and model == "llama-3b":
                     continue  # Unnecessary for small models
@@ -3501,8 +3501,8 @@ async def main():
     
     # Example service endpoints
     endpoints = [
-        "http://llama3-8b-service:8000",
-        "http://llama3-70b-service:8000"
+        "http://llama-3.1-8b-service:8000",
+        "http://llama-3.1-70b-service:8000"
     ]
     
     # Run load test
@@ -3568,3 +3568,13 @@ This comprehensive performance optimization framework provides the foundation fo
 - Secrets management and encryption
 - Compliance frameworks (SOC2, GDPR, HIPAA)
 - Security monitoring and incident response
+
+---
+
+:::info References
+
+- [Shared Configuration Reference](./appendix/shared-config.md)
+- [Performance Tuning Guide](https://docs.vllm.ai/en/latest/models/performance.html)
+- [NVIDIA GPU Optimization](https://developer.nvidia.com/blog/optimizing-inference-performance-for-llms/)
+
+:::

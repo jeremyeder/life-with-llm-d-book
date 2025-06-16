@@ -10,5 +10,10 @@
     "allowed_elements": ["br", "strong", "em", "code", "pre", "blockquote", "h1", "h2", "h3", "h4", "h5", "h6", "a", "img", "ul", "ol", "li", "table", "thead", "tbody", "tr", "th", "td", "details", "summary", "kbd", "sup", "sub"]
   },
   "MD040": false,
-  "MD041": false
+  "MD041": false,
+  "MD029": { "style": "ordered" },
+  "MD012": { "maximum": 2 },
+  "MD022": { "lines_above": 1, "lines_below": 1 },
+  "MD031": { "list_items": true },
+  "MD032": { "list_items": true }
 }

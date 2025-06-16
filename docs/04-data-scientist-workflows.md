@@ -105,7 +105,7 @@ Create deployment configurations that balance performance with resource utilizat
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-8b-dev
+  name: llama-3.1-8b-dev
   namespace: data-science-dev
 spec:
   model:
@@ -777,11 +777,11 @@ Implement comprehensive version control for models:
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: ModelVersion
 metadata:
-  name: llama3-8b-v1-2-0
+  name: llama-3.1-8b-v1-2-0
   namespace: data-science-production
 spec:
   model:
-    name: "llama3-8b"
+    name: "llama-3.1-8b"
     version: "1.2.0"
     modelUri: "hf://meta-llama/Llama-3.1-8B-Instruct"
     

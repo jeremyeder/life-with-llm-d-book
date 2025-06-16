@@ -799,7 +799,7 @@ kubectl exec -n monitoring prometheus-0 -- \
 
 ```bash
 # Check GPU utilization
-kubectl top pods -n llm-d-production --sort-by='gpu'
+kubectl top pods -n production --sort-by='gpu'
 
 # Check memory usage
 kubectl describe nodes | grep -A 5 "Allocated resources"
@@ -819,7 +819,7 @@ kubectl exec -n monitoring prometheus-0 -- \
   'rate(llm_d_requests_total[5m])'
 
 # Check request size distribution
-kubectl logs -n llm-d-production deployment/llm-d-prefill \
+kubectl logs -n production deployment/llm-d-prefill \
   | grep "request_tokens" \
   | tail -50
 ```
@@ -833,7 +833,7 @@ kubectl exec -n monitoring prometheus-0 -- \
   'rate(llm_d_cache_hits_total[5m]) / rate(llm_d_cache_requests_total[5m])'
 
 # Check cache memory usage
-kubectl exec -n llm-d-production deployment/redis-cluster -- \
+kubectl exec -n production deployment/redis-cluster -- \
   redis-cli info memory
 ```
 
@@ -847,7 +847,7 @@ kubectl exec -n llm-d-production deployment/redis-cluster -- \
 ```bash
 kubectl scale deployment llm-d-decode \
   --replicas=16 \
-  -n llm-d-production
+  -n production
 ```
 
 ### GPU Resource Exhaustion
@@ -857,13 +857,13 @@ kubectl scale deployment llm-d-decode \
 
 ```bash
 # Check for OOM events
-kubectl get events -n llm-d-production \
+kubectl get events -n production \
   --field-selector reason=OOMKilled
 
 # Scale prefill pods if needed
 kubectl scale deployment llm-d-prefill \
   --replicas=6 \
-  -n llm-d-production
+  -n production
 ```
 
 ### Cache Misses
@@ -873,11 +873,11 @@ kubectl scale deployment llm-d-prefill \
 
 ```bash
 # Check cache eviction patterns
-kubectl exec -n llm-d-production deployment/redis-cluster -- \
+kubectl exec -n production deployment/redis-cluster -- \
   redis-cli info stats | grep evicted
 
 # Review cache sizing
-kubectl exec -n llm-d-production deployment/redis-cluster -- \
+kubectl exec -n production deployment/redis-cluster -- \
   redis-cli config get maxmemory
 ```
 
@@ -888,7 +888,7 @@ kubectl exec -n llm-d-production deployment/redis-cluster -- \
 
 ```bash
 # Check model loading times
-kubectl logs -n llm-d-production deployment/llm-d-prefill \
+kubectl logs -n production deployment/llm-d-prefill \
   | grep "model_load_time"
 
 # Trigger model warmup
@@ -930,26 +930,26 @@ Complete service outage - all inference requests failing
 ### 1. Verify Outage Scope
 ```bash
 # Check all service endpoints
-kubectl get pods -n llm-d-production -o wide
+kubectl get pods -n production -o wide
 
 # Check service status
-kubectl get svc -n llm-d-production
+kubectl get svc -n production
 
 # Verify ingress configuration
-kubectl get ingress -n llm-d-production
+kubectl get ingress -n production
 ```
 
 ### 2. Check Recent Changes
 
 ```bash
 # Check recent deployments
-kubectl rollout history deployment/llm-d-service -n llm-d-production
+kubectl rollout history deployment/llm-d-service -n production
 
 # Check recent configuration changes
-kubectl get events -n llm-d-production --sort-by='.lastTimestamp'
+kubectl get events -n production --sort-by='.lastTimestamp'
 
 # Review recent Helm releases
-helm history llm-d -n llm-d-production
+helm history llm-d -n production
 ```
 
 ### 3. Check Infrastructure Health
@@ -962,7 +962,7 @@ kubectl get nodes
 kubectl get events --all-namespaces --sort-by='.lastTimestamp'
 
 # Check storage health
-kubectl get pv,pvc -n llm-d-production
+kubectl get pv,pvc -n production
 ```
 
 ## Recovery Actions
@@ -971,27 +971,27 @@ kubectl get pv,pvc -n llm-d-production
 
 ```bash
 # Rollback to previous version
-kubectl rollout undo deployment/llm-d-service -n llm-d-production
+kubectl rollout undo deployment/llm-d-service -n production
 
 # Monitor rollback progress
-kubectl rollout status deployment/llm-d-service -n llm-d-production
+kubectl rollout status deployment/llm-d-service -n production
 ```
 
 ### Pod Recovery
 
 ```bash
 # Force pod restart
-kubectl delete pods -l app=llm-d-service -n llm-d-production
+kubectl delete pods -l app=llm-d-service -n production
 
 # Check pod startup progress
-kubectl get pods -n llm-d-production -w
+kubectl get pods -n production -w
 ```
 
 ### Service Recovery
 
 ```bash
 # Recreate services if needed
-kubectl delete svc llm-d-service -n llm-d-production
+kubectl delete svc llm-d-service -n production
 kubectl apply -f manifests/service.yaml
 ```
 
@@ -1504,5 +1504,6 @@ Continue your SRE journey with:
 - [SLI/SLO Best Practices](https://cloud.google.com/blog/products/management-tools/practical-guide-to-setting-slos)
 - [Prometheus Monitoring](https://prometheus.io/docs/practices/rules/)
 - [Kubernetes HPA Documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+- [Shared Configuration Reference](./appendix/shared-config.md)
 
 :::

@@ -1,0 +1,41 @@
+repos:
+  - repo: local
+    hooks:
+      - id: validate-model-names
+        name: Validate model naming consistency
+        entry: scripts/validate-model-names.sh
+        language: script
+        files: '^docs/.*\.md$'
+        
+      - id: validate-resource-specs
+        name: Validate resource specifications
+        entry: scripts/validate-resource-specs.sh
+        language: script
+        files: '^docs/.*\.md$'
+        
+      - id: validate-namespace-conventions
+        name: Validate namespace naming
+        entry: scripts/validate-namespaces.sh
+        language: script
+        files: '^docs/.*\.md$'
+        
+      - id: check-shared-config-refs
+        name: Check shared config references
+        entry: scripts/check-shared-config-refs.sh
+        language: script
+        files: '^docs/.*\.md$'
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.37.0
+    hooks:
+      - id: markdownlint
+        args: ['--config', '.markdownlint.json', '--fix']

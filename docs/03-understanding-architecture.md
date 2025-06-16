@@ -429,7 +429,7 @@ spec:
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-70b-service
+  name: llama-3.1-70b-service
   namespace: production
 spec:
   model:

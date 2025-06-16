@@ -1,165 +1,130 @@
-# Chapter X: Chapter Title
+---
+title: [Chapter Title]
+description: [Brief description following pattern: "Comprehensive guide to [topic], covering [key areas] and [outcome]"]
+sidebar_position: [Number]
+---
 
-> **Chapter Overview**  
-> Brief description of what this chapter covers and what readers will learn.
+# [Chapter Title]
 
-## Prerequisites
+:::info Chapter Overview
+This chapter focuses on [main topic], covering [key areas]. You'll learn [specific outcomes and skills gained].
+:::
 
-- [ ] Requirement 1
-- [ ] Requirement 2
-- [ ] Requirement 3
+## [First Major Section]
 
-> ⚠️ **Important**  
-> Critical prerequisites or warnings before proceeding.
+### [Subsection Title]
 
-## Overview
+[Content using standard patterns from shared config]
 
-High-level introduction to the chapter topic.
+```yaml
+# Example configuration - reference shared-config.md standards
+apiVersion: inference.llm-d.io/v1alpha1
+kind: LLMDeployment
+metadata:
+  name: llama-3.1-8b  # Use standard naming
+  namespace: production  # Use standard namespaces
+spec:
+  model:
+    name: "meta-llama/Llama-3.1-8B-Instruct"
+  resources:  # Reference shared config templates
+    requests:
+      memory: "16Gi"
+      cpu: "4"
+      nvidia.com/gpu: "1"
+    limits:
+      memory: "24Gi"
+      cpu: "8"
+      nvidia.com/gpu: "1"
+```
 
-### What You'll Learn
+### [Another Subsection]
 
-- Key concept 1
-- Key concept 2
-- Key concept 3
+```python title="example-script.py" showLineNumbers
+#!/usr/bin/env python3
+"""
+[Script description]
+"""
 
-## Section 1: Topic Name
+# Standard imports pattern
+import os
+import json
+from typing import Dict, List, Optional
 
-### Step-by-Step Procedure
+def main():
+    """Main function following standard patterns."""
+    pass
 
-1. **Step 1**: Description
-   ```yaml
-   # Code example with syntax highlighting
-   apiVersion: v1
-   kind: ConfigMap
-   metadata:
-     name: example
-   ```
+if __name__ == "__main__":
+    main()
+```
 
-2. **Step 2**: Description
-   ```bash
-   # Command examples
-   kubectl apply -f example.yaml
-   kubectl get pods
-   ```
+## [Second Major Section]
 
-> 💡 **Tip**  
-> Helpful hints and best practices.
-
-### Verification
-
-Verify the implementation works correctly:
+### [Implementation Example]
 
 ```bash
-# Verification commands
-kubectl get all
-kubectl describe pod example
+# Standard kubectl commands using proper namespaces
+kubectl get llmdeployments -n production
+kubectl describe llmdeployment llama-3.1-8b -n production
+
+# Always include context and error handling
+if ! kubectl get namespace production > /dev/null 2>&1; then
+    echo "Creating production namespace..."
+    kubectl create namespace production
+fi
 ```
-
-Expected output:
-```
-NAME                READY   STATUS    RESTARTS   AGE
-pod/example-pod     1/1     Running   0          30s
-```
-
-## Section 2: Advanced Configuration
-
-### Common Issues and Solutions
-
-> 🔧 **Troubleshooting**
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Error message | Root cause | Step-by-step fix |
-| Another error | Why it happens | How to resolve |
 
 ## Best Practices
 
-- ✅ **Do**: Recommended approach
-- ❌ **Don't**: What to avoid
-- 💡 **Consider**: Additional options
+### [Topic-Specific Practices]
 
-## Performance Considerations
+- **[Practice 1]**: [Description and rationale]
+- **[Practice 2]**: [Description and rationale]
+- **[Practice 3]**: [Description and rationale]
 
-Key performance aspects to consider:
+### Common Pitfalls
 
-1. **Resource Allocation**
-   - CPU and memory requirements
-   - Storage considerations
+1. **[Pitfall 1]**: [Description and solution]
+2. **[Pitfall 2]**: [Description and solution]
 
-2. **Scaling Factors**
-   - Horizontal scaling limits
-   - Vertical scaling options
+## Summary and Next Steps
 
-## Security Notes
+### Key Takeaways
 
-> ⚠️ **Security**  
-> Important security considerations for this configuration.
+- ✅ [Achievement 1]: [Brief description]
+- ✅ [Achievement 2]: [Brief description]  
+- ✅ [Achievement 3]: [Brief description]
 
-- Security best practice 1
-- Security best practice 2
+### [Chapter Integration]
 
-## Real-World Example
+This chapter builds on [previous chapters] and prepares you for [next topics]. The [specific elements] established here are essential for [future applications].
 
-Complete working example with context:
+**Next Steps:**
 
-```yaml
-# Complete YAML manifest
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: real-world-example
-  labels:
-    app: llm-d-example
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: llm-d-example
-  template:
-    metadata:
-      labels:
-        app: llm-d-example
-    spec:
-      containers:
-      - name: container
-        image: example:latest
-        resources:
-          requests:
-            memory: "2Gi"
-            cpu: "1000m"
-          limits:
-            memory: "4Gi"
-            cpu: "2000m"
-```
-
-### Deployment Instructions
-
-```bash
-# Deploy the example
-kubectl apply -f real-world-example.yaml
-
-# Monitor deployment
-kubectl rollout status deployment/real-world-example
-
-# Verify functionality
-kubectl get pods -l app=llm-d-example
-```
-
-## Summary
-
-- Key takeaway 1
-- Key takeaway 2
-- Key takeaway 3
-
-## Next Steps
-
-- Link to next chapter
-- Related topics to explore
-- Additional resources
+- Move to [Next Chapter](./##-next-chapter.md) for [next topic]
+- Review [Related Chapter](./##-related-chapter.md) for [related concepts]
+- Reference [Shared Configuration](./appendix/shared-config.md) for standard specifications
 
 ---
 
-> 📚 **References**  
-> - [External documentation link](#)
-> - [Related chapter reference](#)
-> - [Community resource](#)
+:::info References
+
+- [Primary Reference](https://example.com) - [Description]
+- [Secondary Reference](https://example.com) - [Description]
+- [Shared Configuration Reference](./appendix/shared-config.md)
+- [Related Chapter Reference](./##-related-chapter.md)
+
+:::
+
+<!--
+TEMPLATE USAGE NOTES:
+1. Replace all [bracketed] placeholders with actual content
+2. Ensure all code examples use standard naming from shared-config.md
+3. Include practical, runnable examples
+4. Add cross-references to related chapters
+5. Validate with scripts before committing:
+   - scripts/validate-model-names.sh
+   - scripts/validate-resource-specs.sh  
+   - scripts/validate-namespaces.sh
+   - scripts/check-shared-config-refs.sh
+-->

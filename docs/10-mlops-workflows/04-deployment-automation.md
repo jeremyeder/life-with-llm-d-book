@@ -616,7 +616,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: llama4-progressive-deployment
+  name: llama-3.1-progressive-deployment
   namespace: argo
 spec:
   entrypoint: progressive-rollout
@@ -796,7 +796,7 @@ spec:
         apiVersion: networking.istio.io/v1beta1
         kind: VirtualService
         metadata:
-          name: llama4-routing
+          name: llama-3.1-routing
           namespace: production
         spec:
           hosts:

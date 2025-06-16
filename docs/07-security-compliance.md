@@ -157,7 +157,7 @@ Each inference service should run with a dedicated ServiceAccount with minimal r
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: llama3-inference-sa
+  name: llama-3.1-inference-sa
   namespace: production
   annotations:
     # Disable automatic token mounting for security
@@ -190,7 +190,7 @@ metadata:
   namespace: production
 subjects:
 - kind: ServiceAccount
-  name: llama3-inference-sa
+  name: llama-3.1-inference-sa
   namespace: production
 roleRef:
   kind: Role
@@ -202,15 +202,15 @@ roleRef:
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: llama3-8b-secure
+  name: llama-3.1-8b-secure
   namespace: production
 spec:
   model:
-    name: "meta-llama/Meta-Llama-3-8B-Instruct"
+    name: "meta-llama/Llama-3.1-8B-Instruct"
     source: "huggingface"
   
   deployment:
-    serviceAccountName: llama3-inference-sa
+    serviceAccountName: llama-3.1-inference-sa
     
     # Security context
     securityContext:
@@ -358,7 +358,7 @@ metadata:
 spec:
   # Model-specific access controls
   models:
-  - name: "llama3-70b-production"
+  - name: "llama-3.1-70b-production"
     accessControl:
       allowedUsers:
       - "data-science-team"
@@ -869,11 +869,11 @@ data:
 apiVersion: serving.llm-d.ai/v1alpha1
 kind: InferenceService
 metadata:
-  name: secure-llama3-service
+  name: secure-llama-3.1-service
   namespace: production
 spec:
   model:
-    name: "llama3-8b-secure"
+    name: "llama-3.1-8b-secure"
     repository: "secure-model-repo"
     version: "v1.0.0"
     
@@ -1931,3 +1931,4 @@ This security foundation enables production deployment of llm-d with appropriate
 - [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
 - [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [HashiCorp Vault Documentation](https://developer.hashicorp.com/vault/docs)
+- [Shared Configuration Reference](./appendix/shared-config.md)

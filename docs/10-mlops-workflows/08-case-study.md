@@ -116,7 +116,7 @@ jobs:
     - name: Run model tests
       run: |
         pytest tests/test_model_functionality.py -v
-        python scripts/benchmark_model.py --model-path models/llama-3.1-7b
+        python scripts/benchmark_model.py --model-path models/llama-3.1-8b
     
     - name: Security scan
       run: |
@@ -131,7 +131,7 @@ jobs:
     - name: Deploy to staging
       run: |
         python scripts/deploy_model.py \
-          --model-name llama-3.1-7b \
+          --model-name llama-3.1-8b \
           --environment staging \
           --replicas 1
 ```
@@ -319,18 +319,18 @@ if __name__ == "__main__":
 Mike implements the progressive deployment:
 
 ```yaml
-# deployments/llama-3.1-7b-production.yaml
+# deployments/llama-3.1-8b-production.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: llama-3.1-7b-production
+  name: llama-3.1-8b-production
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/techstart-ai/mlops-config
     targetRevision: main
-    path: applications/llama-3.1-7b/overlays/production
+    path: applications/llama-3.1-8b/overlays/production
   destination:
     server: https://kubernetes.default.svc
     namespace: production
@@ -342,13 +342,13 @@ spec:
 apiVersion: inference.llm-d.io/v1alpha1
 kind: LLMDeployment
 metadata:
-  name: llama-3.1-7b
+  name: llama-3.1-8b
   namespace: production
 spec:
   model:
-    name: llama-3.1-7b
+    name: llama-3.1-8b
     source:
-      modelUri: s3://techstart-models/llama-3.1-7b/v1.0.0
+      modelUri: s3://techstart-models/llama-3.1-8b/v1.0.0
   
   replicas: 3
   
@@ -441,7 +441,7 @@ class BusinessMetricsCollector:
 class CustomerSupportBot:
     def __init__(self):
         self.metrics = BusinessMetricsCollector()
-        self.model_endpoint = "http://llama-3.1-7b-service.production.svc.cluster.local:8080"
+        self.model_endpoint = "http://llama-3.1-8b-service.production.svc.cluster.local:8080"
     
     async def handle_customer_query(self, user_id: str, query: str) -> dict:
         """Handle customer support query"""
@@ -544,7 +544,7 @@ async def run_response_length_experiment():
                 }],
                 "route": [{
                     "destination": {
-                        "host": "llama-3.1-7b-service",
+                        "host": "llama-3.1-8b-service",
                         "subset": "short-responses"
                     },
                     "weight": 50,
@@ -557,7 +557,7 @@ async def run_response_length_experiment():
                     }
                 }, {
                     "destination": {
-                        "host": "llama-3.1-7b-service", 
+                        "host": "llama-3.1-8b-service", 
                         "subset": "detailed-responses"
                     },
                     "weight": 50,

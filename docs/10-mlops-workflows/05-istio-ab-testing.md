@@ -115,11 +115,11 @@ spec:
           exact: "model-comparison-v1"
     route:
     - destination:
-        host: llama-3.1-7b-service
+        host: llama-3.1-8b-service
         subset: v1-0
       weight: 50
     - destination:
-        host: llama-3.1-7b-service
+        host: llama-3.1-8b-service
         subset: v1-1
       weight: 50
     fault:
@@ -139,7 +139,7 @@ spec:
           exact: "true"
     route:
     - destination:
-        host: llama-3.1-13b-service
+        host: llama-3.1-70b-service
         subset: canary
       weight: 100
   
@@ -150,7 +150,7 @@ spec:
           exact: "premium"
     route:
     - destination:
-        host: llama-3.1-13b-service
+        host: llama-3.1-70b-service
         subset: stable
       weight: 80
     - destination:
@@ -165,7 +165,7 @@ spec:
           exact: "enabled"
     route:
     - destination:
-        host: llama-3.1-7b-service
+        host: llama-3.1-8b-service
         subset: long-context
       weight: 100
     timeout: 30s
@@ -173,7 +173,7 @@ spec:
   # Default Route
   - route:
     - destination:
-        host: llama-3.1-7b-service
+        host: llama-3.1-8b-service
         subset: stable
       weight: 100
 ```
@@ -185,10 +185,10 @@ spec:
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: llama-3.1-7b-destinations
+  name: llama-3.1-8b-destinations
   namespace: production
 spec:
-  host: llama-3.1-7b-service
+  host: llama-3.1-8b-service
   trafficPolicy:
     connectionPool:
       tcp:
@@ -233,10 +233,10 @@ spec:
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: llama-3.1-13b-destinations
+  name: llama-3.1-70b-destinations
   namespace: production
 spec:
-  host: llama-3.1-13b-service
+  host: llama-3.1-70b-service
   subsets:
   - name: stable
     labels:
@@ -328,7 +328,7 @@ class ExperimentManager:
         for variant, weight in experiment.traffic_split.items():
             route = {
                 "destination": {
-                    "host": f"llama-3.1-7b-service",  # Base service
+                    "host": f"llama-3.1-8b-service",  # Base service
                     "subset": variant
                 },
                 "weight": weight,
@@ -445,7 +445,7 @@ def run_model_comparison_experiment():
     """Example: Compare two model versions"""
     
     experiment = Experiment(
-        id="llama-3.1-7b-v1-1-comparison",
+        id="llama-3.1-8b-v1-1-comparison",
         name="Llama4 7B v1.1 Performance Test",
         description="Compare v1.0 baseline against v1.1 candidate",
         traffic_split={
@@ -538,7 +538,7 @@ class ExperimentController:
             latency_query = f'''
             histogram_quantile(0.95, 
                 rate(istio_request_duration_milliseconds_bucket{{
-                    destination_service_name="llama-3.1-7b-service",
+                    destination_service_name="llama-3.1-8b-service",
                     destination_version="{variant}"
                 }}[5m])
             )
@@ -549,12 +549,12 @@ class ExperimentController:
             # Success rate
             success_query = f'''
             rate(istio_requests_total{{
-                destination_service_name="llama-3.1-7b-service",
+                destination_service_name="llama-3.1-8b-service",
                 destination_version="{variant}",
                 response_code!~"5.*"
             }}[5m]) / 
             rate(istio_requests_total{{
-                destination_service_name="llama-3.1-7b-service",
+                destination_service_name="llama-3.1-8b-service",
                 destination_version="{variant}"
             }}[5m])
             '''
@@ -564,7 +564,7 @@ class ExperimentController:
             # Request rate
             rate_query = f'''
             rate(istio_requests_total{{
-                destination_service_name="llama-3.1-7b-service",
+                destination_service_name="llama-3.1-8b-service",
                 destination_version="{variant}"
             }}[5m])
             '''
@@ -574,7 +574,7 @@ class ExperimentController:
             # Token generation rate (custom metric)
             tokens_query = f'''
             rate(llm_tokens_generated_total{{
-                model_name="llama-3.1-7b",
+                model_name="llama-3.1-8b",
                 version="{variant}"
             }}[5m])
             '''
