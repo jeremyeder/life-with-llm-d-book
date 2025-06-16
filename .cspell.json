@@ -149,7 +149,12 @@
     "int4",
     "peft",
     "lora",
-    "qlora"
+    "qlora",
+    "lifecycles",
+    "curlimages",
+    "llmdeployment",
+    "noheader",
+    "nounits"
   ],
   "ignorePaths": [
     "node_modules/**",
