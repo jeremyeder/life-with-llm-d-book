@@ -1,3 +1,4 @@
+import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -17,7 +18,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/introduction">
-            Get Started
+            Start Reading - 15min ⏱️
           </Link>
         </div>
       </div>
@@ -29,7 +30,7 @@ export default function Home() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
+      title={`${siteConfig.title}`}
       description="A comprehensive guide to deploying, operating, and optimizing Large Language Model workloads using llm-d on Kubernetes and OpenShift">
       <HomepageHeader />
       <main>

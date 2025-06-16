@@ -1217,7 +1217,7 @@ data:
 ## Resource Optimization Strategies
 
 :::tip Reference Configuration
-All resource specifications in this chapter follow the standard templates defined in the [Shared Configuration](../appendix/shared-config.md) reference.
+All resource specifications in this chapter follow the standard templates defined in the [Shared Configuration](./appendix/shared-config.md) reference.
 :::
 
 ### GPU Utilization Optimization
@@ -2353,7 +2353,7 @@ def analyze_enterprise_transformation():
 
 **If you're just getting started:**
 1. Enable INT8 quantization on one model
-2. Measure the quality impact (probably <5%)
+2. Measure the quality impact (probably less than 5%)
 3. Deploy to production and enjoy 50% cost savings
 
 **If you want to go deeper:**
@@ -2381,6 +2381,6 @@ def analyze_enterprise_transformation():
 - [LLM Quantization Guide](https://github.com/llm-efficiency/quantization)
 - [Kubernetes Autoscaling Best Practices](https://kubernetes.io/docs/concepts/cluster-administration/scaling/)
 - [SRE Workbook: SLO Engineering](https://sre.google/workbook/implementing-slos/)
-- [Shared Configuration Reference](../appendix/shared-config.md)
+- [Shared Configuration Reference](./appendix/shared-config.md)
 
 :::

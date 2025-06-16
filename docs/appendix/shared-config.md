@@ -69,20 +69,20 @@ spec:
 - Staging: `staging`
 - Production: `production`
 
-Example: `llama-8b-dev`, `llama-8b-staging`, `llama-8b-production`
+Example: `llama-3.1-8b-dev`, `llama-3.1-8b-staging`, `llama-3.1-8b-production`
 
 ## Service Naming Conventions
 
 ### LLMDeployment Resources
 
 - Format: `{model}-{size}-{environment}`
-- Examples: `llama-8b-dev`, `mistral-7b-production`
+- Examples: `llama-3.1-8b-dev`, `mistral-7b-production`
 
 ### Services and Endpoints
 
 - Internal: `{model}-{size}-svc`
 - External: `{model}-{size}-api`
-- Examples: `llama-8b-svc`, `llama-8b-api`
+- Examples: `llama-3.1-8b-svc`, `llama-3.1-8b-api`
 
 ## Port Standards
 
@@ -148,14 +148,14 @@ spec:
 ```yaml
 spec:
   rules:
-  - host: "llama-8b-api.example.com"
+  - host: "llama-3.1-8b-api.example.com"
     http:
       paths:
       - path: "/v1"
         pathType: Prefix
         backend:
           service:
-            name: "llama-8b-svc"
+            name: "llama-3.1-8b-svc"
             port:
               number: 8080
 ```
@@ -166,14 +166,14 @@ spec:
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: llama-8b-vs
+  name: llama-3.1-8b-vs
 spec:
   hosts:
-  - "llama-8b-api.example.com"
+  - "llama-3.1-8b-api.example.com"
   http:
   - route:
     - destination:
-        host: llama-8b-svc
+        host: llama-3.1-8b-svc
         port:
           number: 8080
 ```

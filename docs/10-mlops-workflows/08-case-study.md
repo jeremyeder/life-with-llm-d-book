@@ -725,5 +725,5 @@ The result: a production-ready LLM deployment system that scales with business g
 
 With Chapter 10 complete, teams can now implement comprehensive MLOps workflows for their LLM deployments. The next logical chapters would cover:
 
-- [Chapter 11: Cost Optimization](../06-performance-optimization) - Advanced cost management strategies
-- [Chapter 12: Advanced Topics](../07-security-compliance) - Scaling beyond the basics
+- [Chapter 11: Cost Optimization](../11-cost-optimization.md) - Advanced cost management strategies
+- [Chapter 12: MLOps for SREs](../12-mlops-for-sres.md) - Day-to-day operational workflows

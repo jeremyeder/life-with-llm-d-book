@@ -1017,11 +1017,11 @@ if __name__ == "__main__":
 
 ## Next Steps
 
-With robust CI/CD pipelines in place, the next step is implementing comprehensive [Automated Testing Strategies](./03-automated-testing) to ensure model quality and reliability throughout the deployment process.
+With robust CI/CD pipelines in place, the next step is implementing comprehensive [Automated Testing Strategies](./03-automated-testing.md) to ensure model quality and reliability throughout the deployment process.
 
 ## References
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Kubeflow Pipelines SDK](https://kubeflow-pipelines.readthedocs.io/)
-- [Chapter 7: Security and Compliance](../07-security-compliance) - Security scanning and compliance
-- [Chapter 8: Troubleshooting](../08-troubleshooting/index) - Pipeline troubleshooting procedures
+- [Chapter 7: Security and Compliance](../07-security-compliance.md) - Security scanning and compliance
+- [Chapter 8: Troubleshooting](../08-troubleshooting/index.md) - Pipeline troubleshooting procedures

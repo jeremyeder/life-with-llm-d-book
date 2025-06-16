@@ -53,23 +53,29 @@ const config = {
         title: 'Life with llm-d',
         logo: {
           alt: 'llm-d Logo',
-          src: 'img/logo.svg',
+          src: 'img/llm-d-icon.png',
         },
         items: [
           {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
-            label: 'Documentation',
+            label: 'Book Guide',
           },
           {
-            href: 'https://github.com/llm-d',
-            label: 'llm-d GitHub',
-            position: 'right',
+            to: '/docs/introduction',
+            position: 'left',
+            label: 'Introduction',
           },
           {
             href: 'https://llm-d.ai',
-            label: 'llm-d.ai',
+            label: 'What is llm-d?',
+            position: 'left',
+          },
+          {
+            href: 'https://github.com/llm-d',
+            className: 'header-github-link',
+            'aria-label': 'GitHub repository',
             position: 'right',
           },
         ],
@@ -78,11 +84,36 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Documentation',
+            title: 'Book Guide',
             items: [
               {
                 label: 'Getting Started',
                 to: '/docs/introduction',
+              },
+              {
+                label: 'Data Scientist Workflows',
+                to: '/docs/data-scientist-workflows',
+              },
+              {
+                label: 'SRE Operations',
+                to: '/docs/sre-operations',
+              },
+            ],
+          },
+          {
+            title: 'Architecture',
+            items: [
+              {
+                label: 'Understanding Architecture',
+                to: '/docs/understanding-architecture',
+              },
+              {
+                label: 'Performance Optimization',
+                to: '/docs/performance-optimization',
+              },
+              {
+                label: 'Security & Compliance',
+                to: '/docs/security-compliance',
               },
             ],
           },
@@ -97,6 +128,10 @@ const config = {
                 label: 'Official Website',
                 href: 'https://llm-d.ai',
               },
+              {
+                label: 'Slack Community',
+                href: 'https://llm-d.ai/slack',
+              },
             ],
           },
           {
@@ -106,18 +141,22 @@ const config = {
                 label: 'Book Repository',
                 href: 'https://github.com/jeremyeder/life-with-llm-d-book',
               },
+              {
+                label: 'News & Updates',
+                href: 'https://llm-d.ai/news',
+              },
             ],
           },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Life with llm-d. Built with Docusaurus.`,
       },
       prism: {
-        theme: prismThemes.github,
-        darkTheme: prismThemes.dracula,
-        additionalLanguages: ['bash', 'yaml', 'json'],
+        theme: prismThemes.vsLight,
+        darkTheme: prismThemes.vsDark,
+        additionalLanguages: ['bash', 'yaml', 'json', 'python', 'docker'],
       },
       colorMode: {
-        defaultMode: 'dark',
+        defaultMode: 'light',
         disableSwitch: false,
         respectPrefersColorScheme: true,
       },

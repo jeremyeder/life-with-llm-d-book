@@ -1,107 +1,326 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * Custom CSS matching llm-d.ai styling
+ * Uses Purple theme (#7f317f) and Red Hat fonts
  */
 
-/* You can override the default Infima variables here. */
+/* Import Red Hat Display and Red Hat Mono fonts */
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Red+Hat+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+/* Root variables matching llm-d.ai theme */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  /* Primary purple color scheme */
+  --ifm-color-primary: #7f317f;
+  --ifm-color-primary-dark: #723072;
+  --ifm-color-primary-darker: #6b2d6b;
+  --ifm-color-primary-darkest: #582558;
+  --ifm-color-primary-light: #8c348c;
+  --ifm-color-primary-lighter: #953695;
+  --ifm-color-primary-lightest: #a13ea1;
+  
+  /* Font families */
+  --ifm-font-family-base: 'Red Hat Display', system-ui, -apple-system, sans-serif;
+  --ifm-font-family-monospace: 'Red Hat Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  
+  /* Code styling */
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(127, 49, 127, 0.1);
+  
+  /* Layout adjustments */
+  --ifm-navbar-height: 60px;
+  --ifm-footer-background-color: #262626;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* Dark mode colors */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #a13ea1;
+  --ifm-color-primary-dark: #953695;
+  --ifm-color-primary-darker: #8c348c;
+  --ifm-color-primary-darkest: #723072;
+  --ifm-color-primary-light: #ad41ad;
+  --ifm-color-primary-lighter: #b544b5;
+  --ifm-color-primary-lightest: #c14ac1;
+  
+  --ifm-background-color: #262626;
+  --ifm-background-surface-color: #2d2d2d;
+  --ifm-color-content: #ffffff;
+  --ifm-color-content-secondary: #b0b0b0;
+  --docusaurus-highlighted-code-line-bg: rgba(161, 62, 161, 0.3);
 }
 
-/* Dark mode optimizations */
-[data-theme='dark'] {
-  --ifm-background-color: #1a1a1a;
-  --ifm-background-surface-color: #242424;
-  --ifm-color-content: #e3e3e3;
-  --ifm-color-content-secondary: #a0a0a0;
+/* Typography */
+body {
+  font-family: var(--ifm-font-family-base);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ifm-font-family-base);
+  font-weight: 600;
+}
+
+/* Navbar styling */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar__title {
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.navbar__logo {
+  height: 32px;
+  margin-right: 0.75rem;
+}
+
+/* GitHub link icon styling */
+.header-github-link:hover {
+  opacity: 0.6;
+}
+
+.header-github-link:before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  display: flex;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z'/%3E%3C/svg%3E")
+    no-repeat;
+}
+
+[data-theme='dark'] .header-github-link:before {
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z'/%3E%3C/svg%3E")
+    no-repeat;
+}
+
+/* Sidebar styling */
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.theme-doc-sidebar-item-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.theme-doc-sidebar-item-link:hover {
+  background-color: var(--ifm-color-emphasis-100);
+  text-decoration: none;
+}
+
+.theme-doc-sidebar-item-link-level-1 {
+  font-weight: 600;
+}
+
+/* Content area improvements */
+.markdown {
+  --ifm-h1-font-size: 2.25rem;
+  --ifm-h2-font-size: 1.75rem;
+  --ifm-h3-font-size: 1.5rem;
 }
 
 /* Code block enhancements */
 .prism-code {
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  border-radius: 8px;
+}
+
+.theme-code-block {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .theme-code-block {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Copy button styling */
 .theme-code-block .copy-icon {
   opacity: 0.6;
+  transition: opacity 0.2s ease;
 }
 
 .theme-code-block:hover .copy-icon {
   opacity: 1;
 }
 
-/* Admonition customization */
+/* Admonition styling */
 .admonition {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
 }
 
 [data-theme='dark'] .admonition {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Table styling improvements */
-.markdown table {
-  border-collapse: collapse;
-  margin: 20px 0;
-}
-
-.markdown th {
-  background-color: var(--ifm-color-emphasis-200);
+.admonition-heading {
+  font-family: var(--ifm-font-family-base);
   font-weight: 600;
 }
 
-[data-theme='dark'] .markdown th {
-  background-color: var(--ifm-color-emphasis-300);
+/* Table styling */
+.markdown table {
+  border-collapse: collapse;
+  margin: 20px 0;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-/* Sidebar customization for better readability */
-.theme-doc-sidebar-item-link {
-  font-size: 0.9rem;
+.markdown th {
+  background-color: var(--ifm-color-primary);
+  color: white;
+  font-weight: 600;
+  padding: 12px 16px;
+  text-align: left;
 }
 
-/* Mermaid diagram dark mode */
+.markdown td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.markdown tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown tr:nth-child(even) {
+  background-color: var(--ifm-color-emphasis-50);
+}
+
+[data-theme='dark'] .markdown tr:nth-child(even) {
+  background-color: var(--ifm-color-emphasis-100);
+}
+
+/* Button styling */
+.button {
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.button--primary {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
+.button--primary:hover {
+  background-color: var(--ifm-color-primary-dark);
+  border-color: var(--ifm-color-primary-dark);
+  transform: translateY(-1px);
+}
+
+/* Footer styling */
+.footer {
+  background-color: var(--ifm-footer-background-color);
+  color: #ffffff;
+}
+
+.footer__title {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.footer__item {
+  color: #b0b0b0;
+}
+
+.footer__item:hover {
+  color: #ffffff;
+}
+
+/* Mermaid diagram styling */
 [data-theme='dark'] .mermaid {
   background-color: transparent;
+  filter: invert(1) hue-rotate(180deg);
 }
 
-/* Enhanced focus states for accessibility */
-.theme-doc-sidebar-item-link:focus,
-button:focus,
-a:focus {
-  outline: 2px solid var(--ifm-color-primary);
-  outline-offset: 2px;
-}
-
-/* Mobile responsiveness */
+/* Responsive design */
 @media (max-width: 768px) {
+  .navbar__title {
+    font-size: 1.1rem;
+  }
+  
   .prism-code {
     font-size: 0.8rem;
   }
   
   .admonition {
     margin: 16px 0;
+  }
+  
+  .markdown table {
+    font-size: 0.875rem;
+  }
+  
+  .markdown th,
+  .markdown td {
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar__title {
+    display: none;
+  }
+  
+  .navbar__logo {
+    margin-right: 0;
+  }
+}
+
+/* Enhanced focus states for accessibility */
+.theme-doc-sidebar-item-link:focus,
+.button:focus,
+a:focus {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ifm-color-emphasis-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ifm-color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
+/* Print styles */
+@media print {
+  .navbar,
+  .footer,
+  .theme-doc-sidebar-container,
+  .theme-doc-toc-desktop {
+    display: none !important;
+  }
+  
+  .main-wrapper {
+    margin-left: 0 !important;
   }
 }

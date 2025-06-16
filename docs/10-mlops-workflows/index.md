@@ -26,9 +26,9 @@ MLOps for LLMs presents unique challenges compared to traditional machine learni
 
 Before diving into this chapter, ensure you have:
 
-- Completed [Chapter 2: Installation and Setup](../02-installation-setup)
-- Understanding of [Chapter 3: Architecture](../03-understanding-architecture)  
-- Familiarity with [Chapter 5: SRE Operations](../05-sre-operations)
+- Completed [Chapter 2: Installation and Setup](../02-installation-setup.md)
+- Understanding of [Chapter 3: Architecture](../03-understanding-architecture.md)  
+- Familiarity with [Chapter 5: SRE Operations](../05-sre-operations.md)
 - Basic Kubernetes knowledge
 - Git and GitHub experience
 
@@ -218,7 +218,7 @@ kubectl get pods -n istio-system
 aws s3 ls s3://your-model-bucket/ --endpoint-url=https://your-s3-endpoint
 ```
 
-Ready to build production-ready MLOps workflows? Let's begin with [Model Lifecycle Management](./01-model-lifecycle).
+Ready to build production-ready MLOps workflows? Let's begin with [Model Lifecycle Management](./01-model-lifecycle.md).
 
 ---
 

@@ -810,11 +810,11 @@ def configure_traffic_split(
 
 ## Next Steps
 
-With model lifecycle management in place, the next step is building robust [CI/CD Pipelines](./02-cicd-pipelines) that automate the entire process from code commit to production deployment.
+With model lifecycle management in place, the next step is building robust [CI/CD Pipelines](./02-cicd-pipelines.md) that automate the entire process from code commit to production deployment.
 
 ## References
 
 - [Kubeflow Pipelines Documentation](https://www.kubeflow.org/docs/components/pipelines/)
 - [Argo Workflows Guide](https://argoproj.github.io/argo-workflows/)
-- [Chapter 5: SRE Operations](../05-sre-operations) - SLO and monitoring foundations
-- [Chapter 8: Troubleshooting](../08-troubleshooting/index) - Deployment troubleshooting procedures
+- [Chapter 5: SRE Operations](../05-sre-operations.md) - SLO and monitoring foundations
+- [Chapter 8: Troubleshooting](../08-troubleshooting/index.md) - Deployment troubleshooting procedures
