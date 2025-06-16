@@ -808,6 +808,266 @@ if __name__ == "__main__":
 
 **Result**: 30-40% cost reduction with better performance!
 
+## SLO-Driven Scaling with llm-d Inference Scheduler
+
+### Why llm-d's Inference Scheduler is Different
+
+Traditional Kubernetes autoscaling treats all workloads the same. The llm-d inference-scheduler understands LLM-specific patterns:
+
+- **Token generation patterns**: Knows that longer sequences cost more
+- **Model characteristics**: Different models have different cost/performance profiles  
+- **Queue dynamics**: Understands how batching affects both cost and latency
+- **SLO prioritization**: Can trade off between cost, latency, and throughput
+
+### Inference Scheduler Configuration
+
+```yaml
+# cost-optimization/inference-scheduler-config.yaml
+apiVersion: scheduler.llm-d.io/v1alpha1
+kind: InferenceScheduler
+metadata:
+  name: cost-optimized-scheduler
+  namespace: llm-d-system
+spec:
+  # Global SLO-driven policies
+  sloPolicy:
+    enabled: true
+    
+    # Define cost-aware SLOs
+    objectives:
+      # Latency SLO with cost consideration
+      - name: "weighted_latency"
+        description: "P95 latency adjusted for request cost"
+        target: "500ms"
+        weight: 0.4
+        calculator: |
+          # Weighted latency = actual_latency * cost_multiplier
+          p95(request_duration_seconds) * (1 + cost_per_request / 0.001)
+        
+      # Throughput efficiency SLO
+      - name: "cost_efficient_throughput"
+        description: "Tokens per second per dollar spent"
+        target: "75000"  # 75k tokens/second/dollar
+        weight: 0.3
+        calculator: |
+          sum(rate(tokens_generated_total[5m])) / sum(rate(cost_dollars_total[5m]))
+        
+      # Resource utilization SLO
+      - name: "gpu_cost_efficiency"
+        description: "GPU utilization weighted by cost savings"
+        target: "0.7"
+        weight: 0.3
+        calculator: |
+          avg(gpu_utilization) * (1 + spot_savings_ratio)
+    
+    # Cost-aware scaling policies
+    scaling:
+      algorithm: "cost_aware_proportional"
+      
+      # SLO violation thresholds
+      scaleUpConditions:
+        - sloViolation: 0.05      # Scale up if >5% SLO violation
+          urgency: "normal"
+          action: "add_replicas"
+          
+        - sloViolation: 0.15      # Urgent scaling for major violations
+          urgency: "high"
+          action: "add_replicas_fast"
+          
+        - costPerRequest: 0.005   # Scale up if cost/request too high
+          urgency: "low"
+          action: "optimize_batching"
+      
+      scaleDownConditions:
+        - sloViolation: -0.1      # Scale down if over-performing by 10%
+          minIdleTime: "5m"
+          action: "remove_replicas"
+          
+        - utilizationBelow: 0.4   # Scale down low utilization
+          minIdleTime: "2m"
+          action: "consolidate_workloads"
+  
+  # Cost optimization strategies
+  costOptimization:
+    enabled: true
+    
+    # Spot instance management
+    spotInstancePolicy:
+      enabled: true
+      maxSpotRatio: 0.8         # Up to 80% spot instances
+      fallbackStrategy: "graceful_migration"
+      
+      # Spot interruption handling
+      interruption:
+        drainTimeout: "60s"
+        migrationPolicy: "cost_aware"  # Migrate to cheapest available
+    
+    # Dynamic batching optimization
+    batchingPolicy:
+      algorithm: "cost_aware_batching"
+      
+      # Cost-based batch sizing
+      batchSizing:
+        minBatch: 1
+        maxBatch: 32
+        targetCostPerToken: 0.00001  # $0.00001 per token
+        
+        # Dynamic batch size based on queue and cost
+        dynamicSizing:
+          enabled: true
+          queueDepthThreshold: 10
+          costEfficiencyTarget: 0.8
+    
+    # Request routing optimization
+    routingPolicy:
+      algorithm: "cost_complexity_routing"
+      
+      # Route requests based on complexity and cost targets
+      routes:
+        - name: "simple_queries"
+          complexity: "low"
+          targetModel: "llama-3.1-8b-int8"
+          costTarget: 0.0001
+          
+        - name: "moderate_queries"  
+          complexity: "medium"
+          targetModel: "llama-3.1-8b-fp16"
+          costTarget: 0.0005
+          
+        - name: "complex_queries"
+          complexity: "high"
+          targetModel: "llama-3.1-70b-int8"
+          costTarget: 0.002
+          
+        - name: "critical_queries"
+          complexity: "critical"
+          targetModel: "llama-3.1-70b-fp16"
+          costTarget: 0.008
+          slaOverride: true  # Allow higher cost for critical requests
+```
+
+### Scheduler Integration with LLMDeployments
+
+```yaml
+# Individual deployment using the scheduler
+apiVersion: inference.llm-d.io/v1alpha1
+kind: LLMDeployment
+metadata:
+  name: llama-3.1-8b-scheduled
+  namespace: production
+  annotations:
+    scheduler.llm-d.io/cost-optimization: "enabled"
+    scheduler.llm-d.io/slo-profile: "cost-efficient"
+spec:
+  model:
+    name: "llama-3.1-8b"
+    quantization:
+      type: "int8"
+  
+  # Reference the cost-optimized scheduler
+  schedulerName: "cost-optimized-scheduler"
+  
+  # Scheduler-aware resource configuration
+  resources:
+    requests:
+      nvidia.com/gpu: "1"
+      memory: "16Gi"
+    limits:
+      nvidia.com/gpu: "1"
+      memory: "24Gi"
+    
+    # Cost-aware resource policies
+    policies:
+      costOptimization: "aggressive"
+      spotPreference: "preferred"      # Prefer spot but allow on-demand
+      utilizationTarget: 0.75         # Target 75% utilization
+      
+  # Scheduler-managed scaling
+  scaling:
+    mode: "scheduler_managed"  # Let inference-scheduler handle scaling
+    
+    # Provide constraints for scheduler
+    constraints:
+      minReplicas: 0
+      maxReplicas: 20
+      
+      # Cost constraints
+      maxCostPerHour: 50.0           # Max $50/hour
+      maxCostPerRequest: 0.005       # Max $0.005/request
+      
+      # Performance constraints  
+      maxLatencyP95: "1000ms"
+      minThroughput: "100"           # Min 100 tokens/second
+```
+
+### How It Works: SLO-Driven Cost Optimization
+
+The inference-scheduler continuously monitors and optimizes:
+
+#### 1. Real-time SLO Monitoring
+```python
+# Pseudocode for scheduler SLO monitoring
+class SLOMonitor:
+    def evaluate_slos(self, deployment):
+        current_metrics = collect_metrics(deployment)
+        
+        slo_scores = {}
+        for slo in deployment.slo_objectives:
+            actual = current_metrics[slo.name]
+            target = slo.target
+            violation = (actual - target) / target
+            
+            slo_scores[slo.name] = {
+                "violation": violation,
+                "weight": slo.weight,
+                "urgency": calculate_urgency(violation)
+            }
+        
+        return slo_scores
+```
+
+#### 2. Cost-Aware Scaling Decisions
+```python
+class CostAwareScaler:
+    def should_scale(self, slo_scores, current_cost):
+        # Weight SLO violations by their importance
+        weighted_violation = sum(
+            score["violation"] * score["weight"] 
+            for score in slo_scores.values()
+        )
+        
+        # Consider cost in scaling decision
+        if weighted_violation > 0.05:  # SLO violation
+            if current_cost < max_cost_budget:
+                return "scale_up_performance"  # Can afford better performance
+            else:
+                return "optimize_efficiency"   # Must optimize within budget
+        elif weighted_violation < -0.1:  # Over-performing
+            return "scale_down_cost"       # Reduce cost while maintaining SLOs
+        
+        return "no_action"
+```
+
+#### 3. Intelligent Request Routing
+```python
+class CostComplexityRouter:
+    def route_request(self, request, available_models):
+        # Analyze request complexity
+        complexity = analyze_complexity(request.prompt)
+        
+        # Find models that can handle this complexity
+        capable_models = [
+            m for m in available_models 
+            if m.complexity_rating >= complexity
+        ]
+        
+        # Choose based on cost efficiency
+        best_model = min(capable_models, 
+                        key=lambda m: m.cost_per_token / m.quality_score)
+        
+        return best_model
+```
+
 ```yaml
 # cost-optimization/disaggregated-serving.yaml
 apiVersion: inference.llm-d.io/v1alpha1
@@ -1030,21 +1290,39 @@ spec:
       memory: "24Gi"  # Standard limit from shared config
       cpu: "6"
   
-  # Aggressive autoscaling for cost efficiency
-  autoscaling:
-    enabled: true
-    minReplicas: 0  # Scale to zero when idle
-    maxReplicas: 10
-    targetGPUUtilization: 75  # Higher utilization target
-    scaleDownDelay: "2m"      # Quick scale down
-    scaleUpDelay: "30s"       # Quick scale up
-    
-    # Custom metrics for cost-aware scaling
-    customMetrics:
-    - name: requests_per_cost_dollar
-      targetValue: "1000"  # Target 1000 requests per dollar
-    - name: gpu_utilization_efficiency
-      targetValue: "70"    # 70% sustained utilization
+  # SLO-driven autoscaling via llm-d inference-scheduler
+  scheduling:
+    scheduler: "llm-d-inference-scheduler"
+    sloPolicy:
+      enabled: true
+      objectives:
+        # Primary SLO: Request latency
+        - name: "request_latency_p95"
+          target: "500ms"
+          weight: 0.4
+          
+        # Secondary SLO: Token generation rate
+        - name: "tokens_per_second"
+          target: "150"
+          weight: 0.3
+          
+        # Cost SLO: Cost efficiency
+        - name: "cost_per_request"
+          target: "0.002"  # $0.002 per request
+          weight: 0.3
+          
+      # Scaling decisions based on SLO violations
+      scaling:
+        scaleUpThreshold: 0.05    # Scale up if >5% SLO violation
+        scaleDownThreshold: 0.90  # Scale down if <10% SLO violation
+        minReplicas: 0           # Scale to zero when no load
+        maxReplicas: 10
+        
+        # Inference-scheduler specific optimizations
+        schedulerConfig:
+          batchingPolicy: "cost_aware"      # Optimize batching for cost
+          queueManagement: "priority_cost"   # Prioritize cost-efficient requests
+          preemption: "enabled"             # Allow preemption for cost optimization
   
   # Cost-optimized node selection
   nodeSelector:
@@ -2049,8 +2327,9 @@ def analyze_enterprise_transformation():
 ✅ **Monitor and tune** - Watch for optimization opportunities
 
 ### Phase 3: Advanced Strategies (Month 2-3) - Target: 80%+ total savings
+✅ **Deploy llm-d inference-scheduler** - SLO-driven scaling that understands LLM workloads
 ✅ **Dynamic model routing** - Route simple queries to smaller models
-✅ **SLO-based scaling** - Scale based on business metrics, not just load
+✅ **Cost-aware request prioritization** - Use scheduler's complexity analysis
 ✅ **Consider hybrid infrastructure** - On-premise for base load if volume justifies
 ✅ **Implement comprehensive monitoring** - Track cost per request trends
 
