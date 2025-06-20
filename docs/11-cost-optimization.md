@@ -341,8 +341,8 @@ All resource specifications in this chapter follow the standard templates define
 Comprehensive GPU optimization includes real-time monitoring, cost anomaly detection, and SLO-driven scaling:
 
 **Key Optimization Features:**
-- **GPU Utilization Monitoring**: Alerts for underutilized GPUs (<50% utilization)
-- **Memory Waste Detection**: Identifies GPUs with >40% idle memory
+- **GPU Utilization Monitoring**: Alerts for underutilized GPUs (less than 50% utilization)
+- **Memory Waste Detection**: Identifies GPUs with more than 40% idle memory
 - **Cost Anomaly Detection**: Automatic detection of unusual cost spikes
 - **SLO-Driven Autoscaling**: Cost-aware scaling with inference-scheduler integration
 - **Spot Instance Orchestration**: Intelligent use of spot instances for cost savings
@@ -390,6 +390,8 @@ Cost-optimized model serving system that reduces costs through intelligent reque
 :::
 
 **Quick Usage:**
+
+```python
 #!/usr/bin/env python3
 """
 Intelligent model serving system that optimizes costs through:
@@ -1033,7 +1035,7 @@ phase1_optimizations:
   
   - name: "Enable INT8 quantization"
     impact: "30% cost reduction"
-    validation: "A/B tested, <2% quality impact"
+    validation: "A/B tested, less than 2% quality impact"
   
   - name: "Spot instance migration"
     impact: "25% cost reduction"
