@@ -1,0 +1,104 @@
+# Kubernetes RDMA Device Plugin for LLM Inference
+#
+# This DaemonSet deploys the RDMA device plugin on GPU nodes, enabling
+# Kubernetes to schedule RDMA resources alongside GPUs for high-performance
+# LLM inference workloads.
+#
+# Features:
+# - Automatic RDMA device discovery and registration
+# - Integration with Kubernetes resource scheduling
+# - Support for shared RDMA devices across pods
+# - Network attachment definition for RDMA networking
+#
+# Prerequisites:
+# - Nodes labeled with node.kubernetes.io/instance-type: "gpu-rdma"
+# - RDMA drivers installed (use setup-rdma-nodes.sh)
+# - Mellanox RDMA device plugin image
+#
+# Usage:
+#   kubectl apply -f rdma-device-plugin.yaml
+#
+# Resource Request Example:
+#   resources:
+#     requests:
+#       rdma/rdma_shared_device_a: "1"
+#
+# Source: Chapter 6 - Performance Optimization
+
+# RDMA Device Plugin for GPU nodes
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: rdma-device-plugin
+  namespace: kube-system
+  labels:
+    app: rdma-device-plugin
+spec:
+  selector:
+    matchLabels:
+      app: rdma-device-plugin
+  template:
+    metadata:
+      labels:
+        app: rdma-device-plugin
+    spec:
+      nodeSelector:
+        # Only deploy on GPU nodes with RDMA capability
+        node.kubernetes.io/instance-type: "gpu-rdma"
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: rdma-device-plugin
+        image: ghcr.io/mellanox/k8s-rdma-shared-dev-plugin:latest
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: device-plugin
+          mountPath: /var/lib/kubelet/device-plugins
+        - name: proc
+          mountPath: /host/proc
+        - name: sys
+          mountPath: /host/sys
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      volumes:
+      - name: device-plugin
+        hostPath:
+          path: /var/lib/kubelet/device-plugins
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: sys
+        hostPath:
+          path: /sys
+      hostNetwork: true
+      hostPID: true
+---
+# RDMA Network Attachment Definition
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: rdma-network
+  namespace: llm-d-system
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "name": "rdma-network",
+      "type": "macvlan",
+      "master": "ens6f0",
+      "mode": "bridge",
+      "ipam": {
+        "type": "static",
+        "addresses": [
+          {
+            "address": "192.168.100.0/24"
+          }
+        ]
+      }
+    }

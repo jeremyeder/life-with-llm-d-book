@@ -1,0 +1,205 @@
+# HashiCorp Vault Integration for llm-d
+#
+# Complete configuration for integrating HashiCorp Vault with llm-d deployments
+# for secure secrets management including model credentials, API keys, and TLS certificates.
+#
+# Features:
+# - Basic open source Vault deployment
+# - Kubernetes authentication method
+# - External Secrets Operator integration
+# - Secret rotation and management
+# - TLS certificate management
+#
+# Prerequisites:
+# - External Secrets Operator installed
+# - Vault RBAC permissions configured
+#
+# Usage:
+#   kubectl apply -f vault-integration.yaml
+#   ./vault-setup.sh
+#
+# See: docs/07-security-compliance.md#hashicorp-vault-integration
+
+# Vault deployment for llm-d secrets
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault
+  namespace: llm-d-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      serviceAccountName: vault
+      containers:
+      - name: vault
+        image: vault:1.15.2
+        ports:
+        - containerPort: 8200
+          name: vault-port
+        env:
+        - name: VAULT_DEV_ROOT_TOKEN_ID
+          value: "dev-token-123"
+        - name: VAULT_DEV_LISTEN_ADDRESS
+          value: "0.0.0.0:8200"
+        - name: VAULT_ADDR
+          value: "http://127.0.0.1:8200"
+        volumeMounts:
+        - name: vault-config
+          mountPath: /vault/config
+        command:
+        - vault
+        - server
+        - -config=/vault/config/vault.hcl
+      volumes:
+      - name: vault-config
+        configMap:
+          name: vault-config
+
+---
+# Vault configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-config
+  namespace: llm-d-system
+data:
+  vault.hcl: |
+    storage "file" {
+      path = "/vault/data"
+    }
+    
+    listener "tcp" {
+      address = "0.0.0.0:8200"
+      tls_disable = true
+    }
+    
+    api_addr = "http://127.0.0.1:8200"
+    cluster_addr = "http://127.0.0.1:8201"
+    ui = true
+    disable_mlock = true
+
+---
+# Vault service
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault
+  namespace: llm-d-system
+spec:
+  selector:
+    app: vault
+  ports:
+  - name: vault
+    port: 8200
+    targetPort: 8200
+
+---
+# Vault ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault
+  namespace: llm-d-system
+
+---
+# External secrets operator for Vault integration
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: vault-backend
+  namespace: production
+spec:
+  provider:
+    vault:
+      server: "http://vault.llm-d-system.svc.cluster.local:8200"
+      path: "secret"
+      version: "v2"
+      auth:
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "llm-d-role"
+          serviceAccountRef:
+            name: "external-secrets-sa"
+
+---
+# External secret for model credentials
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: model-credentials
+  namespace: production
+spec:
+  refreshInterval: 15s
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: model-repo-credentials
+    creationPolicy: Owner
+  data:
+  - secretKey: aws-access-key-id
+    remoteRef:
+      key: model-repo
+      property: access_key_id
+  - secretKey: aws-secret-access-key
+    remoteRef:
+      key: model-repo
+      property: secret_access_key
+
+---
+# External secret for API keys
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: api-keys
+  namespace: production
+spec:
+  refreshInterval: 60s
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: llm-d-api-keys
+    creationPolicy: Owner
+  data:
+  - secretKey: huggingface-token
+    remoteRef:
+      key: api-keys
+      property: huggingface_token
+  - secretKey: openai-api-key
+    remoteRef:
+      key: api-keys
+      property: openai_api_key
+
+---
+# External secret for TLS certificates
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: tls-certificates
+  namespace: production
+spec:
+  refreshInterval: 3600s  # Refresh hourly
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: llm-d-tls-certificates
+    creationPolicy: Owner
+    type: kubernetes.io/tls
+  data:
+  - secretKey: tls.crt
+    remoteRef:
+      key: tls-certs
+      property: certificate
+  - secretKey: tls.key
+    remoteRef:
+      key: tls-certs
+      property: private_key

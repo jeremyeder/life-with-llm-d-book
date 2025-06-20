@@ -1,0 +1,125 @@
+# High-Performance LLM Inference with RDMA Networking
+#
+# This configuration deploys Llama 3.1 70B with RDMA acceleration for:
+# - Pipeline parallelism across nodes via RDMA interconnect
+# - Tensor parallelism within nodes across 4 GPUs
+# - High-throughput serving with optimized batching
+# - Enhanced monitoring for RDMA performance metrics
+#
+# Performance Expectations:
+# - Inter-node latency: <2μs with RoCE, <0.5μs with InfiniBand
+# - Bandwidth utilization: >90% of available RDMA capacity
+# - Pipeline parallel efficiency: >85% for 2-node setup
+# - Overall throughput: 40-60% improvement vs TCP networking
+#
+# Prerequisites:
+# - RDMA-capable nodes with setup-rdma-nodes.sh applied
+# - RDMA device plugin deployed
+# - Nodes labeled with hardware.llm-d.ai/rdma: "enabled"
+#
+# Source: Chapter 6 - Performance Optimization
+
+# High-performance inference service with RDMA
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: InferenceService
+metadata:
+  name: llama-3.1-70b-rdma
+  namespace: llm-d-production
+spec:
+  model:
+    name: "meta-llama/Meta-Llama-3-70B-Instruct"
+    source: "huggingface"
+    quantization: "bitsandbytes-8bit"
+  
+  deployment:
+    # Multi-GPU configuration for large model
+    replicas: 2
+    
+    resources:
+      requests:
+        nvidia.com/gpu: "4"
+        rdma/rdma_shared_device_a: "1"  # RDMA device
+        cpu: "16"
+        memory: "128Gi"
+      limits:
+        nvidia.com/gpu: "4"
+        rdma/rdma_shared_device_a: "1"
+        cpu: "32"
+        memory: "256Gi"
+    
+    # RDMA networking configuration
+    annotations:
+      k8s.v1.cni.cncf.io/networks: rdma-network
+    
+    # Node affinity for RDMA-capable nodes
+    nodeSelector:
+      hardware.llm-d.ai/rdma: "enabled"
+      hardware.llm-d.ai/gpu-type: "h100"
+    
+    # Pod anti-affinity for distributed deployment
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app: llama-3.1-70b-rdma
+          topologyKey: kubernetes.io/hostname
+
+  engine:
+    name: "vllm"
+    version: "0.4.0"
+    
+    parameters:
+      # Enable tensor parallelism across GPUs
+      tensor_parallel_size: 4
+      pipeline_parallel_size: 2  # Across nodes via RDMA
+      
+      # RDMA-specific optimizations
+      distributed_executor_backend: "ray"
+      enable_chunked_prefill: true
+      max_num_seqs: 256
+      
+      # Memory optimization for RDMA transfers
+      gpu_memory_utilization: 0.85
+      swap_space: 8  # GiB swap for large contexts
+      
+      # Network configuration
+      worker_use_ray: true
+      ray_config:
+        address: "auto"
+        include_dashboard: false
+        object_store_memory: 4000000000  # 4GB
+
+  serving:
+    # High-throughput serving configuration
+    port: 8000
+    max_concurrent_requests: 512
+    timeout_seconds: 300
+    
+    # Load balancing for multiple replicas
+    strategy: "round_robin"
+    health_check:
+      enabled: true
+      path: "/health"
+      interval_seconds: 30
+
+  monitoring:
+    # Enhanced monitoring for RDMA performance
+    metrics:
+      enabled: true
+      port: 9090
+      custom_metrics:
+      - "rdma_bandwidth_bytes_per_second"
+      - "rdma_latency_microseconds"
+      - "inter_node_communication_time"
+      - "pipeline_parallel_efficiency"
+    
+    # RDMA-specific alerts
+    alerts:
+    - name: "RDMAHighLatency"
+      condition: "rdma_latency_microseconds > 10"
+      severity: "warning"
+    - name: "RDMABandwidthLow"
+      condition: "rdma_bandwidth_bytes_per_second < 10000000000"  # <10GB/s
+      severity: "critical"

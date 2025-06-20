@@ -1,0 +1,58 @@
+# Canary Deployment with Traffic Splitting
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: llm-d-canary
+  namespace: production
+spec:
+  replicas: 10
+  strategy:
+    canary:
+      # Canary service and ingress
+      canaryService: llm-d-canary
+      stableService: llm-d-stable
+      
+      # Traffic splitting via Istio
+      trafficRouting:
+        istio:
+          virtualService:
+            name: llm-d-vs
+            routes:
+            - primary
+      
+      # Progressive traffic increase
+      steps:
+      - setWeight: 5    # 5% traffic to canary
+      - pause: {duration: 5m}
+      - analysis:
+          templates:
+          - templateName: canary-analysis
+          args:
+          - name: canary-service
+            value: llm-d-canary
+          
+      - setWeight: 20   # 20% traffic
+      - pause: {duration: 10m}
+      - analysis:
+          templates:
+          - templateName: canary-analysis
+          args:
+          - name: canary-service
+            value: llm-d-canary
+          
+      - setWeight: 50   # 50% traffic
+      - pause: {duration: 10m}
+      - analysis:
+          templates:
+          - templateName: canary-analysis
+          args:
+          - name: canary-service
+            value: llm-d-canary
+      
+      # Automatic rollback conditions
+      analysis:
+        templates:
+        - templateName: canary-analysis
+        args:
+        - name: canary-service
+          value: llm-d-canary

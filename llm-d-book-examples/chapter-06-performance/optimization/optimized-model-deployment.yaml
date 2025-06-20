@@ -1,0 +1,148 @@
+# Optimized Model Deployment with Neural Magic LLM-Compressor
+#
+# This configuration demonstrates deploying INT8-quantized models with llm-d,
+# showcasing the benefits of model optimization:
+# - 50% reduction in memory requirements
+# - 2x improvement in throughput
+# - Minimal quality degradation (<5%)
+# - Higher GPU utilization possible
+#
+# Comparison shows optimized vs baseline performance:
+# Optimized: 3 replicas on 32GB memory, 256 concurrent requests
+# Baseline: 1 replica on 64GB memory, 128 concurrent requests
+#
+# Expected Performance Improvements:
+# - Memory usage: 32GB vs 64GB (50% reduction)
+# - Throughput: 2847 vs 1423 tokens/sec (2x improvement)
+# - Latency: 45ms vs 78ms (42% improvement)
+# - Cost efficiency: 60% better tokens per dollar
+#
+# Source: Chapter 6 - Performance Optimization
+
+# Deploy optimized model with llm-d
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: InferenceService
+metadata:
+  name: llama-3.1-8b-int8-optimized
+  namespace: llm-d-production
+  labels:
+    optimization.llm-d.ai/type: "quantized"
+    optimization.llm-d.ai/format: "int8"
+    optimization.llm-d.ai/compressor: "neural-magic"
+spec:
+  model:
+    name: "llama-3.1-8b-int8-balanced"
+    source: "local"
+    path: "/optimized-models/llama-3-8b/llama-3-8b-int8-balanced"
+    
+    # Optimization metadata
+    optimization:
+      type: "quantization"
+      format: "int8"
+      compression_ratio: 2.1
+      quality_retention: 96.3
+      optimizer: "llm-compressor"
+      
+  deployment:
+    replicas: 3
+    
+    resources:
+      requests:
+        nvidia.com/gpu: "1"        # Reduced GPU requirement
+        cpu: "8"                   # Reduced CPU requirement
+        memory: "32Gi"             # Reduced memory requirement
+      limits:
+        nvidia.com/gpu: "1"
+        cpu: "16"
+        memory: "64Gi"
+    
+    # Node selection for optimized workloads
+    nodeSelector:
+      hardware.llm-d.ai/optimization: "supported"
+      hardware.llm-d.ai/gpu-memory: "40gb+"
+
+  engine:
+    name: "vllm"
+    version: "0.4.0"
+    
+    parameters:
+      # Optimized engine settings for quantized models
+      quantization: "int8"
+      max_model_len: 8192
+      max_num_seqs: 128
+      
+      # Memory efficiency settings
+      gpu_memory_utilization: 0.90  # Higher utilization possible
+      enable_chunked_prefill: true
+      max_num_batched_tokens: 4096
+      
+      # Performance optimization
+      disable_log_stats: false
+      trust_remote_code: true
+
+  serving:
+    port: 8000
+    max_concurrent_requests: 256   # Higher concurrency possible
+    timeout_seconds: 120           # Faster inference expected
+    
+    # Load balancing configuration
+    strategy: "least_requests"
+    health_check:
+      enabled: true
+      path: "/health"
+      interval_seconds: 15
+
+  monitoring:
+    metrics:
+      enabled: true
+      custom_metrics:
+      - "quantization_overhead_percent"
+      - "compression_ratio"
+      - "quality_retention_score"
+      - "memory_savings_gb"
+    
+    alerts:
+    - name: "QuantizationQualityDegradation"
+      condition: "quality_retention_score < 0.90"
+      severity: "warning"
+    - name: "QuantizationPerformanceIssue"
+      condition: "quantization_overhead_percent > 15"
+      severity: "critical"
+
+---
+# Comparison deployment - unoptimized baseline
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: InferenceService
+metadata:
+  name: llama-3.1-8b-baseline
+  namespace: llm-d-production
+  labels:
+    optimization.llm-d.ai/type: "baseline"
+spec:
+  model:
+    name: "meta-llama/Meta-Llama-3-8B-Instruct"
+    source: "huggingface"
+    
+  deployment:
+    replicas: 1
+    
+    resources:
+      requests:
+        nvidia.com/gpu: "1"
+        cpu: "16"
+        memory: "64Gi"
+      limits:
+        nvidia.com/gpu: "1"
+        cpu: "32"
+        memory: "128Gi"
+
+  engine:
+    name: "vllm"
+    parameters:
+      max_model_len: 8192
+      max_num_seqs: 64
+      gpu_memory_utilization: 0.85
+
+  serving:
+    port: 8000
+    max_concurrent_requests: 128

@@ -77,6 +77,8 @@ channels:
 
 ### Complete Service Outage
 
+**📁 Code Example**: [`P0-service-outage.sh`](../../llm-d-book-examples/chapter-08-troubleshooting/emergency-procedures/P0-service-outage.sh)
+
 **Immediate Actions (0-5 minutes):**
 
 ```bash
@@ -153,6 +155,8 @@ kubectl rollout restart deployment -l app.kubernetes.io/name=llm-d -A
 ```
 
 ### GPU Cluster Failure
+
+**📁 Code Example**: [`gpu-cluster-failure.sh`](../../llm-d-book-examples/chapter-08-troubleshooting/emergency-procedures/gpu-cluster-failure.sh)
 
 **Immediate Response:**
 

@@ -1,0 +1,161 @@
+# Comprehensive Performance Monitoring Stack for llm-d
+#
+# This configuration provides automated performance monitoring and alerting:
+# - Daily benchmark execution with CronJob
+# - Configurable alert thresholds for key metrics
+# - Grafana dashboard for performance visualization
+# - Persistent storage for benchmark results
+# - Slack/webhook integration for alerting
+#
+# Key Metrics Monitored:
+# - Latency (P50, P95): Target <200ms for P95
+# - Throughput: Target >500 tokens/sec
+# - Success Rate: Target >95%
+# - Cost Efficiency: Target <$0.001 per token
+# - GPU/Memory Utilization
+#
+# Automated Actions:
+# - Daily performance regression detection
+# - Alert on performance degradation
+# - Historical trend analysis
+# - Cross-hardware performance comparison
+#
+# Source: Chapter 6 - Performance Optimization
+
+# Continuous performance monitoring for llm-d deployments
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: benchmark-automation-config
+  namespace: llm-d-monitoring
+data:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: "30"
+  alert_thresholds: |
+    latency_p95_threshold_ms: 200
+    throughput_threshold_tokens_per_sec: 500
+    success_rate_threshold_percent: 95
+    cost_per_token_threshold_dollars: 0.001
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-performance-benchmark
+  namespace: llm-d-monitoring
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: benchmark-runner
+            image: llm-d/benchmark-automation:latest
+            env:
+            - name: BENCHMARK_CONFIG
+              value: "production-monitoring"
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: alerting-secrets
+                  key: slack-webhook
+            - name: GRAFANA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: monitoring-secrets
+                  key: grafana-api-key
+            volumeMounts:
+            - name: benchmark-results
+              mountPath: /results
+            command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              
+              echo "Starting daily performance benchmark"
+              
+              # Run baseline performance test
+              python3 /app/benchmark-automation.py \
+                --config production-monitoring \
+                --duration 30 \
+                --output-dir /results
+              
+              # Analyze results and send alerts if needed
+              python3 /app/performance-alerting.py \
+                --results-dir /results \
+                --config-map benchmark-automation-config
+              
+              echo "Benchmark automation complete"
+          
+          volumes:
+          - name: benchmark-results
+            persistentVolumeClaim:
+              claimName: benchmark-results-pvc
+
+---
+# Grafana dashboard for benchmark results
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: benchmark-dashboard
+  namespace: llm-d-monitoring
+data:
+  dashboard.json: |
+    {
+      "dashboard": {
+        "title": "llm-d Performance Benchmarks",
+        "panels": [
+          {
+            "title": "Throughput Trends",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "llm_d_benchmark_throughput_tokens_per_sec",
+                "legendFormat": "{{model}}_{{hardware}}"
+              }
+            ]
+          },
+          {
+            "title": "Latency Distribution",
+            "type": "graph", 
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, llm_d_benchmark_latency_ms_bucket)",
+                "legendFormat": "P95 Latency"
+              },
+              {
+                "expr": "histogram_quantile(0.50, llm_d_benchmark_latency_ms_bucket)",
+                "legendFormat": "P50 Latency"
+              }
+            ]
+          },
+          {
+            "title": "Cost Efficiency",
+            "type": "singlestat",
+            "targets": [
+              {
+                "expr": "llm_d_benchmark_cost_per_1k_tokens",
+                "legendFormat": "Cost per 1K tokens"
+              }
+            ]
+          },
+          {
+            "title": "Hardware Utilization",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "llm_d_benchmark_gpu_utilization_percent",
+                "legendFormat": "GPU Utilization"
+              },
+              {
+                "expr": "llm_d_benchmark_memory_utilization_percent", 
+                "legendFormat": "Memory Utilization"
+              }
+            ]
+          }
+        ]
+      }
+    }

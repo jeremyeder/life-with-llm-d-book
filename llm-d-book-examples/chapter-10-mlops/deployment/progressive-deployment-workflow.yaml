@@ -1,0 +1,222 @@
+# Argo Workflows template for progressive LLM model deployment
+# Orchestrates deployment of Llama 3.1 family from 7B to 70B
+# Includes validation gates and traffic routing configuration
+
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: llama-3.1-progressive-deployment
+  namespace: argo
+spec:
+  entrypoint: progressive-rollout
+  
+  templates:
+  - name: progressive-rollout
+    steps:
+    # Phase 1: Deploy 7B model
+    - - name: deploy-7b
+        template: deploy-model
+        arguments:
+          parameters:
+          - name: model-name
+            value: "llama-3.1-7b"
+          - name: model-size
+            value: "7b"
+          - name: replicas
+            value: "5"
+    
+    # Validation phase
+    - - name: validate-7b
+        template: validate-deployment
+        arguments:
+          parameters:
+          - name: model-name
+            value: "llama-3.1-7b"
+          - name: min-success-rate
+            value: "0.99"
+          - name: max-latency-ms
+            value: "2000"
+    
+    # Phase 2: Deploy 13B model (only if 7B is healthy)
+    - - name: deploy-13b
+        template: deploy-model
+        arguments:
+          parameters:
+          - name: model-name
+            value: "llama-3.1-13b"
+          - name: model-size
+            value: "13b"
+          - name: replicas
+            value: "3"
+        when: "{{steps.validate-7b.outputs.result}} == 'success'"
+    
+    # Configure traffic routing
+    - - name: setup-traffic-routing
+        template: configure-istio-routing
+        arguments:
+          parameters:
+          - name: models
+            value: "llama-3.1-7b,llama-3.1-13b"
+        when: "{{steps.deploy-13b.outputs.result}} == 'success'"
+    
+    # Phase 3: Deploy 70B model (conditional)
+    - - name: deploy-70b
+        template: deploy-model
+        arguments:
+          parameters:
+          - name: model-name
+            value: "llama-3.1-70b"
+          - name: model-size
+            value: "70b"
+          - name: replicas
+            value: "2"
+        when: "{{workflow.parameters.deploy-enterprise}} == 'true'"
+  
+  - name: deploy-model
+    inputs:
+      parameters:
+      - name: model-name
+      - name: model-size
+      - name: replicas
+    container:
+      image: argoproj/argocd:latest
+      command: [sh, -c]
+      args:
+      - |
+        echo "Deploying {{inputs.parameters.model-name}}..."
+        
+        # Trigger ArgoCD application sync
+        argocd app sync {{inputs.parameters.model-name}} \
+          --server argocd-server.argocd.svc.cluster.local \
+          --auth-token $ARGOCD_TOKEN \
+          --parameter replicas={{inputs.parameters.replicas}}
+        
+        # Wait for deployment to be ready
+        argocd app wait {{inputs.parameters.model-name}} \
+          --health \
+          --timeout 900
+        
+        echo "Deployment completed successfully"
+      env:
+      - name: ARGOCD_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: argocd-token
+            key: token
+  
+  - name: validate-deployment
+    inputs:
+      parameters:
+      - name: model-name
+      - name: min-success-rate
+      - name: max-latency-ms
+    script:
+      image: python:3.9
+      command: [python]
+      source: |
+        import requests
+        import time
+        import json
+        
+        model_name = "{{inputs.parameters.model-name}}"
+        endpoint = f"http://{model_name}-service.production.svc.cluster.local:8080"
+        
+        print(f"Validating {model_name} deployment...")
+        
+        # Run validation tests
+        success_count = 0
+        total_requests = 20
+        latencies = []
+        
+        for i in range(total_requests):
+            try:
+                start_time = time.time()
+                response = requests.post(
+                    f"{endpoint}/v1/completions",
+                    json={
+                        "prompt": f"Test request {i}",
+                        "max_tokens": 10,
+                        "temperature": 0.1
+                    },
+                    timeout=10
+                )
+                end_time = time.time()
+                
+                latency_ms = (end_time - start_time) * 1000
+                latencies.append(latency_ms)
+                
+                if response.status_code == 200:
+                    success_count += 1
+                    
+            except Exception as e:
+                print(f"Request {i} failed: {e}")
+        
+        # Calculate metrics
+        success_rate = success_count / total_requests
+        avg_latency = sum(latencies) / len(latencies) if latencies else 999999
+        
+        min_success_rate = float("{{inputs.parameters.min-success-rate}}")
+        max_latency = float("{{inputs.parameters.max-latency-ms}}")
+        
+        print(f"Validation results:")
+        print(f"  Success rate: {success_rate:.2%} (required: {min_success_rate:.2%})")
+        print(f"  Avg latency: {avg_latency:.0f}ms (max: {max_latency:.0f}ms)")
+        
+        if success_rate >= min_success_rate and avg_latency <= max_latency:
+            print("✅ Validation PASSED")
+            print("success")
+        else:
+            print("❌ Validation FAILED")
+            print("failed")
+  
+  - name: configure-istio-routing
+    inputs:
+      parameters:
+      - name: models
+    container:
+      image: istio/pilot:latest
+      command: [sh, -c]
+      args:
+      - |
+        echo "Configuring traffic routing for models: {{inputs.parameters.models}}"
+        
+        # Create VirtualService for intelligent routing
+        cat <<EOF | kubectl apply -f -
+        apiVersion: networking.istio.io/v1beta1
+        kind: VirtualService
+        metadata:
+          name: llama-3.1-routing
+          namespace: production
+        spec:
+          hosts:
+          - llm-gateway.production.svc.cluster.local
+          http:
+          # Route enterprise requests to 70B model
+          - match:
+            - headers:
+                x-model-tier:
+                  exact: enterprise
+            route:
+            - destination:
+                host: llama-3.1-70b-service
+                port:
+                  number: 8080
+          # Route premium requests to 13B model
+          - match:
+            - headers:
+                x-model-tier:
+                  exact: premium
+            route:
+            - destination:
+                host: llama-3.1-13b-service
+                port:
+                  number: 8080
+          # Default routing to 7B model
+          - route:
+            - destination:
+                host: llama-3.1-7b-service
+                port:
+                  number: 8080
+        EOF
+        
+        echo "Traffic routing configured successfully"

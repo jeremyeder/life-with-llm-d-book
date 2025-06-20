@@ -1,0 +1,66 @@
+# Grafana Dashboard Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-d-golden-signals-dashboard
+  namespace: monitoring
+data:
+  dashboard.json: |
+    {
+      "dashboard": {
+        "title": "LLM-D Golden Signals",
+        "panels": [
+          {
+            "title": "Request Rate (Traffic)",
+            "type": "stat",
+            "targets": [{
+              "expr": "sum(rate(llm_d_requests_total[5m]))",
+              "legendFormat": "Requests/sec"
+            }],
+            "thresholds": [
+              {"value": 50, "color": "red"},
+              {"value": 100, "color": "yellow"},
+              {"value": 200, "color": "green"}
+            ]
+          },
+          {
+            "title": "Error Rate",
+            "type": "stat",
+            "targets": [{
+              "expr": "sum(rate(llm_d_requests_total{status=~'5..'}[5m])) / sum(rate(llm_d_requests_total[5m])) * 100",
+              "legendFormat": "Error %"
+            }],
+            "thresholds": [
+              {"value": 1, "color": "green"},
+              {"value": 5, "color": "yellow"},
+              {"value": 10, "color": "red"}
+            ]
+          },
+          {
+            "title": "Latency Distribution",
+            "type": "heatmap",
+            "targets": [{
+              "expr": "histogram_quantile(0.50, rate(llm_d_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "p50"
+            }, {
+              "expr": "histogram_quantile(0.95, rate(llm_d_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "p95"
+            }, {
+              "expr": "histogram_quantile(0.99, rate(llm_d_request_duration_seconds_bucket[5m]))",
+              "legendFormat": "p99"
+            }]
+          },
+          {
+            "title": "Resource Saturation",
+            "type": "graph",
+            "targets": [{
+              "expr": "avg(llm_d_gpu_utilization) by (instance)",
+              "legendFormat": "GPU Utilization - {{instance}}"
+            }, {
+              "expr": "avg(llm_d_memory_utilization) by (instance)",
+              "legendFormat": "Memory Utilization - {{instance}}"
+            }]
+          }
+        ]
+      }
+    }

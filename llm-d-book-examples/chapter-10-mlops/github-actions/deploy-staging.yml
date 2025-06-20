@@ -1,0 +1,66 @@
+# GitHub Actions workflow for staging deployment
+# This workflow automatically deploys models to staging environment after validation
+# Includes integration testing and post-deployment validation
+
+name: Deploy to Staging
+
+on:
+  workflow_run:
+    workflows: ["Model Validation Pipeline"]
+    types:
+      - completed
+    branches:
+      - main
+
+env:
+  KUBEFLOW_ENDPOINT: ${{ secrets.KUBEFLOW_ENDPOINT }}
+  KUBEFLOW_TOKEN: ${{ secrets.KUBEFLOW_TOKEN }}
+  STAGING_CLUSTER: ${{ secrets.STAGING_CLUSTER }}
+
+jobs:
+  deploy-staging:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          pip install kfp==2.0.0 kubernetes boto3
+          
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.STAGING_KUBECONFIG }}" | base64 -d > ~/.kube/config
+          
+      - name: Deploy to Staging
+        run: |
+          python scripts/deploy-to-staging.py \
+            --kubeflow-endpoint ${{ env.KUBEFLOW_ENDPOINT }} \
+            --kubeflow-token ${{ env.KUBEFLOW_TOKEN }} \
+            --target-namespace staging
+            
+      - name: Run Integration Tests
+        run: |
+          python scripts/run-integration-tests.py \
+            --environment staging \
+            --timeout 600
+            
+      - name: Post Deployment Validation
+        run: |
+          python scripts/validate-deployment.py \
+            --namespace staging \
+            --timeout 300
+            
+      - name: Notify Slack
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "Staging deployment ${{ job.status }} for commit ${{ github.sha }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

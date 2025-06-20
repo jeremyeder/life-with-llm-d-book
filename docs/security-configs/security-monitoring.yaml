@@ -1,0 +1,263 @@
+# Security Monitoring and Alerting Configuration
+#
+# Comprehensive security monitoring for llm-d deployments including:
+# - Authentication failure detection
+# - Unusual API access pattern monitoring
+# - Model access anomaly detection
+# - Resource exhaustion attack prevention
+# - Prompt injection attempt logging
+#
+# Components:
+# - Prometheus alerting rules
+# - AlertManager routing configuration
+# - Grafana security dashboard
+# - Log aggregation with Fluentd
+#
+# Usage:
+#   kubectl apply -f security-monitoring.yaml
+#
+# See: docs/07-security-compliance.md#security-alerting-and-monitoring
+
+# Prometheus rules for security monitoring
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: llm-d-security-alerts
+  namespace: llm-d-monitoring
+spec:
+  groups:
+  - name: llm-d-security
+    rules:
+    # Authentication failures
+    - alert: HighAuthenticationFailures
+      expr: increase(apiserver_audit_total{verb="create",objectRef_resource="tokenreviews",response_code!~"2.."}[5m]) > 10
+      for: 2m
+      labels:
+        severity: warning
+        component: authentication
+      annotations:
+        summary: "High number of authentication failures"
+        description: "{{ $value }} authentication failures in the last 5 minutes"
+    
+    # Suspicious API access patterns
+    - alert: UnusualAPIAccess
+      expr: rate(apiserver_audit_total{objectRef_apiGroup="serving.llm-d.ai"}[10m]) > 2
+      for: 5m
+      labels:
+        severity: warning
+        component: api-access
+      annotations:
+        summary: "Unusual API access pattern detected"
+        description: "High rate of llm-d API calls: {{ $value }} requests/sec"
+    
+    # Model access anomalies
+    - alert: UnauthorizedModelAccess
+      expr: increase(llm_d_model_access_denied_total[5m]) > 0
+      for: 1m
+      labels:
+        severity: critical
+        component: model-security
+      annotations:
+        summary: "Unauthorized model access attempt"
+        description: "{{ $value }} unauthorized model access attempts detected"
+    
+    # Resource exhaustion attacks
+    - alert: SuspiciousResourceUsage
+      expr: max_over_time(container_memory_usage_bytes{container="inference-server"}[5m]) / container_spec_memory_limit_bytes > 0.9
+      for: 10m
+      labels:
+        severity: warning
+        component: resource-security
+      annotations:
+        summary: "Potential resource exhaustion attack"
+        description: "Memory usage consistently above 90% for {{ $labels.pod }}"
+    
+    # Prompt injection attempts
+    - alert: PromptInjectionAttempt
+      expr: increase(llm_d_prompt_injection_blocked_total[5m]) > 0
+      for: 1m
+      labels:
+        severity: warning
+        component: input-security
+      annotations:
+        summary: "Prompt injection attempt blocked"
+        description: "{{ $value }} prompt injection attempts in the last 5 minutes"
+
+---
+# AlertManager configuration for security alerts
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-security-config
+  namespace: llm-d-monitoring
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: 'localhost:587'
+      smtp_from: 'alerts@llm-d.example.com'
+    
+    route:
+      group_by: ['alertname', 'component']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'web.hook'
+      routes:
+      # Critical security alerts - immediate notification
+      - match:
+          severity: critical
+        receiver: 'security-team-pager'
+        group_wait: 10s
+        repeat_interval: 1h
+      
+      # Authentication issues
+      - match:
+          component: authentication
+        receiver: 'security-team-email'
+        group_interval: 2m
+    
+    receivers:
+    - name: 'web.hook'
+      webhook_configs:
+      - url: 'http://llm-d-webhook-service:8080/alerts'
+        send_resolved: true
+    
+    - name: 'security-team-pager'
+      pagerduty_configs:
+      - service_key: 'your-pagerduty-service-key'
+        description: 'Critical llm-d Security Alert: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+    
+    - name: 'security-team-email'
+      email_configs:
+      - to: 'security-team@company.com'
+        subject: 'llm-d Security Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          {{ end }}
+
+---
+# Grafana dashboard for security monitoring
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-dashboard
+  namespace: llm-d-monitoring
+data:
+  security-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "llm-d Security Monitoring",
+        "tags": ["security", "llm-d"],
+        "panels": [
+          {
+            "title": "Authentication Events",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(apiserver_audit_total{verb=\"create\",objectRef_resource=\"tokenreviews\"}[5m])",
+                "legendFormat": "Authentication Requests"
+              },
+              {
+                "expr": "rate(apiserver_audit_total{verb=\"create\",objectRef_resource=\"tokenreviews\",response_code!~\"2..\"}[5m])",
+                "legendFormat": "Authentication Failures"
+              }
+            ]
+          },
+          {
+            "title": "Model Access Patterns",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(llm_d_model_requests_total[5m])",
+                "legendFormat": "Model Requests - {{model}}"
+              },
+              {
+                "expr": "rate(llm_d_model_access_denied_total[5m])",
+                "legendFormat": "Access Denied - {{model}}"
+              }
+            ]
+          },
+          {
+            "title": "Security Events Summary",
+            "type": "singlestat",
+            "targets": [
+              {
+                "expr": "sum(increase(llm_d_security_events_total[24h]))",
+                "legendFormat": "Security Events (24h)"
+              }
+            ]
+          },
+          {
+            "title": "Input Validation Events",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(llm_d_input_validation_blocked_total[5m])",
+                "legendFormat": "Blocked Inputs - {{reason}}"
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+---
+# Fluentd configuration for log aggregation
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-security-config
+  namespace: llm-d-monitoring
+data:
+  fluent.conf: |
+    # Source: Kubernetes audit logs
+    <source>
+      @type tail
+      path /var/log/audit.log
+      pos_file /var/log/fluentd-audit.log.pos
+      tag kubernetes.audit
+      format json
+      time_key timestamp
+      time_format %Y-%m-%dT%H:%M:%S.%NZ
+    </source>
+    
+    # Source: llm-d application logs
+    <source>
+      @type kubernetes_metadata
+      tag kubernetes.application
+      annotation_match ["llm-d.ai/*"]
+    </source>
+    
+    # Filter: Extract security events
+    <filter kubernetes.audit>
+      @type grep
+      <regexp>
+        key objectRef.apiGroup
+        pattern ^serving\.llm-d\.ai$
+      </regexp>
+    </filter>
+    
+    # Filter: Parse llm-d specific logs
+    <filter kubernetes.application>
+      @type parser
+      key_name log
+      reserve_data true
+      <parse>
+        @type json
+        json_parser yajl
+      </parse>
+    </filter>
+    
+    # Output: Send to Elasticsearch
+    <match kubernetes.**>
+      @type elasticsearch
+      host elasticsearch.monitoring.svc.cluster.local
+      port 9200
+      index_name llm-d-security
+      type_name _doc
+      include_tag_key true
+      tag_key @log_name
+      flush_interval 5s
+    </match>

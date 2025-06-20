@@ -1,0 +1,103 @@
+# Disaster Recovery Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: disaster-recovery-plan
+  namespace: sre
+data:
+  recovery_procedures.yaml: |
+    disaster_recovery:
+      scenarios:
+        cluster_failure:
+          description: "Complete cluster failure or corruption"
+          rto: "2 hours"  # Recovery Time Objective
+          rpo: "15 minutes"  # Recovery Point Objective
+          
+          procedures:
+            - "Activate backup cluster"
+            - "Restore configuration from Git"
+            - "Restore model artifacts from backup"
+            - "Redirect traffic via DNS"
+            - "Validate service functionality"
+            
+        data_center_outage:
+          description: "Complete data center or region failure"
+          rto: "4 hours"
+          rpo: "30 minutes"
+          
+          procedures:
+            - "Failover to secondary region"
+            - "Restore from cross-region backups"
+            - "Update load balancer configuration"
+            - "Validate cross-region connectivity"
+            
+        persistent_storage_failure:
+          description: "Loss of persistent storage volumes"
+          rto: "1 hour"
+          rpo: "15 minutes"
+          
+          procedures:
+            - "Restore from volume snapshots"
+            - "Recreate PVCs with restored data"
+            - "Restart affected pods"
+            - "Verify model artifacts integrity"
+
+      backup_strategy:
+        configuration:
+          frequency: "continuous"  # GitOps-based
+          location: "git-repository"
+          retention: "90 days"
+          
+        model_artifacts:
+          frequency: "daily"
+          location: "s3://backups/llm-models"
+          retention: "30 days"
+          
+        persistent_data:
+          frequency: "every 6 hours"
+          location: "volume-snapshots"
+          retention: "7 days"
+          
+        metrics_and_logs:
+          frequency: "real-time"
+          location: "centralized-logging"
+          retention: "30 days"
+
+  backup_scripts.sh: |
+    #!/bin/bash
+    # Automated backup script for LLM-D infrastructure
+    
+    set -e
+    
+    NAMESPACE="llm-d-production"
+    BACKUP_LOCATION="s3://llm-d-backups/$(date +%Y-%m-%d)"
+    
+    echo "Starting backup process..."
+    
+    # Backup Kubernetes configurations
+    echo "Backing up Kubernetes configurations..."
+    kubectl get all -n $NAMESPACE -o yaml > k8s-configs-backup.yaml
+    kubectl get configmaps -n $NAMESPACE -o yaml > configmaps-backup.yaml
+    kubectl get secrets -n $NAMESPACE -o yaml > secrets-backup.yaml
+    
+    # Create volume snapshots
+    echo "Creating volume snapshots..."
+    kubectl get pvc -n $NAMESPACE -o json | \
+      jq -r '.items[].metadata.name' | \
+      xargs -I {} kubectl patch pvc {} -n $NAMESPACE \
+      --type merge -p '{"metadata":{"annotations":{"backup.kubernetes.io/snapshot":"true"}}}'
+    
+    # Backup model artifacts
+    echo "Backing up model artifacts..."
+    kubectl exec -n $NAMESPACE deployment/llm-d-model-service -- \
+      tar czf - /models | aws s3 cp - $BACKUP_LOCATION/models.tar.gz
+    
+    # Upload configurations to S3
+    aws s3 cp k8s-configs-backup.yaml $BACKUP_LOCATION/
+    aws s3 cp configmaps-backup.yaml $BACKUP_LOCATION/
+    aws s3 cp secrets-backup.yaml $BACKUP_LOCATION/
+    
+    echo "Backup completed successfully!"
+    
+    # Cleanup local files
+    rm -f *-backup.yaml

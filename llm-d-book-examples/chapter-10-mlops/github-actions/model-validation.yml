@@ -1,0 +1,108 @@
+# GitHub Actions workflow for model validation pipeline
+# This workflow validates model configurations, runs security scans, and triggers Kubeflow pipelines
+# It detects changes to model files and validates them before deployment
+
+name: Model Validation Pipeline
+
+on:
+  pull_request:
+    paths:
+      - 'models/**'
+      - 'pipelines/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'models/**'
+
+env:
+  KUBEFLOW_ENDPOINT: ${{ secrets.KUBEFLOW_ENDPOINT }}
+  KUBEFLOW_TOKEN: ${{ secrets.KUBEFLOW_TOKEN }}
+  MODEL_REGISTRY_S3_BUCKET: ${{ secrets.MODEL_REGISTRY_S3_BUCKET }}
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      models: ${{ steps.changes.outputs.models }}
+      models_files: ${{ steps.changes.outputs.models_files }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          list-files: json
+          filters: |
+            models:
+              - 'models/**'
+
+  validate-model-configs:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.models == 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        model-path: ${{ fromJson(needs.detect-changes.outputs.models_files) }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          pip install pyyaml jsonschema kfp boto3
+          
+      - name: Validate model configuration
+        run: |
+          python scripts/validate-model-config.py ${{ matrix.model-path }}
+          
+      - name: Check model artifacts
+        run: |
+          python scripts/check-model-artifacts.py ${{ matrix.model-path }}
+
+  security-scan:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.models == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  trigger-kubeflow-pipeline:
+    needs: [validate-model-configs, security-scan]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install Kubeflow SDK
+        run: |
+          pip install kfp==2.0.0
+          
+      - name: Trigger Model Registration Pipeline
+        run: |
+          python scripts/trigger-registration-pipeline.py \
+            --endpoint ${{ env.KUBEFLOW_ENDPOINT }} \
+            --token ${{ env.KUBEFLOW_TOKEN }} \
+            --models-changed '${{ needs.detect-changes.outputs.models_files }}'

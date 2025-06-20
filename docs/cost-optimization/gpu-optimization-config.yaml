@@ -1,0 +1,273 @@
+# GPU Utilization Optimization Configuration
+#
+# This configuration provides comprehensive GPU monitoring, optimization,
+# and cost-aware autoscaling for llm-d deployments.
+#
+# Key Features:
+# - Real-time GPU utilization monitoring and alerting
+# - Cost anomaly detection and automated responses
+# - SLO-driven autoscaling with inference-scheduler integration
+# - Spot instance orchestration for cost savings
+# - Multi-tier node selection for different workload priorities
+#
+# Usage:
+#   kubectl apply -f gpu-optimization-config.yaml
+#
+# See: docs/11-cost-optimization.md#gpu-utilization-optimization
+
+# Prometheus monitoring rules for GPU and cost optimization
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gpu-optimization-config
+  namespace: monitoring
+data:
+  prometheus-rules.yaml: |
+    groups:
+    - name: gpu-utilization
+      rules:
+      - alert: LowGPUUtilization
+        expr: nvidia_gpu_utilization < 50
+        for: 10m
+        labels:
+          severity: warning
+          component: cost-optimization
+        annotations:
+          summary: "GPU utilization below 50% for {{ $labels.instance }}"
+          description: "GPU {{ $labels.gpu }} on {{ $labels.instance }} has been underutilized"
+          
+      - alert: HighGPUMemoryIdle
+        expr: (nvidia_gpu_memory_total - nvidia_gpu_memory_used) / nvidia_gpu_memory_total > 0.4
+        for: 15m
+        labels:
+          severity: info
+          component: cost-optimization
+        annotations:
+          summary: "GPU memory utilization below 60%"
+          description: "Consider consolidating workloads or scaling down"
+          
+    - name: cost-anomalies
+      rules:
+      - alert: CostAnomalyDetected
+        expr: increase(llm_cost_total[1h]) > 1.5 * increase(llm_cost_total[1h] offset 24h)
+        for: 5m
+        labels:
+          severity: critical
+          component: cost-optimization
+        annotations:
+          summary: "Unusual cost increase detected"
+          description: "Hourly costs increased by >50% compared to same time yesterday"
+
+---
+# Cost-optimized LLMDeployment with SLO-driven scaling
+apiVersion: inference.llm-d.io/v1alpha1
+kind: LLMDeployment
+metadata:
+  name: llama-3.1-8b-optimized
+  namespace: production
+  annotations:
+    cost-optimization.llm-d.io/target-utilization: "75"
+    cost-optimization.llm-d.io/max-idle-minutes: "5"
+    cost-optimization.llm-d.io/scale-to-zero: "true"
+spec:
+  model:
+    name: "llama-3.1-8b"
+  
+  # Resource requests based on actual requirements
+  resources:
+    requests:
+      nvidia.com/gpu: "1"
+      memory: "16Gi"  # Optimized based on profiling
+      cpu: "4"        # Reduced from default
+    limits:
+      nvidia.com/gpu: "1"
+      memory: "24Gi"  # Standard limit from shared config
+      cpu: "6"
+  
+  # SLO-driven autoscaling via llm-d inference-scheduler
+  scheduling:
+    scheduler: "llm-d-inference-scheduler"
+    sloPolicy:
+      enabled: true
+      objectives:
+        # Primary SLO: Request latency
+        - name: "request_latency_p95"
+          target: "500ms"
+          weight: 0.4
+          
+        # Secondary SLO: Token generation rate
+        - name: "tokens_per_second"
+          target: "150"
+          weight: 0.3
+          
+        # Cost SLO: Cost efficiency
+        - name: "cost_per_request"
+          target: "0.002"  # $0.002 per request
+          weight: 0.3
+          
+      # Scaling decisions based on SLO violations
+      scaling:
+        scaleUpThreshold: 0.05    # Scale up if >5% SLO violation
+        scaleDownThreshold: 0.90  # Scale down if <10% SLO violation
+        minReplicas: 0           # Scale to zero when no load
+        maxReplicas: 10
+        
+        # Inference-scheduler specific optimizations
+        schedulerConfig:
+          batchingPolicy: "cost_aware"      # Optimize batching for cost
+          queueManagement: "priority_cost"   # Prioritize cost-efficient requests
+          preemption: "enabled"             # Allow preemption for cost optimization
+  
+  # Cost-optimized node selection
+  nodeSelector:
+    cost-tier: "spot"           # Prefer spot instances
+    gpu-efficiency: "high"      # High-efficiency GPUs
+  
+  tolerations:
+  - key: "spot-instance"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  - key: "cost-optimized"
+    operator: "Exists"
+    effect: "PreferNoSchedule"
+  
+  # Efficient scheduling preferences
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 80
+        preference:
+          matchExpressions:
+          - key: node-type
+            operator: In
+            values: ["spot", "preemptible"]
+      - weight: 60
+        preference:
+          matchExpressions:
+          - key: cost-per-hour
+            operator: Lt
+            values: ["2.0"]  # Prefer nodes < $2/hour
+    
+    # Pack workloads efficiently
+    podAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 50
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: workload-type
+              operator: In
+              values: ["llm-inference"]
+          topologyKey: kubernetes.io/hostname
+
+---
+# Cost monitoring dashboard configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cost-monitoring-dashboard
+  namespace: monitoring
+data:
+  dashboard.json: |
+    {
+      "dashboard": {
+        "title": "LLM Cost Optimization",
+        "tags": ["cost", "gpu", "llm-d"],
+        "panels": [
+          {
+            "title": "GPU Utilization vs Cost",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "avg(nvidia_gpu_utilization) by (instance)",
+                "legendFormat": "GPU Utilization - {{instance}}"
+              },
+              {
+                "expr": "rate(llm_cost_total[5m]) * 3600",
+                "legendFormat": "Cost per Hour"
+              }
+            ]
+          },
+          {
+            "title": "Cost per Request Trend",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(llm_cost_total[5m]) / rate(llm_requests_total[5m])",
+                "legendFormat": "Cost per Request"
+              }
+            ]
+          },
+          {
+            "title": "Spot vs On-Demand Usage",
+            "type": "pie",
+            "targets": [
+              {
+                "expr": "sum(nvidia_gpu_utilization) by (instance_type)",
+                "legendFormat": "{{instance_type}}"
+              }
+            ]
+          },
+          {
+            "title": "SLO Compliance",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "avg(llm_d_slo_compliance_ratio)",
+                "legendFormat": "SLO Compliance %"
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+---
+# Multi-tier node configuration for cost optimization
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-tier-config
+  namespace: llm-d-system
+data:
+  node-tiers.yaml: |
+    # Node tier configuration for cost-optimized scheduling
+    node_tiers:
+      spot_optimized:
+        description: "Ultra-low cost spot instances"
+        cost_tier: "spot"
+        instance_types: ["g4dn.2xlarge", "p3.2xlarge"]
+        gpu_efficiency: "high"
+        availability: "best_effort"
+        cost_savings: 60%
+        
+      balanced:
+        description: "Mixed spot and on-demand"
+        cost_tier: "mixed"
+        instance_types: ["g4dn.4xlarge", "p3.8xlarge"]
+        gpu_efficiency: "medium"
+        availability: "high"
+        cost_savings: 30%
+        
+      performance:
+        description: "High-performance on-demand"
+        cost_tier: "on-demand"
+        instance_types: ["p4d.xlarge", "p4d.2xlarge"]
+        gpu_efficiency: "ultra"
+        availability: "guaranteed"
+        cost_savings: 0%
+    
+    scheduling_rules:
+      # Route based on SLO requirements
+      - workload_type: "batch"
+        preferred_tier: "spot_optimized"
+        max_latency: "10s"
+        
+      - workload_type: "interactive"
+        preferred_tier: "balanced"
+        max_latency: "1s"
+        
+      - workload_type: "critical"
+        preferred_tier: "performance"
+        max_latency: "200ms"

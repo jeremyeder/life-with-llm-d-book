@@ -1,0 +1,116 @@
+# GitHub Actions workflow for production deployment
+# This workflow handles manual production deployments with approval gates
+# Supports multiple deployment strategies (blue-green, canary)
+
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_name:
+        description: 'Model name to deploy'
+        required: true
+        type: string
+      model_version:
+        description: 'Model version to deploy'
+        required: true
+        type: string
+      deployment_strategy:
+        description: 'Deployment strategy'
+        required: true
+        default: 'blue-green'
+        type: choice
+        options:
+          - blue-green
+          - canary
+      approval_required:
+        description: 'Require manual approval'
+        required: true
+        default: true
+        type: boolean
+
+env:
+  KUBEFLOW_ENDPOINT: ${{ secrets.KUBEFLOW_ENDPOINT }}
+  KUBEFLOW_TOKEN: ${{ secrets.KUBEFLOW_TOKEN }}
+  PRODUCTION_CLUSTER: ${{ secrets.PRODUCTION_CLUSTER }}
+
+jobs:
+  validate-production-readiness:
+    runs-on: ubuntu-latest
+    outputs:
+      validation_result: ${{ steps.validate.outputs.result }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validate Production Readiness
+        id: validate
+        run: |
+          python scripts/validate-production-readiness.py \
+            --model-name ${{ github.event.inputs.model_name }} \
+            --model-version ${{ github.event.inputs.model_version }} \
+            --staging-namespace staging
+            
+  request-approval:
+    needs: validate-production-readiness
+    if: ${{ github.event.inputs.approval_required == 'true' && needs.validate-production-readiness.outputs.validation_result == 'passed' }}
+    runs-on: ubuntu-latest
+    environment: production-approval
+    steps:
+      - name: Manual Approval Required
+        run: |
+          echo "Manual approval required for production deployment"
+          echo "Model: ${{ github.event.inputs.model_name }}"
+          echo "Version: ${{ github.event.inputs.model_version }}"
+          echo "Strategy: ${{ github.event.inputs.deployment_strategy }}"
+
+  deploy-production:
+    needs: [validate-production-readiness, request-approval]
+    if: always() && (needs.request-approval.result == 'success' || github.event.inputs.approval_required == 'false')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          pip install kfp==2.0.0 kubernetes boto3
+          
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.PRODUCTION_KUBECONFIG }}" | base64 -d > ~/.kube/config
+          
+      - name: Deploy to Production
+        run: |
+          python scripts/deploy-to-production.py \
+            --kubeflow-endpoint ${{ env.KUBEFLOW_ENDPOINT }} \
+            --kubeflow-token ${{ env.KUBEFLOW_TOKEN }} \
+            --model-name ${{ github.event.inputs.model_name }} \
+            --model-version ${{ github.event.inputs.model_version }} \
+            --strategy ${{ github.event.inputs.deployment_strategy }} \
+            --target-namespace production
+            
+      - name: Monitor Deployment
+        run: |
+          python scripts/monitor-deployment.py \
+            --namespace production \
+            --model-name ${{ github.event.inputs.model_name }} \
+            --timeout 900
+            
+      - name: Run Smoke Tests
+        run: |
+          python scripts/run-smoke-tests.py \
+            --environment production \
+            --model-name ${{ github.event.inputs.model_name }}
+            
+      - name: Update Deployment Status
+        if: always()
+        run: |
+          python scripts/update-deployment-status.py \
+            --model-name ${{ github.event.inputs.model_name }} \
+            --model-version ${{ github.event.inputs.model_version }} \
+            --status ${{ job.status }} \
+            --environment production

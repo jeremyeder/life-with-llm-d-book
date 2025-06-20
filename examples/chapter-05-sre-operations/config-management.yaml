@@ -1,0 +1,110 @@
+# Configuration Management Structure
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-d-config-template
+  namespace: config-management
+data:
+  # Environment-specific configurations
+  environments.yaml: |
+    environments:
+      development:
+        namespace: "development"
+        replicas:
+          prefill: 1
+          decode: 1
+        resources:
+          gpu_per_pod: 1
+          memory_per_pod: "16Gi"
+        monitoring:
+          sample_rate: 1.0
+          detailed_logging: true
+        
+      staging:
+        namespace: "staging"
+        replicas:
+          prefill: 2
+          decode: 4
+        resources:
+          gpu_per_pod: 1
+          memory_per_pod: "24Gi"
+        monitoring:
+          sample_rate: 0.1
+          detailed_logging: false
+        
+      production:
+        namespace: "production"
+        replicas:
+          prefill: 4
+          decode: 8
+        resources:
+          gpu_per_pod: 2
+          memory_per_pod: "32Gi"
+        monitoring:
+          sample_rate: 0.01
+          detailed_logging: false
+          
+  # Model configurations
+  models.yaml: |
+    models:
+      llama3-8b:
+        model_uri: "hf://meta-llama/Llama-3.1-8B-Instruct"
+        quantization: "fp8"
+        tensor_parallel_size: 1
+        context_length: 8192
+        
+      llama3-70b:
+        model_uri: "hf://meta-llama/Llama-3.1-70B-Instruct"
+        quantization: "fp8"
+        tensor_parallel_size: 4
+        context_length: 8192
+        
+  # Operational configurations
+  operations.yaml: |
+    operations:
+      health_checks:
+        liveness_probe:
+          path: "/health"
+          initial_delay: 30
+          period: 10
+          timeout: 5
+          failure_threshold: 3
+          
+        readiness_probe:
+          path: "/ready"
+          initial_delay: 10
+          period: 5
+          timeout: 3
+          failure_threshold: 3
+      
+      scaling:
+        hpa:
+          min_replicas: 2
+          max_replicas: 20
+          target_cpu: 70
+          target_memory: 80
+          scale_up_policies:
+            - type: "Percent"
+              value: 100
+              period_seconds: 15
+          scale_down_policies:
+            - type: "Percent"
+              value: 10
+              period_seconds: 60
+      
+      security:
+        pod_security_context:
+          run_as_non_root: true
+          run_as_user: 1000
+          fs_group: 2000
+        
+        network_policies:
+          enabled: true
+          allow_namespaces: ["monitoring", "ingress-nginx"]
+          
+        rbac:
+          create_service_account: true
+          cluster_role_rules:
+            - api_groups: [""]
+              resources: ["configmaps", "secrets"]
+              verbs: ["get", "list", "watch"]

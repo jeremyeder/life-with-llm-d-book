@@ -1,0 +1,108 @@
+# Istio Gateway and VirtualService for LLM traffic management
+# Configures intelligent routing, A/B testing, and traffic splitting
+# Supports experiment-based routing and feature flag testing
+
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: llm-gateway
+  namespace: production
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - api.llm-platform.com
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: llm-platform-tls
+    hosts:
+    - api.llm-platform.com
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: llm-routing
+  namespace: production
+spec:
+  hosts:
+  - api.llm-platform.com
+  gateways:
+  - llm-gateway
+  http:
+  # A/B Testing Routes
+  - match:
+    - headers:
+        x-experiment-id:
+          exact: "model-comparison-v1"
+    route:
+    - destination:
+        host: llama-3.1-7b-service
+        subset: v1-0
+      weight: 50
+    - destination:
+        host: llama-3.1-7b-service
+        subset: v1-1
+      weight: 50
+    fault:
+      delay:
+        percentage:
+          value: 0.1
+        fixedDelay: 5s
+    headers:
+      response:
+        set:
+          x-model-version: "ab-test-v1"
+  
+  # Canary Deployment Route
+  - match:
+    - headers:
+        x-canary-user:
+          exact: "true"
+    route:
+    - destination:
+        host: llama-3.1-70b-service
+        subset: canary
+      weight: 100
+  
+  # Premium Tier Routing
+  - match:
+    - headers:
+        x-tier:
+          exact: "premium"
+    route:
+    - destination:
+        host: llama-3.1-13b-service
+        subset: stable
+      weight: 80
+    - destination:
+        host: llama-3.1-70b-service
+        subset: stable
+      weight: 20
+  
+  # Feature Flag: Long Context
+  - match:
+    - headers:
+        x-feature-long-context:
+          exact: "enabled"
+    route:
+    - destination:
+        host: llama-3.1-7b-service
+        subset: long-context
+      weight: 100
+    timeout: 30s
+  
+  # Default Route
+  - route:
+    - destination:
+        host: llama-3.1-7b-service
+        subset: stable
+      weight: 100

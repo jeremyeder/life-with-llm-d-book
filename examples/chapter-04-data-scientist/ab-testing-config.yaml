@@ -1,0 +1,52 @@
+# A/B Testing Configuration
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: ABTestConfig
+metadata:
+  name: model-comparison-test
+  namespace: data-science-production
+spec:
+  # Define model variants
+  variants:
+    - name: "model-a"
+      weight: 50  # 50% of traffic
+      service: "model-prod-v1"
+    
+    - name: "model-b"
+      weight: 50  # 50% of traffic
+      service: "model-prod-v2"
+  
+  # Traffic routing rules
+  routing:
+    strategy: "random"  # or "user-based", "session-based"
+    stickiness: "session"  # Maintain user consistency
+  
+  # Metrics collection
+  metrics:
+    - name: "latency"
+      threshold: "1s"
+      comparison: "lower_is_better"
+    
+    - name: "user_satisfaction"
+      threshold: "4.0"
+      comparison: "higher_is_better"
+    
+    - name: "error_rate"
+      threshold: "1%"
+      comparison: "lower_is_better"
+  
+  # Test duration and criteria
+  duration: "7d"
+  minSamples: 10000
+  confidenceLevel: 0.95
+  
+  # Automatic rollback conditions
+  rollback:
+    enabled: true
+    conditions:
+      - metric: "error_rate"
+        threshold: "5%"
+        duration: "5m"
+      
+      - metric: "latency"
+        threshold: "2s"
+        duration: "10m"

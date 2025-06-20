@@ -1,0 +1,138 @@
+# Stage 1: Development environment
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: InferenceService
+metadata:
+  name: model-dev-v1
+  namespace: data-science-dev
+  labels:
+    environment: "development"
+    version: "v1.0.0"
+spec:
+  model:
+    modelUri: "hf://meta-llama/Llama-3.1-8B-Instruct"
+    quantization: "none"
+    tensorParallelSize: 1
+  
+  serving:
+    prefill:
+      replicas: 1
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+          memory: "32Gi"
+    
+    decode:
+      replicas: 1
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+          memory: "32Gi"
+  
+  # Development-specific settings
+  development:
+    enableDebugLogging: true
+    allowExperimentalFeatures: true
+    
+  monitoring:
+    enabled: true
+    metricsCollection:
+      detailed: true
+      sampleRate: 1.0  # Collect all metrics in dev
+
+---
+# Stage 2: Staging environment
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: InferenceService
+metadata:
+  name: model-staging-v1
+  namespace: data-science-staging
+  labels:
+    environment: "staging"
+    version: "v1.0.0"
+spec:
+  model:
+    modelUri: "hf://meta-llama/Llama-3.1-8B-Instruct"
+    quantization: "fp8"  # Use quantization for staging
+    tensorParallelSize: 1
+  
+  serving:
+    prefill:
+      replicas: 2
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+          memory: "24Gi"
+    
+    decode:
+      replicas: 2
+      autoscaling:
+        enabled: true
+        minReplicas: 2
+        maxReplicas: 4
+        targetLatency: "500ms"
+  
+  # Production-like settings
+  monitoring:
+    enabled: true
+    metricsCollection:
+      detailed: false
+      sampleRate: 0.1  # Sample 10% in staging
+    
+  caching:
+    enabled: true
+    redis:
+      cluster: "redis-staging"
+
+---
+# Stage 3: Production environment
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: InferenceService
+metadata:
+  name: model-prod-v1
+  namespace: data-science-production
+  labels:
+    environment: "production"
+    version: "v1.0.0"
+spec:
+  model:
+    modelUri: "hf://meta-llama/Llama-3.1-8B-Instruct"
+    quantization: "fp8"
+    tensorParallelSize: 2
+  
+  serving:
+    prefill:
+      replicas: 4
+      resources:
+        limits:
+          nvidia.com/gpu: 2
+          memory: "48Gi"
+    
+    decode:
+      replicas: 8
+      autoscaling:
+        enabled: true
+        minReplicas: 4
+        maxReplicas: 16
+        targetLatency: "200ms"
+  
+  # Production settings
+  monitoring:
+    enabled: true
+    alerting:
+      enabled: true
+      thresholds:
+        latencyP95: "1s"
+        errorRate: "1%"
+        throughput: "100rqs"
+    
+  caching:
+    enabled: true
+    redis:
+      cluster: "redis-production"
+      replication: true
+    
+  # High availability
+  availability:
+    multiZone: true
+    podDisruptionBudget:
+      minAvailable: 2

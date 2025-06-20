@@ -1,0 +1,56 @@
+# RDMA Technology Comparison for LLM Inference
+#
+# This configuration compares InfiniBand vs RoCE for different deployment scenarios.
+# Use this to understand the trade-offs between performance, cost, and complexity.
+#
+# InfiniBand Advantages:
+# - Highest performance: 200Gb/s HDR, 0.5μs latency
+# - Lowest CPU overhead: 1%
+# - Best for: Large model training, high-frequency inference, >100B models
+#
+# RoCE Advantages:
+# - Lower cost: Uses existing Ethernet infrastructure
+# - Easier deployment: Standard networking equipment
+# - Good performance: 100Gb/s, 2μs latency
+# - Best for: Mixed workloads, moderate scale (7B-70B models)
+#
+# Source: Chapter 6 - Performance Optimization
+
+# InfiniBand Configuration (Dedicated Fabric)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: infiniband-config
+  namespace: llm-d-system
+data:
+  # InfiniBand provides highest performance but requires dedicated hardware
+  fabric_type: "infiniband"
+  bandwidth: "200Gb/s"  # HDR InfiniBand
+  latency_microseconds: "0.5"
+  cpu_overhead_percent: "1"
+  deployment_complexity: "high"
+  hardware_cost: "high"
+  use_cases: |
+    - Large model training clusters
+    - High-frequency inference workloads
+    - Multi-node model sharding (>100B parameters)
+---
+# RoCE Configuration (Ethernet-based)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: roce-config
+  namespace: llm-d-system
+data:
+  # RoCE provides good performance on existing Ethernet infrastructure
+  fabric_type: "roce_v2"
+  bandwidth: "100Gb/s"  # Standard 100GbE
+  latency_microseconds: "2"
+  cpu_overhead_percent: "3"
+  deployment_complexity: "medium"
+  hardware_cost: "medium"
+  use_cases: |
+    - Mixed workload environments
+    - Moderate scale inference (7B-70B models)
+    - Cost-conscious deployments
+    - Existing Ethernet infrastructure

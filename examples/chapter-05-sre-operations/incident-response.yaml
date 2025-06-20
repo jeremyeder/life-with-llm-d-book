@@ -1,0 +1,75 @@
+# Incident Response Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: incident-response-procedures
+  namespace: sre
+data:
+  severity_levels.yaml: |
+    severity_levels:
+      P0_CRITICAL:
+        description: "Complete service outage affecting all users"
+        response_time: "5 minutes"
+        escalation_time: "15 minutes"
+        team_members: ["on-call-sre", "service-owner", "incident-commander"]
+        communication_channels: ["#incidents-critical", "pager-duty"]
+        examples:
+          - "All inference requests failing (>95% error rate)"
+          - "Complete cluster outage"
+          - "Data corruption or security breach"
+        
+      P1_HIGH:
+        description: "Significant service degradation affecting majority of users"
+        response_time: "15 minutes"
+        escalation_time: "30 minutes"
+        team_members: ["on-call-sre", "service-owner"]
+        communication_channels: ["#incidents-high", "slack"]
+        examples:
+          - "High error rate (>10%)"
+          - "Severe latency degradation (>5s p95)"
+          - "GPU resource exhaustion"
+        
+      P2_MEDIUM:
+        description: "Partial service degradation with workarounds available"
+        response_time: "30 minutes"
+        escalation_time: "2 hours"
+        team_members: ["on-call-sre"]
+        communication_channels: ["#incidents-medium"]
+        examples:
+          - "Elevated error rate (2-10%)"
+          - "Moderate latency increase (2-5s p95)"
+          - "Single node failures"
+        
+      P3_LOW:
+        description: "Minor issues with minimal user impact"
+        response_time: "2 hours"
+        escalation_time: "8 hours"
+        team_members: ["on-call-sre"]
+        communication_channels: ["#incidents-low"]
+        examples:
+          - "Non-critical monitoring alerts"
+          - "Minor performance degradation"
+          - "Capacity warnings"
+
+  response_procedures.yaml: |
+    response_procedures:
+      initial_response:
+        - "Acknowledge the incident in PagerDuty"
+        - "Join the incident response channel"
+        - "Assess severity using established criteria"
+        - "Notify stakeholders based on severity level"
+        - "Begin investigation using runbooks"
+        
+      investigation_steps:
+        - "Check service status dashboard"
+        - "Review recent deployments and changes"
+        - "Analyze logs and metrics"
+        - "Identify root cause"
+        - "Implement immediate mitigation"
+        
+      communication_protocol:
+        - "Post initial status within 15 minutes"
+        - "Provide updates every 30 minutes for P0/P1"
+        - "Maintain clear, factual communication"
+        - "Document all actions taken"
+        - "Conduct post-incident review"

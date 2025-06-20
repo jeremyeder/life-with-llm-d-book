@@ -1,0 +1,45 @@
+# development-config.yaml
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: InferenceService
+metadata:
+  name: llama-3.1-8b-dev
+  namespace: data-science-dev
+spec:
+  model:
+    modelUri: "hf://meta-llama/Llama-3.1-8B-Instruct"
+    quantization: "none"  # Full precision for development
+    tensorParallelSize: 1
+  
+  serving:
+    prefill:
+      replicas: 1
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+          memory: "32Gi"
+        requests:
+          nvidia.com/gpu: 1
+          memory: "32Gi"
+    
+    decode:
+      replicas: 1
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+          memory: "32Gi"
+        requests:
+          nvidia.com/gpu: 1
+          memory: "32Gi"
+  
+  # Development-specific configurations
+  development:
+    logging:
+      level: "DEBUG"
+      requestTracing: true
+    
+    experimentation:
+      allowModelReload: true
+      enableMetricsCollection: true
+      
+  caching:
+    enabled: false  # Disable for consistent experiment results

@@ -1,0 +1,77 @@
+# NVIDIA H100 Optimized Configuration for Llama 3.1 70B
+# 
+# This configuration leverages H100-specific features:
+# - High GPU memory utilization (90%)
+# - Tensor parallelism across 4 H100 GPUs
+# - Chunked prefill for memory efficiency
+# - Aggressive latency targets (150ms)
+# - Transformer Engine FP8 quantization
+#
+# Expected Performance:
+# - Prefill: ~40 tokens/sec per replica
+# - Decode: ~150 tokens/sec per replica
+# - Total Cost: ~$18/hour for 4x H100 setup
+#
+# Source: Chapter 6 - Performance Optimization
+
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: InferenceService
+metadata:
+  name: llama-3.1-70b-h100-optimized
+  namespace: production
+spec:
+  model:
+    modelUri: "hf://meta-llama/Llama-3.1-70B-Instruct"
+    quantization: "fp8"  # Leverage Transformer Engine
+    tensorParallelSize: 4
+    maxModelLen: 8192
+    
+  serving:
+    prefill:
+      replicas: 2
+      resources:
+        limits:
+          nvidia.com/gpu: 4  # 4x H100 for TP=4
+          memory: "256Gi"
+        requests:
+          nvidia.com/gpu: 4
+          memory: "256Gi"
+      
+      # H100-specific optimizations
+      env:
+      - name: VLLM_GPU_MEMORY_UTILIZATION
+        value: "0.90"  # H100 can handle higher utilization
+      - name: VLLM_MAX_NUM_BATCHED_TOKENS
+        value: "8192"  # Optimize for H100 memory bandwidth
+      - name: VLLM_ENABLE_CHUNKED_PREFILL
+        value: "true"
+      - name: CUDA_DEVICE_MAX_CONNECTIONS
+        value: "1"  # Reduce context switching overhead
+        
+    decode:
+      replicas: 8
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+          memory: "64Gi"
+        requests:
+          nvidia.com/gpu: 1
+          memory: "64Gi"
+          
+      autoscaling:
+        enabled: true
+        minReplicas: 4
+        maxReplicas: 16
+        targetLatency: "150ms"  # Aggressive latency target for H100
+        
+  # Hopper-specific scheduling
+  nodeSelector:
+    nvidia.com/gpu.product: "NVIDIA-H100-80GB-HBM3"
+    
+  # Performance monitoring
+  monitoring:
+    enabled: true
+    metrics:
+      gpuUtilization: true
+      memoryBandwidth: true
+      tensorEngineEfficiency: true

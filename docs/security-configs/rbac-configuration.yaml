@@ -1,0 +1,92 @@
+# llm-d RBAC Configuration
+# Comprehensive role-based access control for production llm-d deployments
+# 
+# This configuration provides three primary roles:
+# - Model Operator: Full control over llm-d resources
+# - Data Scientist: Limited model access for development
+# - SRE: Full operational access for production support
+#
+# Usage:
+#   kubectl apply -f rbac-configuration.yaml
+#
+# See: docs/07-security-compliance.md#rbac-configuration-for-llm-d-resources
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: llm-d-model-operator
+rules:
+# Core llm-d resource permissions
+- apiGroups: ["serving.llm-d.ai"]
+  resources: ["inferenceservices", "modelrepositories"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: ["serving.llm-d.ai"]
+  resources: ["inferenceservices/status"]
+  verbs: ["get", "update", "patch"]
+# Required Kubernetes resources
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+
+---
+# Data Scientist Role - Limited Model Access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: llm-d-data-scientist
+rules:
+- apiGroups: ["serving.llm-d.ai"]
+  resources: ["inferenceservices"]
+  verbs: ["get", "list", "watch", "create"]
+  resourceNames: [] # Can be restricted to specific models
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list"]
+
+---
+# SRE Role - Full Operational Access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: llm-d-sre
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+- nonResourceURLs: ["/metrics", "/healthz", "/readyz"]
+  verbs: ["get"]
+
+---
+# Bind roles to users/groups
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: llm-d-data-scientists
+subjects:
+- kind: Group
+  name: "data-scientists"
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: llm-d-data-scientist
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: llm-d-sres
+subjects:
+- kind: Group
+  name: "sre-team"
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: llm-d-sre
+  apiGroup: rbac.authorization.k8s.io

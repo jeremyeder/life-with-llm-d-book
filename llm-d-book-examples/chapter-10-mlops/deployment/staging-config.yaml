@@ -1,0 +1,29 @@
+# Staging environment configuration
+# Lower resource requirements for cost-effective testing
+# Includes autoscaling and monitoring for staging workloads
+
+environment: staging
+namespace: staging
+
+cluster:
+  gpu_node_selector:
+    node-type: gpu-v100
+  
+resources:
+  default_limits:
+    memory_multiplier: 0.8
+    gpu_multiplier: 1.0
+  
+autoscaling:
+  enabled: true
+  min_replicas: 1
+  max_replicas: 5
+
+monitoring:
+  prometheus_namespace: monitoring
+  alert_manager_webhook: "https://hooks.slack.com/services/staging-alerts"
+
+deployment:
+  strategy: "rolling-update"
+  max_unavailable: 1
+  max_surge: 1

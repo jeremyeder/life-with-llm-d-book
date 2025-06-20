@@ -163,6 +163,8 @@ kubectl exec -n <namespace> <pod> -- \
 
 ### GPU Memory Analysis
 
+**📁 Code Example**: [`gpu-memory-profile.py`](../../llm-d-book-examples/chapter-08-troubleshooting/diagnostic-tools/gpu-memory-profile.py)
+
 ```python
 # gpu_memory_profile.py - Run inside pod
 import torch
@@ -261,6 +263,8 @@ flamegraph.pl perf.script > flame.svg
 ```
 
 ### Memory Profiling
+
+**📁 Code Example**: [`memory-profiler.py`](../../llm-d-book-examples/chapter-08-troubleshooting/diagnostic-tools/memory-profiler.py)
 
 ```python
 # memory_profiler.py - Memory usage analysis
@@ -380,6 +384,8 @@ curl "http://localhost:16686/api/traces?service=llm-model&operation=inference&li
 
 ### Comprehensive Health Check
 
+**📁 Code Example**: [`llm-d-health-check.sh`](../../llm-d-book-examples/chapter-08-troubleshooting/diagnostic-tools/llm-d-health-check.sh)
+
 ```bash
 #!/bin/bash
 # llm-d-health-check.sh
@@ -419,6 +425,8 @@ kubectl exec -n $NAMESPACE -l app=$DEPLOYMENT -- curl -s -o /dev/null -w "HTTP C
 ```
 
 ### Automated Diagnostics Collection
+
+**📁 Code Example**: [`collect-diagnostics.py`](../../llm-d-book-examples/chapter-08-troubleshooting/diagnostic-tools/collect-diagnostics.py)
 
 ```python
 #!/usr/bin/env python3

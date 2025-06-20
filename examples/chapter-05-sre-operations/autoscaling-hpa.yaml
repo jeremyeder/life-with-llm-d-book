@@ -1,0 +1,94 @@
+# Multi-metric HPA Configuration
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: llm-d-intelligent-hpa
+  namespace: production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: llm-d-decode
+  
+  minReplicas: 4
+  maxReplicas: 32
+  
+  # Multi-metric scaling
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+        
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+        
+  - type: Custom
+    custom:
+      metric:
+        name: llm_d_queue_depth
+      target:
+        type: AverageValue
+        averageValue: "5"
+        
+  - type: Custom
+    custom:
+      metric:
+        name: llm_d_request_latency_p95
+      target:
+        type: AverageValue
+        averageValue: "1500m"  # 1.5 seconds
+  
+  # Scaling behavior
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Max
+      
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+      selectPolicy: Min
+
+---
+# Vertical Pod Autoscaler for Resource Optimization
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: llm-d-vpa
+  namespace: production
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: llm-d-prefill
+  
+  updatePolicy:
+    updateMode: "Auto"  # Automatically apply recommendations
+    
+  resourcePolicy:
+    containerPolicies:
+    - containerName: llm-d-service
+      minAllowed:
+        cpu: 500m
+        memory: 8Gi
+      maxAllowed:
+        cpu: 4000m
+        memory: 64Gi
+      controlledResources: ["cpu", "memory"]

@@ -1,0 +1,57 @@
+# SLO Configuration
+apiVersion: monitoring.llm-d.ai/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: llm-d-production-slos
+  namespace: sre-monitoring
+spec:
+  service: "llm-d-production"
+  
+  objectives:
+    - name: "availability"
+      description: "Service availability excluding planned maintenance"
+      target: 99.9  # 99.9% uptime (43.8 minutes downtime/month)
+      metric:
+        type: "availability"
+        good_query: "up{job='llm-d-service'} == 1"
+        total_query: "up{job='llm-d-service'}"
+      window: "30d"
+    
+    - name: "latency"
+      description: "95th percentile inference latency"
+      target: 95.0  # 95% of requests under threshold
+      metric:
+        type: "latency"
+        query: "histogram_quantile(0.95, rate(llm_d_request_duration_seconds_bucket[5m]))"
+        threshold: "2s"
+      window: "30d"
+    
+    - name: "error_rate"
+      description: "Error rate for inference requests"
+      target: 99.5  # 99.5% success rate (0.5% error budget)
+      metric:
+        type: "ratio"
+        good_query: "rate(llm_d_requests_total{status!~'5..'}[5m])"
+        total_query: "rate(llm_d_requests_total[5m])"
+      window: "30d"
+    
+    - name: "throughput"
+      description: "Minimum sustained throughput"
+      target: 100.0  # Minimum 100 requests/second
+      metric:
+        type: "throughput" 
+        query: "rate(llm_d_requests_total[5m])"
+        threshold: "100"
+      window: "30d"
+
+  # Error budget configuration
+  error_budget:
+    policy: "burn_rate"
+    alerts:
+      - severity: "page"
+        burn_rate: 14.4  # Page if burning budget 14.4x faster
+        duration: "2m"
+      
+      - severity: "ticket"
+        burn_rate: 6.0   # Create ticket if burning 6x faster
+        duration: "15m"

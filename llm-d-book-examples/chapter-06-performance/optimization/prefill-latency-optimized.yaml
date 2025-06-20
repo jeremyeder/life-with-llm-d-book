@@ -1,0 +1,99 @@
+# Ultra-Low Latency Configuration for Interactive Chat Applications
+#
+# This configuration prioritizes time-to-first-token (TTFT) over throughput:
+# - Small model (8B) for faster processing
+# - Multiple replicas (8) for request distribution
+# - Lower GPU memory utilization (75%) for faster allocation
+# - Disabled chunked prefill for minimum latency
+# - Synchronous processing to eliminate async overhead
+# - Small batch sizes (8) for immediate response
+# - Least-connections load balancing
+#
+# Expected Performance:
+# - TTFT: <50ms for typical chat prompts
+# - Decode latency: <10ms per token
+# - Throughput trade-off: ~60% of maximum possible
+# - Ideal for: Interactive chat, real-time applications
+#
+# Source: Chapter 6 - Performance Optimization
+
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: InferenceService
+metadata:
+  name: ultra-low-latency-chat
+  namespace: interactive-services
+spec:
+  model:
+    modelUri: "hf://meta-llama/Llama-3.1-8B-Instruct"
+    quantization: "fp8"
+    tensorParallelSize: 1
+    maxModelLen: 4096  # Shorter context for lower latency
+    
+  serving:
+    prefill:
+      replicas: 8  # Multiple replicas for request distribution
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+          memory: "32Gi"
+          cpu: "8"
+        requests:
+          nvidia.com/gpu: 1
+          memory: "32Gi"
+          cpu: "8"
+      
+      # Aggressive latency optimization
+      env:
+      - name: VLLM_GPU_MEMORY_UTILIZATION
+        value: "0.75"  # Lower utilization for faster allocation
+      - name: VLLM_MAX_NUM_SEQS
+        value: "16"  # Limit concurrent sequences
+      - name: VLLM_ENABLE_CHUNKED_PREFILL
+        value: "false"  # Disable for minimum latency
+      - name: VLLM_DISABLE_ASYNC_OUTPUT_PROC
+        value: "true"  # Synchronous processing
+      - name: CUDA_LAUNCH_BLOCKING
+        value: "1"  # Ensure synchronous execution
+      
+      # Container-level optimizations  
+      securityContext:
+        capabilities:
+          add: ["SYS_NICE"]  # Allow process priority adjustment
+      
+    decode:
+      replicas: 4
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+          memory: "16Gi"
+        requests:
+          nvidia.com/gpu: 1
+          memory: "16Gi"
+      
+      # Decode latency optimization
+      env:
+      - name: VLLM_DECODE_BATCH_SIZE
+        value: "8"  # Small batches for responsiveness
+      - name: VLLM_TOKEN_BUDGET_RATIO
+        value: "0.8"  # Reserve capacity for new requests
+        
+  # Load balancing for latency
+  loadBalancing:
+    strategy: "least-connections"  # Route to least loaded replica
+    healthCheck:
+      path: "/health"
+      intervalSeconds: 5
+      timeoutSeconds: 2
+    
+  # Priority scheduling
+  priorityClassName: "high-priority-inference"
+  
+  # Monitoring for latency tracking
+  monitoring:
+    enabled: true
+    metrics:
+      timeToFirstToken: true
+      prefillLatency: true
+      decodeLatency: true
+    alerting:
+      latencyThreshold: "100ms"

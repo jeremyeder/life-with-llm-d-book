@@ -1,0 +1,18 @@
+# Model Categories Configuration
+# Code generation models
+code_models:
+  - "codellama/CodeLlama-7b-Instruct-hf"
+  - "codellama/CodeLlama-13b-Instruct-hf"
+  - "codellama/CodeLlama-34b-Instruct-hf"
+
+# General conversation models
+chat_models:
+  - "meta-llama/Llama-3.1-8B-Instruct"
+  - "meta-llama/Llama-3.1-70B-Instruct"
+  - "meta-llama/Llama-3.1-405B-Instruct"
+
+# Specialized domain models
+domain_models:
+  - "microsoft/DialoGPT-medium"
+  - "facebook/blenderbot-400M-distill"
+  - "microsoft/BioGPT-Large"

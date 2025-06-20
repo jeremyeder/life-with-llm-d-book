@@ -1,0 +1,34 @@
+# Production environment configuration
+# High-availability settings with SLO requirements
+# Blue-green deployment strategy with manual approval gates
+
+environment: production
+namespace: production
+
+cluster:
+  gpu_node_selector:
+    node-type: gpu-a100
+  
+resources:
+  default_limits:
+    memory_multiplier: 1.0
+    gpu_multiplier: 1.0
+  
+autoscaling:
+  enabled: true
+  min_replicas: 3
+  max_replicas: 20
+
+monitoring:
+  prometheus_namespace: monitoring
+  alert_manager_webhook: "https://hooks.slack.com/services/production-alerts"
+
+deployment:
+  strategy: "blue-green"
+  approval_required: true
+  canary_percentage: 10
+  
+slo:
+  availability: 0.999
+  latency_p95_ms: 2000
+  error_rate: 0.01

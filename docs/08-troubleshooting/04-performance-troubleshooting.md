@@ -500,6 +500,8 @@ class KVCacheManager:
 
 ### Load Testing Framework
 
+**📁 Code Example**: [`load-test.py`](../../llm-d-book-examples/chapter-08-troubleshooting/performance-troubleshooting/load-test.py)
+
 ```python
 # load_test.py
 import asyncio

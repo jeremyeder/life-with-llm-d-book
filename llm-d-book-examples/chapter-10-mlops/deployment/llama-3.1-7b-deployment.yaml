@@ -1,0 +1,55 @@
+# Base Llama 3.1 7B model deployment configuration
+# GitOps-managed LLM deployment with autoscaling and monitoring
+# Supports environment-specific overlays for dev, staging, production
+
+apiVersion: inference.llm-d.io/v1alpha1
+kind: LLMDeployment
+metadata:
+  name: llama-3.1-7b
+  labels:
+    app: llama-3.1-7b
+    model-family: llama-3.1
+    model-size: 7b
+    managed-by: gitops
+spec:
+  model:
+    name: llama-3.1-7b
+    source:
+      modelUri: s3://model-registry/llama-3.1-7b/v1.0.0
+    framework: pytorch
+    architecture: llama-3.1
+    parameters: 7000000000
+  
+  replicas: 2
+  
+  resources:
+    requests:
+      nvidia.com/gpu: "1"
+      memory: "16Gi"
+      cpu: "4"
+    limits:
+      nvidia.com/gpu: "1"
+      memory: "20Gi"
+      cpu: "8"
+  
+  serving:
+    protocol: http
+    port: 8080
+    batchSize: 4
+    maxSequenceLength: 4096
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetGPUUtilization: 70
+    
+  monitoring:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+      
+  nodeSelector:
+    gpu-type: "a100"
+    node-pool: "inference"

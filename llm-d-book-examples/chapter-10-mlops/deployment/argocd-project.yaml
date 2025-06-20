@@ -1,0 +1,56 @@
+# ArgoCD project configuration for LLM model deployments
+# Defines access controls, allowed repositories, and RBAC policies
+# Supports multiple environments with appropriate permissions
+
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: llm-models
+  namespace: argocd
+spec:
+  description: "LLM Model Deployments"
+  
+  sourceRepos:
+  - https://github.com/your-org/llm-gitops-config
+  - https://github.com/your-org/llm-model-configs
+  
+  destinations:
+  - namespace: development
+    server: https://kubernetes.default.svc
+  - namespace: staging
+    server: https://kubernetes.default.svc
+  - namespace: production
+    server: https://kubernetes.default.svc
+  
+  clusterResourceWhitelist:
+  - group: ''
+    kind: Namespace
+  - group: inference.llm-d.io
+    kind: '*'
+  - group: networking.istio.io
+    kind: '*'
+  
+  namespaceResourceWhitelist:
+  - group: ''
+    kind: '*'
+  - group: apps
+    kind: '*'
+  - group: autoscaling
+    kind: '*'
+  
+  roles:
+  - name: ml-engineers
+    description: "ML Engineers can deploy to dev/staging"
+    policies:
+    - p, proj:llm-models:ml-engineers, applications, get, llm-models/*, allow
+    - p, proj:llm-models:ml-engineers, applications, sync, llm-models/development/*, allow
+    - p, proj:llm-models:ml-engineers, applications, sync, llm-models/staging/*, allow
+    groups:
+    - ml-engineers
+    
+  - name: sre-team
+    description: "SRE team has full access"
+    policies:
+    - p, proj:llm-models:sre-team, applications, *, llm-models/*, allow
+    groups:
+    - sre-team

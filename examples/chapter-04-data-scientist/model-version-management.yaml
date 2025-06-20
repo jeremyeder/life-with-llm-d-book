@@ -1,0 +1,49 @@
+# Model Version Management
+apiVersion: serving.llm-d.ai/v1alpha1
+kind: ModelVersion
+metadata:
+  name: llama-3.1-8b-v1-2-0
+  namespace: data-science-production
+spec:
+  model:
+    name: "llama-3.1-8b"
+    version: "1.2.0"
+    modelUri: "hf://meta-llama/Llama-3.1-8B-Instruct"
+    
+  # Version metadata
+  metadata:
+    author: "data-science-team"
+    description: "Optimized version with improved latency"
+    changeLog: |
+      - Updated quantization to fp8
+      - Optimized tensor parallel configuration
+      - Improved cache efficiency
+    
+  # Deployment configuration
+  deployment:
+    strategy: "blue-green"  # or "rolling", "canary"
+    rollbackPolicy:
+      enabled: true
+      automaticRollback: true
+      conditions:
+        - metric: "error_rate"
+          threshold: "2%"
+          duration: "5m"
+        - metric: "latency_p95"
+          threshold: "1s"
+          duration: "10m"
+  
+  # Testing requirements
+  testing:
+    required: true
+    suites:
+      - name: "regression_tests"
+        required: true
+      - name: "performance_tests"
+        required: true
+      - name: "quality_tests"
+        required: false
+    
+    approvals:
+      required: 2
+      roles: ["data-scientist", "ml-engineer"]

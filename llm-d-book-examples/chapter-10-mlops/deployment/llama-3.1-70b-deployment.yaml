@@ -1,0 +1,71 @@
+# Llama 3.1 70B enterprise model deployment configuration
+# High-resource deployment with model parallelism and premium tier settings
+# Requires H100 GPUs with high-speed interconnects
+
+apiVersion: inference.llm-d.io/v1alpha1
+kind: LLMDeployment
+metadata:
+  name: llama-3.1-70b
+  labels:
+    app: llama-3.1-70b
+    model-family: llama-3.1
+    model-size: 70b
+    model-tier: enterprise
+spec:
+  model:
+    name: llama-3.1-70b
+    source:
+      modelUri: s3://model-registry/llama-3.1-70b/v1.0.0
+    framework: pytorch
+    architecture: llama-3.1
+    parameters: 70000000000
+    
+    # Model parallelism configuration
+    parallelism:
+      tensor: 8  # Split across 8 GPUs
+      pipeline: 1
+  
+  replicas: 2  # Each replica uses 8 GPUs
+  
+  resources:
+    requests:
+      nvidia.com/gpu: "8"  # 8 GPUs per replica
+      memory: "256Gi"
+      cpu: "32"
+    limits:
+      nvidia.com/gpu: "8"
+      memory: "320Gi"
+      cpu: "64"
+  
+  serving:
+    protocol: http
+    port: 8080
+    batchSize: 1  # Single request processing
+    maxSequenceLength: 8192  # Longer context
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4  # Limited by GPU availability
+    targetGPUUtilization: 80
+    
+  nodeSelector:
+    gpu-type: "h100"  # Requires latest GPUs
+    node-pool: "enterprise"
+    
+  tolerations:
+  - key: "enterprise-workload"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "gpu-interconnect"
+            operator: In
+            values:
+            - "nvlink"
+            - "infiniband"
