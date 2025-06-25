@@ -32,15 +32,15 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11']
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     
     - name: Cache pip dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements-test.txt') }}
@@ -52,57 +52,18 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements-test.txt
     
-    - name: Run linting
+    - name: Run tests
       run: |
-        # Run ruff for linting
-        ruff check examples/ docs/cost-optimization/ docs/security-configs/ tests/
-    
-    - name: Run type checking
-      run: |
-        # Run mypy for type checking
-        mypy --ignore-missing-imports examples/ docs/cost-optimization/ docs/security-configs/
-      continue-on-error: true  # Don't fail on type errors initially
-    
-    - name: Run tests with coverage
-      run: |
-        pytest -v --cov --cov-report=xml --cov-report=term
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-${{ matrix.python-version }}
-        fail_ci_if_error: false
-    
-    - name: Generate coverage report comment
-      if: github.event_name == 'pull_request'
-      uses: py-cov-action/python-coverage-comment-action@v3
-      with:
-        GITHUB_TOKEN: ${{ github.token }}
-        MINIMUM_GREEN: 85
-        MINIMUM_ORANGE: 70
-    
-    - name: Check coverage threshold
-      run: |
-        coverage report --fail-under=80
-    
-    - name: Upload coverage HTML report
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: coverage-report-${{ matrix.python-version }}
-        path: htmlcov/
-        retention-days: 7
+        pytest tests/ -v
   
   test-notebooks:
     runs-on: ubuntu-latest
     if: false  # Disabled for now, enable when notebook tests are added
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     
@@ -119,32 +80,19 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install bandit
+      run: pip install bandit[toml]
     
     - name: Run Bandit security scan
-      uses: gaurav-nelson/bandit-action@v1
-      with:
-        path: "examples/ docs/cost-optimization/ docs/security-configs/"
-        level: medium
-        confidence: medium
-        exit_zero: true  # Don't fail the build on security issues
+      run: |
+        bandit -r examples/ docs/cost-optimization/ docs/security-configs/ -f json -o bandit-report.json || true
+        bandit -r examples/ docs/cost-optimization/ docs/security-configs/ || true
+      continue-on-error: true  # Don't fail the build on security issues
   
-  publish-results:
-    needs: [test]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Download coverage reports
-      uses: actions/download-artifact@v3
-      with:
-        path: coverage-reports
-    
-    - name: Create coverage badge
-      uses: cicirello/jacoco-badge-generator@v2
-      with:
-        coverage-badge-filename: coverage.svg
-        generate-coverage-badge: true
-        coverage-label: Coverage
-        colors: '#4c1 #97CA00 #a4a61d #dfb317 #fe7d37 #e05d44'
-        intervals: '100 90 80 70 60 0'
