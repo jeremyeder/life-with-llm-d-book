@@ -18,17 +18,35 @@ except ImportError:
     import requests
     class LLMDClient:
         def __init__(self, endpoint, model_name):
-            self.endpoint = endpoint
+            self.endpoint = endpoint.rstrip('/')
             self.model_name = model_name
             self.session = requests.Session()
         
         def chat_completion(self, messages, **kwargs):
-            """Mock chat completion method."""
-            return {"mock": "response"}
+            """Mock chat completion method that actually uses session."""
+            url = f"{self.endpoint}/v1/chat/completions"
+            payload = {
+                "model": self.model_name,
+                "messages": messages,
+                "max_tokens": kwargs.get("max_tokens", 1000),
+                "temperature": kwargs.get("temperature", 0.7),
+                "top_p": kwargs.get("top_p", 0.9),
+                "stream": kwargs.get("stream", False)
+            }
+            headers = {"Content-Type": "application/json"}
+            response = self.session.post(url, json=payload, headers=headers)
+            return response.json()
         
         def embeddings(self, input_text, model=None):
-            """Mock embeddings method."""
-            return {"mock": "embeddings"}
+            """Mock embeddings method that actually uses session."""
+            url = f"{self.endpoint}/v1/embeddings"
+            payload = {
+                "model": model or self.model_name,
+                "input": input_text
+            }
+            headers = {"Content-Type": "application/json"}
+            response = self.session.post(url, json=payload, headers=headers)
+            return response.json()
 from tests.fixtures.mock_responses import MockLLMResponses
 
 
