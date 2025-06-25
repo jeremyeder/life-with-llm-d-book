@@ -9,7 +9,6 @@ coverage[toml]>=7.3.0
 
 # Mocking and testing utilities
 responses>=0.23.3  # For mocking HTTP requests
-unittest-mock>=1.5  # Additional mock utilities
 
 # Test data generation
 faker>=19.6.1
