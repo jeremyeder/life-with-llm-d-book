@@ -13,6 +13,24 @@ updates:
     commit-message:
       prefix: "deps"
       include: "scope"
+    # Group related updates to reduce PR noise
+    groups:
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
+        update-types:
+          - "minor"
+          - "patch"
+      dev-dependencies:
+        patterns:
+          - "cspell"
+          - "markdownlint-cli"
+          - "@types/*"
+          - "eslint*"
+          - "prettier*"
+        update-types:
+          - "minor" 
+          - "patch"
     
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
@@ -27,3 +45,11 @@ updates:
     commit-message:
       prefix: "ci"
       include: "scope"
+    # Group GitHub Actions updates
+    groups:
+      github-actions:
+        patterns:
+          - "actions/*"
+        update-types:
+          - "minor"
+          - "patch"
