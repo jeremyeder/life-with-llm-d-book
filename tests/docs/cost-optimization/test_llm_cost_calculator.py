@@ -107,13 +107,14 @@ class TestGPUSpecs:
         assert gpu.provider == CloudProvider.COREWEAVE
 
 
-@pytest.mark.skipif(LLMCostCalculator is None, reason="LLMCostCalculator module not available")
 class TestLLMCostCalculator:
     """Test cases for LLMCostCalculator class."""
     
     @pytest.fixture
     def calculator(self):
         """Create calculator instance."""
+        if LLMCostCalculator is None:
+            pytest.skip("LLMCostCalculator module not available")
         return LLMCostCalculator()
     
     @pytest.fixture

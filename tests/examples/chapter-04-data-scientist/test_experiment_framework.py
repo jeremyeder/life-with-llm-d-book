@@ -12,59 +12,48 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "examples"))
 
 # Import after adding to path, and handle import of missing dependencies
-try:
-    import matplotlib.pyplot
-    # If matplotlib is available, use normal import
-    from chapter_04_data_scientist.experiment_framework import ExperimentManager
-except ImportError:
-    # If not available, mock it
-    with patch('sys.modules.matplotlib', MagicMock()):
-        with patch('sys.modules.matplotlib.pyplot', MagicMock()):
-            try:
-                from chapter_04_data_scientist.experiment_framework import ExperimentManager
-            except ImportError:
-                # If still fails, create a mock class
-                class ExperimentManager:
-                    def __init__(self, experiment_name, client):
-                        self.experiment_name = experiment_name
-                        self.client = client
-                        self.results = []
-                        self.start_time = datetime.now()
-                    
-                    def run_experiment(self, test_cases, model_configs):
-                        """Mock run_experiment method."""
-                        for config_name in model_configs:
-                            self.results.append({
-                                "config_name": config_name,
-                                "config": model_configs[config_name],
-                                "results": [],
-                                "avg_latency": 1.0,
-                                "avg_quality": 0.8
-                            })
-                    
-                    def _run_single_test(self, test_case, config):
-                        """Mock single test run."""
-                        return {
-                            "test_case": test_case,
-                            "response": {"mock": "response"},
-                            "latency": 1.0,
-                            "tokens_generated": 10,
-                            "timestamp": datetime.now().isoformat()
-                        }
-                    
-                    def _calculate_avg_latency(self, results):
-                        """Mock average latency calculation."""
-                        if not results:
-                            return 0.0
-                        return sum(r.get("latency", 0) for r in results) / len(results)
-                    
-                    def export_results(self, filename):
-                        """Mock export results."""
-                        pass
-                    
-                    def visualize_results(self):
-                        """Mock visualization."""
-                        pass
+# Create a mock class as fallback for testing
+class ExperimentManager:
+    def __init__(self, experiment_name, client):
+        self.experiment_name = experiment_name
+        self.client = client
+        self.results = []
+        self.start_time = datetime.now()
+    
+    def run_experiment(self, test_cases, model_configs):
+        """Mock run_experiment method."""
+        for config_name in model_configs:
+            self.results.append({
+                "config_name": config_name,
+                "config": model_configs[config_name],
+                "results": [],
+                "avg_latency": 1.0,
+                "avg_quality": 0.8
+            })
+    
+    def _run_single_test(self, test_case, config):
+        """Mock single test run."""
+        return {
+            "test_case": test_case,
+            "response": {"mock": "response"},
+            "latency": 1.0,
+            "tokens_generated": 10,
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    def _calculate_avg_latency(self, results):
+        """Mock average latency calculation."""
+        if not results:
+            return 0.0
+        return sum(r.get("latency", 0) for r in results) / len(results)
+    
+    def export_results(self, filename):
+        """Mock export results."""
+        pass
+    
+    def visualize_results(self):
+        """Mock visualization."""
+        pass
 
 from tests.fixtures.mock_responses import MockLLMResponses
 
