@@ -28,3 +28,23 @@ types-requests>=2.31.0
 # Code quality
 black>=23.9.1
 ruff>=0.0.291
+
+# Optional dependencies for better test coverage
+# Data science and ML libraries
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+scikit-learn>=1.3.0
+
+# Kubernetes and cloud libraries  
+kubernetes>=27.2.0
+pyyaml>=6.0
+
+# Monitoring and metrics
+prometheus-client>=0.17.0
+
+# MLOps and experiment tracking
+mlflow>=2.5.0
+
+# Additional utilities
+requests>=2.31.0

@@ -54,9 +54,26 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements-test.txt
     
-    - name: Run tests
+    - name: Run tests with coverage
       run: |
         pytest tests/ -v
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-${{ matrix.python-version }}
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+    
+    - name: Upload coverage HTML report
+      uses: actions/upload-artifact@v4
+      if: matrix.python-version == '3.11'  # Only upload from one version
+      with:
+        name: coverage-report
+        path: htmlcov/
+        retention-days: 7
   
   test-notebooks:
     runs-on: ubuntu-latest

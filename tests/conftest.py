@@ -12,11 +12,11 @@ import shutil
 from pathlib import Path
 from unittest.mock import Mock, MagicMock, patch
 from typing import Dict, Any, Generator
-# import asyncio  # Uncomment when needed
+import asyncio
 
 
 # Pytest plugins
-# pytest_plugins = ["pytest_asyncio"]  # Uncomment when pytest-asyncio is installed
+pytest_plugins = ["pytest_asyncio"]
 
 
 @pytest.fixture
@@ -231,11 +231,10 @@ def create_mock_deployment_config(name: str = "test-deployment") -> Dict[str, An
     }
 
 
-# Async test helpers (uncomment when asyncio is needed)
-# @pytest.fixture
-# def event_loop():
-#     """Create an instance of the default event loop for the test session."""
-#     import asyncio
-#     loop = asyncio.get_event_loop_policy().new_event_loop()
-#     yield loop
-#     loop.close()
+# Async test helpers
+@pytest.fixture
+def event_loop():
+    """Create an instance of the default event loop for the test session."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
