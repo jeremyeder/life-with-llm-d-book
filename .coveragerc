@@ -1,0 +1,57 @@
+[run]
+source = 
+    examples
+    docs/cost-optimization
+    docs/security-configs
+    llm-d-book-examples
+
+omit = 
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */venv/*
+    */node_modules/*
+    setup.py
+    */migrations/*
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+fail_under = 80
+
+exclude_lines =
+    # Standard patterns to exclude
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstract
+    @abstractmethod
+    
+    # Defensive programming patterns
+    except ImportError
+    except Exception as e:
+    except KeyboardInterrupt
+    
+    # Debug-only code
+    if DEBUG:
+    if debug:
+    
+    # Platform-specific code
+    if sys.platform
+
+[html]
+directory = htmlcov
+
+[xml]
+output = coverage.xml
+
+[paths]
+source =
+    examples/
+    docs/cost-optimization/
+    docs/security-configs/
+    llm-d-book-examples/

@@ -1,0 +1,31 @@
+# Testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.1
+pytest-asyncio>=0.21.1
+
+# Coverage tools
+coverage[toml]>=7.3.0
+
+# Mocking and testing utilities
+responses>=0.23.3  # For mocking HTTP requests
+unittest-mock>=1.5  # Additional mock utilities
+
+# Test data generation
+faker>=19.6.1
+
+# Property-based testing (for future use)
+hypothesis>=6.87.0
+
+# Testing utilities
+pytest-timeout>=2.1.0  # Timeout failing tests
+pytest-xdist>=3.3.1    # Parallel test execution
+pytest-benchmark>=4.0.0  # For future performance tests
+
+# Type checking (for test code quality)
+mypy>=1.5.1
+types-requests>=2.31.0
+
+# Code quality
+black>=23.9.1
+ruff>=0.0.291
