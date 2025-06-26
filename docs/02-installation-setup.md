@@ -53,16 +53,19 @@ kustomize     # Configuration management
 
 # Tool installation (Ubuntu/Debian)
 sudo apt update
-sudo apt install -y kubectl helm git
+sudo apt install -y kubectl helm git jq
 
-# Install yq
+# Tool installation (RHEL/CentOS/Fedora)
+# For RHEL/CentOS 8+
+sudo dnf install -y git jq
+# For Fedora
+sudo dnf install -y kubectl helm git jq
+
+# Install yq (all distributions)
 sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
 sudo chmod +x /usr/local/bin/yq
 
-# Install jq
-sudo apt install -y jq
-
-# Install kustomize
+# Install kustomize (all distributions)
 curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
 sudo mv kustomize /usr/local/bin/
 ```

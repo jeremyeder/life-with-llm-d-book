@@ -103,8 +103,13 @@ spec:
           /usr/bin/nvidia-uninstall --silent
           # Install compatible version
           /usr/bin/nvidia-installer --silent --install-libglvnd
-          # Restart docker to pick up changes
+          # Restart container runtime to pick up changes
+          # For systems using Docker
           systemctl restart docker
+          # For systems using containerd
+          systemctl restart containerd
+          # For systems using CRI-O (common on RHEL/OpenShift)
+          systemctl restart crio
 EOF
 
 # Wait for rollback completion
