@@ -248,8 +248,13 @@ kubectl exec -n <namespace> network-test -- \
 
 ```bash
 # Install profiling tools in pod
+# For Debian/Ubuntu-based containers
 kubectl exec -n <namespace> <pod> -- \
   apt-get update && apt-get install -y linux-tools-common
+
+# For RHEL/CentOS/Fedora-based containers
+kubectl exec -n <namespace> <pod> -- \
+  dnf install -y perf
 
 # CPU flame graph generation
 kubectl exec -n <namespace> <pod> -- \
