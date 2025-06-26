@@ -37,21 +37,21 @@ Traditional deployment tools weren't built with LLMs in mind. llm-d addresses un
 
 ### Strategic Value Proposition
 
-**Red Hat's Open Source Advantage**: Unlike proprietary cloud providers, llm-d gives you complete control over your AI infrastructure. You're not locked into a single vendor's ecosystem or pricing model.
+**Open Source Advantage**: Unlike proprietary cloud providers, llm-d gives you complete control over your AI infrastructure. You're not locked into a single vendor's ecosystem or pricing model.
 
-**Enterprise-Grade Reliability**: Built on Red Hat's proven enterprise Kubernetes platform, llm-d delivers the "boring reliability" that Fortune 500 companies require for mission-critical AI workloads.
+**Enterprise-Grade Reliability**: Built on proven enterprise Kubernetes platforms, llm-d delivers the "boring reliability" that enterprises require for mission-critical AI workloads.
 
 **Total Cost of Ownership (TCO) Benefits**:
 
 | Approach | Initial Setup | Annual Costs | Vendor Lock-in | Customization |
 |----------|--------------|--------------|----------------|---------------|
-| **AWS Bedrock** | Low | $500K-2M+ | High | Limited |
-| **Azure OpenAI** | Low | $400K-1.5M+ | High | Limited |
-| **Google Vertex AI** | Medium | $600K-2.5M+ | High | Limited |
-| **llm-d on Red Hat OpenShift** | Medium | $200K-800K | None | Full |
+| **Managed Cloud AI Services** | Low | High ($$$$) | High | Limited |
+| **Cloud Provider APIs** | Low | High ($$$$) | High | Limited |
+| **Proprietary Platforms** | Medium | Very High ($$$$$) | High | Limited |
+| **llm-d on Kubernetes** | Medium | Lower ($$) | None | Full |
 
 **Risk Mitigation**: 
-- **No vendor lock-in**: Move between cloud providers freely
+- **No vendor lock-in**: Move between cloud providers or on-premises freely
 - **Regulatory compliance**: Keep sensitive data in your own infrastructure
 - **Open source transparency**: No black box dependencies
 - **Community-driven innovation**: Benefit from ecosystem contributions
@@ -192,7 +192,7 @@ Each of these components will be explored in detail throughout this book.
 ## Summary
 
 - llm-d simplifies LLM deployment on Kubernetes while delivering strategic competitive advantages
-- **Strategic Benefits**: 60-80% cost reduction vs cloud providers, zero vendor lock-in, full customization control
+- **Strategic Benefits**: Significant cost reduction vs cloud providers, zero vendor lock-in, full customization control
 - **Technical Benefits**: Start small and gradually increase complexity, efficient GPU resource management
 - **Operational Benefits**: Enterprise-grade reliability with open source transparency
 - **Success Path**: Production deployment requires careful planning and execution, but the ROI justifies the investment
