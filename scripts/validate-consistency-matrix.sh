@@ -119,7 +119,7 @@ validate_namespace_consistency() {
         
         # Look for namespace specifications
         while IFS= read -r line; do
-            if [[ "$line" =~ namespace:[[:space:]]*[\"']?([^\"'[:space:]]+)[\"']? ]]; then
+            if [[ "$line" =~ namespace:[[:space:]]*[\"\']?([^\"\'[:space:]]+)[\"\']? ]]; then
                 local namespace="${BASH_REMATCH[1]}"
                 namespace_refs["$namespace"]+="$file:$line|"
             fi
