@@ -1,41 +1,148 @@
+# Pre-commit hooks configuration for enhanced documentation validation
+# Prevents documentation drift by running validation before each commit
+
 repos:
+  # Enhanced documentation validation
   - repo: local
     hooks:
+      # Core consistency validations
       - id: validate-model-names
-        name: Validate model naming consistency
-        entry: scripts/validate-model-names.sh
+        name: Validate Model Names
+        entry: ./scripts/validate-model-names.sh
         language: script
         files: '^docs/.*\.md$'
-        
-      - id: validate-resource-specs
-        name: Validate resource specifications
-        entry: scripts/validate-resource-specs.sh
-        language: script
-        files: '^docs/.*\.md$'
-        
-      - id: validate-namespace-conventions
-        name: Validate namespace naming
-        entry: scripts/validate-namespaces.sh
-        language: script
-        files: '^docs/.*\.md$'
-        
-      - id: check-shared-config-refs
-        name: Check shared config references
-        entry: scripts/check-shared-config-refs.sh
-        language: script
-        files: '^docs/.*\.md$'
+        pass_filenames: true
+        description: "Ensure model names follow shared configuration standards"
 
+      - id: validate-namespaces
+        name: Validate Namespaces
+        entry: ./scripts/validate-namespaces.sh
+        language: script
+        files: '^docs/.*\.md$'
+        pass_filenames: true
+        description: "Ensure namespace usage follows project conventions"
+
+      - id: validate-resource-specs
+        name: Validate Resource Specifications
+        entry: ./scripts/validate-resource-specs.sh
+        language: script
+        files: '^docs/.*\.md$'
+        pass_filenames: true
+        description: "Validate Kubernetes resource specifications"
+
+      # Enhanced syntax and structure validation
+      - id: validate-yaml-syntax
+        name: Validate YAML Syntax
+        entry: ./scripts/validate-yaml-syntax.sh
+        language: script
+        files: '^docs/.*\.md$'
+        pass_filenames: true
+        description: "Comprehensive YAML syntax and structure validation"
+
+      - id: validate-cross-references
+        name: Validate Cross-References
+        entry: ./scripts/validate-cross-references.sh
+        language: script
+        files: '^docs/.*\.md$'
+        pass_filenames: true
+        description: "Check internal links and cross-references"
+
+      # Accuracy validation
+      - id: validate-mathematical-accuracy
+        name: Validate Mathematical Accuracy
+        entry: ./scripts/validate-mathematical-accuracy.sh
+        language: script
+        files: '^docs/.*\.md$'
+        pass_filenames: true
+        description: "Verify mathematical calculations and formulas"
+
+      - id: validate-technical-claims
+        name: Validate Technical Claims
+        entry: ./scripts/validate-technical-claims.sh
+        language: script
+        files: '^docs/.*\.md$'
+        pass_filenames: true
+        description: "Fact-check technical claims against authoritative sources"
+
+      # Consistency matrix validation (runs on all docs)
+      - id: validate-consistency-matrix
+        name: Validate Consistency Matrix
+        entry: ./scripts/validate-consistency-matrix.sh
+        language: script
+        files: '^docs/.*\.md$'
+        pass_filenames: false
+        description: "Cross-chapter consistency validation"
+
+      - id: check-shared-config-refs
+        name: Check Shared Config References
+        entry: ./scripts/check-shared-config-refs.sh
+        language: script
+        files: '^docs/.*\.md$'
+        pass_filenames: true
+        description: "Validate references to shared configuration"
+
+  # Standard formatting and linting
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
+        files: '^docs/.*\.md$'
       - id: end-of-file-fixer
+        files: '^docs/.*\.md$'
       - id: check-yaml
+        files: '\.(yaml|yml)$'
       - id: check-json
+        files: '\.json$'
       - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
 
+  # Markdown linting
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.37.0
     hooks:
       - id: markdownlint
+        files: '^docs/.*\.md$'
         args: ['--config', '.markdownlint.json', '--fix']
+
+  # Python code formatting for examples
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        files: '^(examples|tests|docs)/.*\.py$'
+        language_version: python3
+
+  # Python import sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        files: '^(examples|tests|docs)/.*\.py$'
+        args: ["--profile", "black"]
+
+  # Python linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        files: '^(examples|tests|docs)/.*\.py$'
+        args: ['--max-line-length=88', '--extend-ignore=E203,W503']
+
+  # Spell checking
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.16.23
+    hooks:
+      - id: typos
+        files: '^docs/.*\.md$'
+        args: ['--config', '.typos.toml']
+
+# Configuration for pre-commit behavior
+default_install_hook_types: [pre-commit, pre-push]
+default_stages: [commit, push]
+
+# Fail fast - stop on first failure
+fail_fast: true
+
+# Minimum pre-commit version
+minimum_pre_commit_version: '3.0.0'
