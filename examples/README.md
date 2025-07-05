@@ -24,7 +24,7 @@ All examples are designed to work with the llm-d platform. To use an example:
 
 ## Testing
 
-These examples are automatically tested against the upstream llm-d codebase. See `.github/workflows/test-examples.yml` for the CI configuration.
+These examples are automatically tested against the upstream llm-d codebase. See `.github/workflows/validate-and-test.yml` for the CI configuration.
 
 ## Contributing
 
