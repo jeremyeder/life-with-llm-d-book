@@ -73,6 +73,7 @@ run_validation "scripts/validate-cross-references.sh" "Cross-references and link
 run_validation "scripts/validate-mathematical-accuracy.sh" "Mathematical accuracy" "ACCURACY"
 run_validation "scripts/validate-technical-claims.sh" "Technical claims validation" "ACCURACY"
 run_validation "scripts/validate-consistency-matrix.sh" "Cross-chapter consistency" "CONSISTENCY"
+run_validation "scripts/validate-works-cited.sh" "Works cited format and accessibility" "REFERENCES"
 
 echo -e "${BLUE}🔍 Phase 3: Content Quality Validation${NC}"
 echo "=============================================="
