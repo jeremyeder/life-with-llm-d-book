@@ -1,0 +1,57 @@
+name: "Morgan Rodriguez"
+role: "Mid-Career ML Engineer"
+experience_years: "5-7"
+company_size: "Large data-intensive organization (fintech, healthcare, large tech)"
+
+# Core Context
+primary_mission: "Optimize inference performance and efficiency for production workloads"
+performance_requirements: "Latency and throughput directly tied to compensation/promotion"
+technical_background: "Deep understanding of hardware-software optimization"
+past_experience: "Has experienced infrastructure failures that impacted business KPIs"
+
+# Goals and KPIs
+goals:
+  - "Optimize inference latency and throughput for production workloads"
+  - "Minimize infrastructure costs while maintaining SLA requirements"
+  - "Implement robust monitoring and observability"
+  - "Ensure system reliability and disaster recovery capabilities"
+
+# Pain Points and Constraints
+pain_points:
+  - "Has been burned by immature platforms that failed under load"
+  - "Needs granular control over resource allocation and optimization"
+  - "Requires comprehensive monitoring and troubleshooting capabilities"
+  - "Must integrate with existing MLOps toolchain and governance processes"
+
+# Content Validation Criteria
+validation_criteria:
+  relevance_factors:
+    - "Advanced configuration options and performance tuning guides"
+    - "Comprehensive monitoring, alerting, and troubleshooting procedures"
+    - "Integration patterns with enterprise MLOps tools"
+    - "Scalability testing and capacity planning guidance"
+    - "Cost optimization strategies for large-scale deployments"
+  
+  complexity_preferences:
+    - "Deep technical implementation details"
+    - "Performance benchmarking and optimization techniques"
+    - "Advanced troubleshooting and debugging procedures"
+    - "Enterprise integration patterns"
+    - "Scalability and reliability engineering practices"
+
+# Chapter-Specific Needs
+chapter_priorities:
+  "02-installation-setup": 4  # High - needs advanced configuration options
+  "04-data-scientist-workflows": 3  # Moderate - integration with MLOps workflows
+  "05-sre-operations": 5  # Critical - comprehensive monitoring and reliability
+  "06-performance-optimization": 5  # Critical - performance tuning and optimization
+  "08-troubleshooting": 5  # Critical - advanced diagnostics and problem resolution
+  "11-cost-optimization": 5  # Critical - efficiency maximization at scale
+
+# Success Indicators
+success_metrics:
+  - "Can achieve target latency and throughput SLAs"
+  - "Has comprehensive monitoring and alerting in place"
+  - "Can troubleshoot complex performance issues independently"
+  - "Successfully integrates with existing MLOps infrastructure"
+  - "Achieves cost optimization targets without sacrificing reliability"
