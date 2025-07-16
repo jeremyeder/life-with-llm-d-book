@@ -112,9 +112,9 @@ jobs:
           sudo apt-get install -y bc jq
 
       - name: Setup Node.js for markdown tools
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install Node.js dependencies
@@ -216,7 +216,7 @@ jobs:
       run: |
         bandit -r examples/ docs/cost-optimization/ docs/security-configs/ -f json -o bandit-report.json || true
         bandit -r examples/ docs/cost-optimization/ docs/security-configs/ || true
-      continue-on-error: true  # Don't fail the build on security issues
+      continue-on-error: true
 
   # ========== COMPREHENSIVE VALIDATION ==========
   
@@ -239,9 +239,9 @@ jobs:
           python-version: '3.11'
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install all dependencies
@@ -266,7 +266,7 @@ jobs:
           path: |
             htmlcov/
             coverage.xml
-          retention-days: 7
+          retention-days: 30
 
   # ========== PR-SPECIFIC CHECKS ==========
   
