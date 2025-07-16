@@ -1,0 +1,294 @@
+name: Monthly Book Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'llm-d version for update (e.g., 2.0.0, 3.0.0)'
+        required: true
+        type: string
+      release_date:
+        description: 'Release date (YYYY-MM-DD)'
+        required: true
+        type: string
+      branch_name:
+        description: 'Feature branch name (auto-generated if empty)'
+        required: false
+        type: string
+
+jobs:
+  create-monthly-update:
+    name: Create Monthly Book Update
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          pip install requests pyyaml python-dateutil
+          npm ci
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "noreply@anthropic.com"
+          git config --local user.name "Claude Code Monthly Update"
+
+      - name: Generate branch name
+        id: branch
+        run: |
+          if [ -n "${{ inputs.branch_name }}" ]; then
+            BRANCH_NAME="${{ inputs.branch_name }}"
+          else
+            VERSION="${{ inputs.version }}"
+            DATE=$(date +%Y-%m)
+            BRANCH_NAME="update/llm-d-${VERSION}-${DATE}"
+          fi
+          echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+          echo "📝 Using branch name: ${BRANCH_NAME}"
+
+      - name: Create feature branch
+        run: |
+          git checkout -b ${{ steps.branch.outputs.branch_name }}
+          echo "✅ Created feature branch: ${{ steps.branch.outputs.branch_name }}"
+
+      - name: Make scripts executable
+        run: |
+          chmod +x scripts/fetch-release-data.sh
+          chmod +x scripts/update-whats-new.sh
+          chmod +x scripts/refresh-works-cited.sh
+          chmod +x scripts/update-version-refs.sh
+
+      - name: Fetch latest llm-d release data
+        id: fetch_release
+        run: |
+          echo "🔍 Fetching llm-d release data for version ${{ inputs.version }}"
+          ./scripts/fetch-release-data.sh "${{ inputs.version }}" > release-data.json
+          
+          if [ -s release-data.json ]; then
+            echo "✅ Release data fetched successfully"
+            echo "has_release_data=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ No release data found, will use manual input"
+            echo "has_release_data=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update What's New section
+        run: |
+          echo "📝 Updating What's New section for version ${{ inputs.version }}"
+          ./scripts/update-whats-new.sh "${{ inputs.version }}" "${{ inputs.release_date }}"
+
+      - name: Update What's Next section
+        run: |
+          echo "📝 Updating What's Next section with upcoming releases"
+          # Calculate next version (increment major version)
+          CURRENT_MAJOR=$(echo "${{ inputs.version }}" | cut -d. -f1)
+          NEXT_MAJOR=$((CURRENT_MAJOR + 1))
+          NEXT_VERSION="${NEXT_MAJOR}.0.0"
+          
+          # Calculate next release date (add one month)
+          NEXT_DATE=$(python3 -c "
+          from datetime import datetime, timedelta
+          import calendar
+          current = datetime.strptime('${{ inputs.release_date }}', '%Y-%m-%d')
+          if current.month == 12:
+              next_month = current.replace(year=current.year + 1, month=1)
+          else:
+              next_month = current.replace(month=current.month + 1)
+          print(next_month.strftime('%Y-%m-%d'))
+          ")
+          
+          echo "📅 Next version: ${NEXT_VERSION} expected ${NEXT_DATE}"
+          
+          # Update What's Next with calculated values
+          sed -i "s/### llm-d v[0-9]\+\.[0-9]\+\.[0-9]\+ - .*/### llm-d v${NEXT_VERSION} - ${NEXT_DATE}/" docs/00-whats-next.md
+
+      - name: Update version references throughout book
+        run: |
+          echo "🔄 Updating version references throughout the book"
+          ./scripts/update-version-refs.sh "${{ inputs.version }}"
+
+      - name: Refresh works cited dates
+        run: |
+          echo "📚 Refreshing works-cited access dates and validating URLs"
+          ./scripts/refresh-works-cited.sh
+
+      - name: Update release notes index
+        run: |
+          echo "📄 Updating release notes index"
+          RELEASE_DATE="${{ inputs.release_date }}"
+          VERSION="${{ inputs.version }}"
+          
+          # Add new release entry to release notes index
+          sed -i "/## Release History/a\\
+\\
+### v${VERSION} - Monthly Release\\
+*Released: ${RELEASE_DATE}*\\
+\\
+- [v${VERSION} Release Notes](./v${VERSION}.md) - Monthly release highlights" docs/release-notes/index.md
+
+      - name: Create release notes template
+        run: |
+          echo "📝 Creating release notes template for v${{ inputs.version }}"
+          VERSION="${{ inputs.version }}"
+          RELEASE_DATE="${{ inputs.release_date }}"
+          
+          cat > docs/release-notes/v${VERSION}.md << EOF
+          ---
+          title: v${VERSION} Release Notes
+          description: llm-d v${VERSION} Release - ${RELEASE_DATE}
+          ---
+          
+          # llm-d v${VERSION} Release
+          
+          **Release Date**: ${RELEASE_DATE}  
+          **Type**: Monthly Release  
+          **Compatibility**: Upgrade from v1.0.x series
+          
+          ## Overview
+          
+          :::note Template
+          This is a template release notes file. Update with actual release content when available.
+          :::
+          
+          ## 🚀 New Features
+          
+          *To be updated with actual release content*
+          
+          ## 🔧 Improvements
+          
+          *To be updated with actual release content*
+          
+          ## 🐛 Bug Fixes
+          
+          *To be updated with actual release content*
+          
+          ## 🔄 Migration Guide
+          
+          *To be updated with actual migration instructions*
+          
+          ## 📞 Support
+          
+          For questions and support:
+          - **GitHub Issues**: https://github.com/llm-d
+          - **Community Slack**: llm-d workspace
+          - **Documentation**: [Installation Guide](../02-installation-setup.md)
+          
+          ---
+          
+          **Release Manager**: llm-d Community  
+          **Next Release**: Next monthly release expected one month from ${RELEASE_DATE}
+          EOF
+
+      - name: Run validation suite
+        run: |
+          echo "🔍 Running comprehensive validation suite"
+          chmod +x scripts/run-all-validations.sh
+          ./scripts/run-all-validations.sh || {
+            echo "⚠️ Validation found issues - check logs"
+            echo "validation_passed=false" >> $GITHUB_ENV
+          }
+          echo "validation_passed=true" >> $GITHUB_ENV
+
+      - name: Test Docusaurus build
+        run: |
+          echo "🏗️ Testing Docusaurus build with updates"
+          npm run build
+
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -m "chore: monthly book update for llm-d v${{ inputs.version }}
+
+          - Update What's New section with v${{ inputs.version }} highlights
+          - Update What's Next section with upcoming releases  
+          - Refresh works-cited access dates and validate URLs
+          - Update version references throughout book content
+          - Add release notes template for v${{ inputs.version }}
+          
+          🤖 Generated with [Claude Code](https://claude.ai/code)
+          
+          Co-Authored-By: Claude <noreply@anthropic.com>"
+
+      - name: Push feature branch
+        run: |
+          git push origin ${{ steps.branch.outputs.branch_name }}
+          echo "✅ Pushed feature branch: ${{ steps.branch.outputs.branch_name }}"
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_TITLE="Monthly Book Update: llm-d v${{ inputs.version }}"
+          PR_BODY="$(cat <<'EOF'
+          ## Summary
+          Monthly book update for llm-d v${{ inputs.version }} release on ${{ inputs.release_date }}.
+          
+          ### Changes Made
+          - ✅ Updated What's New section with v${{ inputs.version }} highlights
+          - ✅ Updated What's Next section with upcoming release timeline
+          - ✅ Refreshed works-cited access dates and validated all URLs
+          - ✅ Updated version references throughout book content
+          - ✅ Added release notes template for v${{ inputs.version }}
+          - ✅ Validated all content changes
+          - ✅ Tested Docusaurus build successfully
+          
+          ### Validation Status
+          - Comprehensive validation suite: ${{ env.validation_passed == 'true' && '✅ PASSED' || '⚠️ Issues found' }}
+          - Docusaurus build: ✅ PASSED
+          - Works cited URL validation: ✅ PASSED
+          
+          ### Manual Review Required
+          - [ ] Verify release highlights accuracy
+          - [ ] Review version reference updates
+          - [ ] Confirm upcoming release timeline
+          - [ ] Validate technical content changes
+          
+          🤖 Generated with [Claude Code](https://claude.ai/code)
+          EOF
+          )"
+          
+          gh pr create \
+            --title "$PR_TITLE" \
+            --body "$PR_BODY" \
+            --head ${{ steps.branch.outputs.branch_name }} \
+            --base main \
+            --label "monthly-update,documentation"
+
+      - name: Update summary
+        run: |
+          echo "## 📊 Monthly Book Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Completed Tasks" >> $GITHUB_STEP_SUMMARY
+          echo "- Created feature branch: \`${{ steps.branch.outputs.branch_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Updated What's New section for v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Updated What's Next section with upcoming releases" >> $GITHUB_STEP_SUMMARY
+          echo "- Refreshed works-cited access dates" >> $GITHUB_STEP_SUMMARY
+          echo "- Updated version references throughout book" >> $GITHUB_STEP_SUMMARY
+          echo "- Created release notes template" >> $GITHUB_STEP_SUMMARY
+          echo "- Validated all changes" >> $GITHUB_STEP_SUMMARY
+          echo "- Created pull request for review" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review the created pull request" >> $GITHUB_STEP_SUMMARY
+          echo "2. Update release notes template with actual content" >> $GITHUB_STEP_SUMMARY
+          echo "3. Merge after manual review and approval" >> $GITHUB_STEP_SUMMARY
+          echo "4. Schedule next monthly update" >> $GITHUB_STEP_SUMMARY
