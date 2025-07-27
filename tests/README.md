@@ -147,7 +147,7 @@ Tests run automatically on:
 - When Python files or test configurations change
 
 GitHub Actions workflow features:
-- Multi-version Python testing (3.12, 3.13)
+- Python 3.13 testing
 - Code coverage reporting to Codecov
 - Coverage comments on PRs
 - Security scanning with Bandit
