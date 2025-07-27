@@ -10,6 +10,7 @@ sidebar_position: 7
 This chapter covers essential security controls and compliance considerations for production llm-d deployments. Building on upstream Kubernetes security capabilities, we'll explore identity management, application security, data protection, and basic compliance requirements specific to LLM inference platforms.
 
 **What you'll learn:**
+
 - LLM-specific security challenges and threat vectors
 - RBAC configuration patterns for llm-d resources
 - API security and prompt injection defenses
@@ -78,6 +79,7 @@ llm-d extends Kubernetes RBAC to provide fine-grained access control over infere
 - **SRE**: Full operational access for production support and monitoring
 
 **Key RBAC Features:**
+
 - Granular permissions for llm-d custom resources
 - Namespace-scoped access controls
 - Integration with existing identity providers
@@ -90,6 +92,7 @@ For complete RBAC configuration including ClusterRoles, RoleBindings, and user/g
 :::
 
 **Quick Setup:**
+
 ```bash
 kubectl apply -f security-configs/rbac-configuration.yaml
 ```
@@ -109,6 +112,7 @@ Each inference service should run with a dedicated ServiceAccount following the 
 :::
 
 **Security Context Best Practices:**
+
 - Run as non-root user (UID 1000+)
 - Drop all capabilities
 - Use read-only root filesystem
@@ -124,6 +128,7 @@ llm-d supports multiple authentication mechanisms aligned with Kubernetes standa
 - **mTLS**: Certificate-based authentication for service-to-service communication
 
 **Authentication Flow:**
+
 1. Client presents credentials (JWT, API key, certificate)
 2. llm-d validates against configured providers
 3. Rate limits applied based on authentication method
@@ -166,6 +171,7 @@ Protecting model assets requires both infrastructure and application-level contr
 - **Audit Logging**: Comprehensive access logging for compliance
 
 **Key Protection Mechanisms:**
+
 - Model servers isolated from external traffic
 - Access only through authenticated inference gateway
 - Monitoring system health checks allowed
@@ -180,6 +186,7 @@ Protecting model assets requires both infrastructure and application-level contr
 Protect inference APIs from abuse and resource exhaustion through comprehensive middleware:
 
 **Security Middleware Features:**
+
 - **Token Bucket Rate Limiting**: Per-client request throttling with configurable windows
 - **Prompt Injection Detection**: Pattern-based detection of malicious input attempts
 - **Input Validation**: Length limits, content filtering, and parameter validation
@@ -188,6 +195,7 @@ Protect inference APIs from abuse and resource exhaustion through comprehensive 
 - **Blocked Pattern Detection**: Configurable patterns for common attack vectors
 
 **Key Protection Mechanisms:**
+
 - Rate limiting with exponential backoff
 - Real-time prompt injection detection
 - Automatic sensitive content filtering
@@ -199,6 +207,7 @@ Protect inference APIs from abuse and resource exhaustion through comprehensive 
 :::
 
 **Quick Integration:**
+
 ```python
 from api_security_middleware import SecurityMiddleware, SecurityConfig
 
@@ -212,6 +221,7 @@ result = middleware.validate_request(request_data)
 Implement comprehensive input validation to defend against prompt injection attacks:
 
 **Input Validation Framework:**
+
 - **Length Limits**: Configurable maximum prompt and context lengths
 - **Pattern Detection**: Regex-based detection of injection attempts
 - **PII Detection**: Automatic detection of sensitive information
@@ -219,6 +229,7 @@ Implement comprehensive input validation to defend against prompt injection atta
 - **Output Filtering**: Response validation and content safety checks
 
 **Common Injection Patterns Detected:**
+
 - System instruction overrides ("ignore previous instructions")
 - Jailbreak attempts ("developer mode", "admin mode")  
 - Information extraction ("show your training data")
@@ -250,12 +261,14 @@ The validation system integrates with Kubernetes admission controllers to valida
 Implement encryption for data at rest and in transit:
 
 **Encryption Requirements:**
+
 - **TLS Termination**: All external API traffic encrypted with TLS 1.2+
 - **Data at Rest**: Model storage encrypted using cloud provider KMS
 - **In-Transit**: Internal service communication over encrypted channels
 - **Certificate Management**: Automated certificate rotation and renewal
 
 **Key Management:**
+
 - Cloud provider KMS integration (AWS KMS, GCP Cloud KMS, Azure Key Vault)
 - Certificate automation with cert-manager
 - Secret rotation policies and procedures
@@ -266,6 +279,7 @@ Implement encryption for data at rest and in transit:
 Protect valuable model assets from unauthorized access:
 
 **Model Repository Security:**
+
 - **Encrypted Storage**: S3 with SSE-KMS encryption for model files
 - **Access Controls**: ServiceAccount-based access restrictions
 - **Network Isolation**: IP-based access controls for internal networks
@@ -273,6 +287,7 @@ Protect valuable model assets from unauthorized access:
 - **Audit Logging**: Comprehensive access logging for compliance
 
 **Security Controls:**
+
 - Download rate limiting and concurrent access controls
 - Model caching policies and retention management
 - Version control and rollback procedures
@@ -283,6 +298,7 @@ Protect valuable model assets from unauthorized access:
 Implement privacy controls for user interactions:
 
 **Privacy Control Framework:**
+
 - **Data Minimization**: Collect only necessary data for inference operations
 - **PII Detection**: Automatic detection and anonymization of sensitive information
 - **Retention Policies**: Configurable data retention periods with automatic cleanup
@@ -291,6 +307,7 @@ Implement privacy controls for user interactions:
 - **Audit Logging**: Comprehensive logging of all data processing activities
 
 **Key Features:**
+
 - Email, phone, SSN, and credit card detection
 - Configurable retention periods (7-365 days)
 - Automatic data expiration and cleanup
@@ -319,6 +336,7 @@ Implement privacy controls for user interactions:
 Configure comprehensive audit logging for llm-d operations:
 
 **Audit Policy Framework:**
+
 - **Request-level logging** for all llm-d custom resources
 - **Metadata logging** for secret access in production namespaces
 - **RequestResponse logging** for model serving endpoints
@@ -326,6 +344,7 @@ Configure comprehensive audit logging for llm-d operations:
 - **Selective exclusions** to reduce log volume from routine operations
 
 **Key Audit Capabilities:**
+
 - Complete audit trail for compliance requirements
 - Integration with external SIEM systems via webhooks
 - Configurable log retention and rotation policies
@@ -336,6 +355,7 @@ Configure comprehensive audit logging for llm-d operations:
 Implement automated security monitoring and alerting through Prometheus rules and AlertManager integration:
 
 **Security Monitoring Components:**
+
 - **Prometheus AlertRules**: Authentication failures, API access anomalies, model access attempts
 - **AlertManager Configuration**: Critical alert routing with PagerDuty and email integration  
 - **Grafana Dashboards**: Real-time security event visualization and trend analysis
@@ -343,6 +363,7 @@ Implement automated security monitoring and alerting through Prometheus rules an
 - **SIEM Integration**: Elasticsearch and external security system connectivity
 
 **Key Security Alerts:**
+
 - High authentication failure rates (>10 failures/5min)
 - Unusual API access patterns (>2 requests/sec)
 - Unauthorized model access attempts  
@@ -354,9 +375,11 @@ Implement automated security monitoring and alerting through Prometheus rules an
 :::
 
 **Quick Setup:**
+
 ```bash
 kubectl apply -f security-configs/security-monitoring.yaml
 ```
+
 ```
 
 ### Integration with Popular Monitoring Solutions

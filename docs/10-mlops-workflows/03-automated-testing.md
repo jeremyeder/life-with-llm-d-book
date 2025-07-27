@@ -47,6 +47,7 @@ Comprehensive test suite for validating LLM model functionality, including loadi
 📎 **Full Example**: [test_model_functionality.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/testing/test_model_functionality.py)
 
 Test coverage:
+
 - **Model Loading**: Validates model and tokenizer initialization
 - **Basic Inference**: Tests single prompt generation and output validation
 - **Batch Processing**: Validates concurrent prompt processing
@@ -54,6 +55,7 @@ Test coverage:
 - **Multi-Model Testing**: Pytest fixture for testing multiple model variants
 
 Usage:
+
 ```bash
 # Run all functionality tests
 pytest tests/unit/test_model_functionality.py -v
@@ -69,6 +71,7 @@ Advanced testing framework for evaluating model response quality, bias detection
 📎 **Full Example**: [test_model_quality.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/testing/test_model_quality.py)
 
 Quality assessment features:
+
 - **Benchmark Testing**: Predefined task-based quality evaluation
 - **Keyword Validation**: Checks for expected content in responses
 - **Coherence Analysis**: Detects repetitive or incoherent outputs
@@ -77,6 +80,7 @@ Quality assessment features:
 - **Scoring System**: Weighted quality metrics with configurable thresholds
 
 Usage:
+
 ```bash
 # Run quality assessment tests
 pytest tests/quality/test_model_quality.py -v
@@ -94,6 +98,7 @@ Asynchronous load testing framework for validating model performance under vario
 📎 **Full Example**: [test_load_performance.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/testing/test_load_performance.py)
 
 Load testing features:
+
 - **Async Architecture**: Uses aiohttp for high-concurrency testing
 - **Batch Processing**: Maintains consistent concurrency levels
 - **Comprehensive Metrics**: Success rate, latency percentiles, throughput
@@ -102,11 +107,13 @@ Load testing features:
 - **Error Handling**: Graceful handling of network and service errors
 
 Test scenarios:
+
 - **Concurrent Load**: Tests 1, 5, 10, 20 concurrent requests
 - **Sustained Load**: Extended testing for stability validation
 - **Performance Thresholds**: Configurable SLA validation
 
 Usage:
+
 ```bash
 # Run all load tests
 pytest tests/performance/test_load_performance.py -v
@@ -122,6 +129,7 @@ Comprehensive benchmarking suite for measuring model performance across differen
 📎 **Full Example**: [benchmark_models.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/testing/benchmark_models.py)
 
 Benchmarking capabilities:
+
 - **Inference Speed**: Measures latency and throughput across batch sizes
 - **Memory Profiling**: Tracks RAM and GPU memory usage patterns
 - **System Information**: Captures hardware configuration for context
@@ -130,12 +138,14 @@ Benchmarking capabilities:
 - **Result Persistence**: Saves benchmarks for historical comparison
 
 Metrics collected:
+
 - **Latency**: Min, max, average response times
 - **Throughput**: Tokens per second, requests per second
 - **Memory**: Model size, peak usage, overhead
 - **Batch Performance**: Scaling characteristics across batch sizes
 
 Usage:
+
 ```bash
 # Run full benchmark suite
 python tests/performance/benchmark_models.py

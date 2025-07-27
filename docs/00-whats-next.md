@@ -15,24 +15,29 @@ Explore the future direction of llm-d development, including planned features, c
 ## Upcoming Releases
 
 ### llm-d v2.0.0 - July 17, 2025
+
 *Development Status: Release Preparation*
 
 **🔮 Planned Features:**
+
 - **Enhanced Autoscaling**: Variant autoscaling with dynamic role reassignment
 - **Improved Caching**: Multi-tier prefix cache hierarchy optimizations
 - **Extended Hardware Support**: Broader accelerator compatibility matrix
 - **Monitoring Enhancements**: Advanced metrics collection and alerting
 
 **🔧 Technical Improvements:**
+
 - Performance optimizations for disaggregated serving
 - Enhanced Gateway API integration
 - Improved error handling and recovery mechanisms
 - Extended Prometheus metrics coverage
 
 ### llm-d v3.0.0 - August 14, 2025
+
 *Development Status: Planning*
 
 **🚀 Major Features:**
+
 - **Multi-Model Routing**: Support for multiple base models in single deployment
 - **LoRA Adapter Support**: Dynamic adapter loading and management
 - **Edge Computing**: Optimizations for edge deployment scenarios
@@ -43,18 +48,21 @@ Explore the future direction of llm-d development, including planned features, c
 ### Q3 2025 Focus Areas
 
 **Infrastructure Maturity**
+
 - Production-grade reliability and stability
 - Comprehensive observability and debugging tools
 - Enhanced security and compliance frameworks
 - Performance optimization for cost efficiency
 
 **Developer Experience**
+
 - Simplified deployment and configuration workflows
 - Improved documentation and getting-started guides
 - Enhanced troubleshooting and diagnostic tools
 - Expanded example configurations and use cases
 
 **Community Growth**
+
 - Expanded partner ecosystem integration
 - Academic research collaboration programs
 - Industry adoption case studies and best practices
@@ -63,12 +71,14 @@ Explore the future direction of llm-d development, including planned features, c
 ### Q4 2025 Priorities
 
 **Enterprise Readiness**
+
 - Enterprise-grade security and compliance features
 - Advanced multi-tenancy and resource isolation
 - Comprehensive backup and disaster recovery
 - Integration with enterprise management systems
 
 **Performance Leadership**
+
 - State-of-the-art inference performance optimizations
 - Advanced caching and prefetching strategies
 - Hardware-specific optimization frameworks
@@ -79,18 +89,21 @@ Explore the future direction of llm-d development, including planned features, c
 ### Core Platform Evolution
 
 **Kubernetes Integration**
+
 - Custom Resource Definition (CRD) enhancements
 - Operator pattern implementation improvements
 - Enhanced cluster management and networking
 - Advanced resource scheduling and allocation
 
 **vLLM Integration**
+
 - Deeper integration with vLLM performance features
 - Support for emerging vLLM capabilities
 - Optimization for new model architectures
 - Enhanced debugging and profiling tools
 
 **Gateway and Routing**
+
 - Advanced traffic management and load balancing
 - Intelligent request routing based on workload characteristics
 - Enhanced circuit breaker and retry mechanisms
@@ -99,12 +112,14 @@ Explore the future direction of llm-d development, including planned features, c
 ### Hardware and Performance
 
 **Accelerator Support**
+
 - Expanded GPU vendor support and optimization
 - Support for emerging AI accelerator architectures
 - Hardware-specific performance tuning frameworks
 - Advanced memory management and optimization
 
 **Networking Optimization**
+
 - RDMA support for high-performance networking
 - Advanced network topology awareness
 - Optimized inter-node communication protocols
@@ -115,12 +130,14 @@ Explore the future direction of llm-d development, including planned features, c
 ### Open Source Ecosystem
 
 **Upstream Contributions**
+
 - Active participation in vLLM development
 - Kubernetes SIG-AI collaboration
 - Cloud Native Computing Foundation (CNCF) engagement
 - Open standards development and adoption
 
 **Research Collaboration**
+
 - Academic partnerships for cutting-edge research
 - Performance benchmarking and optimization studies
 - Novel algorithm development and validation
@@ -129,12 +146,14 @@ Explore the future direction of llm-d development, including planned features, c
 ### Developer Community
 
 **Educational Resources**
+
 - Comprehensive tutorial and workshop development
 - Video content and webinar series
 - Hands-on labs and interactive learning experiences
 - Certification and training program development
 
 **Contribution Framework**
+
 - Enhanced contributor guidelines and onboarding
 - Mentorship programs for new contributors
 - Regular contributor recognition and rewards
@@ -145,12 +164,14 @@ Explore the future direction of llm-d development, including planned features, c
 ### How to Influence the Roadmap
 
 **Community Input**
+
 - Participate in weekly contributor standups
 - Submit feature requests through GitHub issues
 - Engage in Slack discussions and forums
 - Attend community events and conferences
 
 **Development Participation**
+
 - Contribute code through pull requests
 - Help with documentation and examples
 - Participate in testing and validation
@@ -159,12 +180,14 @@ Explore the future direction of llm-d development, including planned features, c
 ### Stay Connected
 
 **Regular Updates**
+
 - Monthly roadmap updates in community calls
 - Quarterly strategic planning sessions
 - Release candidate testing and feedback cycles
 - Community surveys and input gathering
 
 **Communication Channels**
+
 - **GitHub**: Development coordination and issue tracking
 - **Slack**: Real-time community discussions
 - **Mailing Lists**: Formal announcements and decisions

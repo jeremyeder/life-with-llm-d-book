@@ -6,7 +6,7 @@
 
 #### **Core Infrastructure**
 - [x] **Testing Framework Setup** - pytest, coverage, fixtures, mocks
-- [x] **CI/CD Pipeline** - GitHub Actions with Python 3.11 + 3.12
+- [x] **CI/CD Pipeline** - GitHub Actions with Python 3.13 + 3.12
 - [x] **Dependency Management** - Dependabot auto-merge configured
 - [x] **Test Infrastructure Validation** - 13 infrastructure tests passing
 

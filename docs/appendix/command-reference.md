@@ -56,6 +56,7 @@ kubectl get llmdeployments -n production -o custom-columns="NAME:.metadata.name,
 ```
 
 **Expected output:**
+
 ```
 NAME             MODEL                                          REPLICAS   STATUS
 llama-3.1-8b     hf://meta-llama/Llama-3.1-8B-Instruct        2          Running
@@ -125,6 +126,7 @@ kubectl describe nodes -l node-type=gpu | grep -A 5 "nvidia.com/gpu"
 ```
 
 **Expected output:**
+
 ```
 NAME                     GPU_ALLOCATABLE   GPU_CAPACITY
 gpu-node-1              8                  8
@@ -223,6 +225,7 @@ kubectl describe limitrange -n production
 ```
 
 **Expected diagnostic output:**
+
 ```bash
 # Pod status check
 NAME                            READY   STATUS    RESTARTS   AGE
@@ -235,6 +238,7 @@ llama-3.1-8b-service   10.244.1.15:8080,10.244.2.20:8080  5m
 ```
 
 **Cross-references:**
+
 - Chapter 8: [Troubleshooting Guide](../08-troubleshooting/03-diagnostic-tools.md)
 - Chapter 12: [MLOps for SREs](../12-mlops-for-sres.md#incident-response)
 
@@ -303,6 +307,7 @@ kubectl get pods -n production -o json | jq '.items[] | select(.spec.containers[
 ```
 
 **Cross-references:**
+
 - Chapter 7: [Security and Compliance](../07-security-compliance.md#rbac-configuration)
 
 ## Scaling and Performance Management
@@ -365,6 +370,7 @@ kubectl get deployment llama-3.1-8b -n production -o jsonpath='{.status.replicas
 ```
 
 **Expected HPA output:**
+
 ```
 NAME                REFERENCE               TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
 llama-3.1-8b-hpa   Deployment/llama-3.1-8b   45%/70%, 65%/80%   2         10        4          5m
@@ -415,6 +421,7 @@ EOF
 ```
 
 **Cross-references:**
+
 - Chapter 6: [Performance Optimization](../06-performance-optimization.md#scaling-strategies)
 - Chapter 11: [Cost Optimization](../11-cost-optimization.md#resource-management)
 
@@ -474,6 +481,7 @@ kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=llm-d -n produc
 ```
 
 **Cross-references:**
+
 - Chapter 12: [MLOps for SREs](../12-mlops-for-sres.md#backup-procedures)
 
 ## Performance Testing and Validation
@@ -511,6 +519,7 @@ kubectl top pods -n production -l app.kubernetes.io/name=llm-d --containers
 ```
 
 **Cross-references:**
+
 - Chapter 6: [Performance Optimization](../06-performance-optimization.md#performance-testing)
 
 ## Maintenance and Updates
@@ -569,6 +578,7 @@ kubectl describe nodes | grep -A 4 "Capacity:\|Allocatable:"
 ```
 
 **Cross-references:**
+
 - Chapter 5: [SRE Operations](../05-sre-operations.md#maintenance-procedures)
 - Chapter 12: [MLOps for SREs](../12-mlops-for-sres.md#operational-workflows)
 
@@ -635,6 +645,7 @@ alias kgpu='kubectl get nodes -l node-type=gpu'
 ---
 
 :::info Command Best Practices
+
 - Always specify namespace with `-n` flag for production commands
 - Use `--dry-run=client` to validate configurations before applying
 - Include timeouts in wait commands: `--timeout=300s`
@@ -643,6 +654,7 @@ alias kgpu='kubectl get nodes -l node-type=gpu'
 :::
 
 :::tip Next Steps
+
 - Review [CRD Reference](./crd-reference.md) for resource specifications
 - Check [Configuration Templates](./configuration-templates.md) for ready-to-use configurations
 - Reference [Shared Configuration](./shared-config.md) for naming conventions and standards

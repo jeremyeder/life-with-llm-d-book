@@ -36,6 +36,7 @@ This cost difference comes from:
 ### The Good News
 
 With proper optimization, you can achieve dramatic cost reductions:
+
 - **50-70% reduction**: Through quantization and efficient resource use
 - **30-40% reduction**: Through disaggregated serving (prefill/decode split)
 - **20-30% reduction**: Through intelligent request routing
@@ -48,6 +49,7 @@ With proper optimization, you can achieve dramatic cost reductions:
 If you're new to LLM cost optimization, start here! These changes can be implemented in hours and provide immediate savings:
 
 ### 1. Enable Quantization (30-50% savings, 1 hour)
+
 ```yaml
 # Change your LLMDeployment from this:
 spec:
@@ -64,6 +66,7 @@ spec:
 ```
 
 ### 2. Use Spot Instances (40-60% savings, 30 minutes)
+
 ```yaml
 # Add to your deployment:
 nodeSelector:
@@ -76,6 +79,7 @@ tolerations:
 ```
 
 ### 3. Enable Autoscaling (20-40% savings, 15 minutes)
+
 ```yaml
 autoscaling:
   enabled: true
@@ -85,6 +89,7 @@ autoscaling:
 ```
 
 ### 4. Right-size Resources (10-30% savings, 10 minutes)
+
 - Don't request more GPU memory than you need
 - Start with smaller instances and scale up if needed
 - Monitor actual usage and adjust
@@ -112,21 +117,21 @@ pie title LLM Infrastructure Cost Breakdown
    - **GPU type**: Newer GPUs (H100) cost more but are more efficient
    - **Utilization**: Idle GPUs still cost money - aim for 70-80% utilization
    - **Pricing model**: Spot instances can be 60-70% cheaper than on-demand
-   
+
    *💡 Quick win: Switch to spot instances for non-critical workloads*
 
 2. **Model Storage: 10-20% of total costs**
    - **Model files**: Large models (70B parameters) = ~140GB storage
    - **Multiple copies**: Dev, staging, prod, and version history
    - **Fast access**: SSD storage costs more but improves load times
-   
+
    *💡 Quick win: Use lifecycle policies to archive old model versions*
 
 3. **Memory and CPU: 8-15% of total costs**
    - **RAM**: LLMs need lots of memory to hold model weights
    - **CPU overhead**: For request preprocessing and response formatting
    - **Network**: Moving data between storage and compute
-   
+
    *💡 Quick win: Right-size memory allocations - don't over-provision*
 
 ### Cost Modeling Framework
@@ -134,6 +139,7 @@ pie title LLM Infrastructure Cost Breakdown
 A comprehensive cost modeling framework helps organizations understand, predict, and optimize their LLM deployment costs across different cloud providers.
 
 **Key Framework Features:**
+
 - **Multi-cloud cost comparison** across CoreWeave, Lambda Labs, AWS, GCP, Azure
 - **GPU requirement calculation** based on model specifications and target throughput
 - **Memory optimization analysis** including model weights, KV cache, and system overhead
@@ -141,6 +147,7 @@ A comprehensive cost modeling framework helps organizations understand, predict,
 - **Real-time pricing updates** and market analysis capabilities
 
 **Core Calculations:**
+
 - Memory requirements (model weights + KV cache + activations + overhead)
 - GPU count optimization for both throughput and memory constraints
 - Cost per request analysis across different deployment configurations
@@ -151,6 +158,7 @@ A comprehensive cost modeling framework helps organizations understand, predict,
 :::
 
 **Quick Usage:**
+
 ```python
 from llm_cost_calculator import LLMCostCalculator
 
@@ -172,6 +180,7 @@ comparison = calculator.compare_providers("llama-3.1-8b", 10)
 - **INT4 (4-bit Integer)**: Uses 4 bits per number = 75% smaller = 75% cheaper
 
 **Example**: A 70B parameter model
+
 - **FP16**: ~140GB memory, costs $8,000/month
 - **INT8**: ~70GB memory, costs $4,000/month (50% savings!)
 - **INT4**: ~35GB memory, costs $2,000/month (75% savings!)
@@ -179,6 +188,7 @@ comparison = calculator.compare_providers("llama-3.1-8b", 10)
 **Quality impact**: Usually less than 5% performance drop
 
 **Quantization Optimizer Framework:**
+
 - **Multiple quantization strategies**: FP16, INT8, INT4, Mixed Precision, Dynamic
 - **Automatic cost-benefit analysis** with performance impact estimation
 - **GPU compatibility checking** for different quantization types
@@ -186,6 +196,7 @@ comparison = calculator.compare_providers("llama-3.1-8b", 10)
 - **Implementation complexity assessment** for planning purposes
 
 **Quantization Profiles:**
+
 - **FP16**: 50% memory reduction, 99.5% performance retention, 40% cost savings
 - **INT8**: 75% memory reduction, 97% performance retention, 65% cost savings  
 - **INT4**: 87.5% memory reduction, 92% performance retention, 80% cost savings
@@ -196,6 +207,7 @@ comparison = calculator.compare_providers("llama-3.1-8b", 10)
 :::
 
 **Quick Usage:**
+
 ```python
 from quantization_optimizer import QuantizationOptimizer
 
@@ -207,6 +219,7 @@ config = optimizer.generate_quantization_config("llama-3.1-8b", "int8")
 ### Prefill/Decode Disaggregation: llm-d's Secret Weapon
 
 **What is disaggregation?** LLM inference has two distinct phases:
+
 1. **Prefill**: Reading and understanding your prompt (CPU-heavy, can batch well)
 2. **Decode**: Generating the response word by word (GPU-heavy, needs low latency)
 
@@ -215,11 +228,13 @@ config = optimizer.generate_quantization_config("llama-3.1-8b", "int8")
 #### Why This Saves Money
 
 **Traditional approach**: One big expensive server handles both phases
+
 - Wastes money on over-provisioned resources
 - GPU sits idle during prefill
 - CPU sits idle during decode
 
 **llm-d disaggregation**: Separate fleets optimized for each phase
+
 - **Prefill fleet**: Cheaper servers, bigger batches, spot instances
 - **Decode fleet**: Faster servers, smaller batches, consistent performance
 
@@ -241,17 +256,20 @@ Traditional Kubernetes autoscaling treats all workloads the same. The llm-d infe
 The llm-d inference-scheduler provides SLO-driven scaling specifically designed for LLM workloads with cost optimization as a first-class concern.
 
 **Cost-Aware SLO Framework:**
+
 - **Weighted Latency**: P95 latency adjusted for request cost impact
 - **Cost Efficient Throughput**: Tokens per second per dollar spent optimization
 - **GPU Cost Efficiency**: GPU utilization weighted by cost savings potential
 
 **Scaling Policies:**
+
 - Scale up on SLO violations (>5% normal, >15% urgent)
-- Scale down when over-performing (>10% margin) 
+- Scale down when over-performing (>10% margin)
 - Cost-based scaling when cost per request exceeds thresholds
 - Spot instance management with graceful fallback strategies
 
 **Advanced Features:**
+
 - Dynamic batching with cost-aware batch sizing
 - Request complexity routing to optimize model selection
 - Spot interruption handling with cost-aware migration
@@ -262,6 +280,7 @@ The llm-d inference-scheduler provides SLO-driven scaling specifically designed 
 :::
 
 **Quick Setup:**
+
 ```yaml
 apiVersion: inference.llm-d.io/v1alpha1
 kind: LLMDeployment
@@ -279,12 +298,14 @@ spec:
 The scheduler seamlessly integrates with individual LLMDeployment resources to provide cost-aware scaling:
 
 **Integration Features:**
+
 - Automatic detection of cost-optimization annotations
 - SLO profile selection (cost-efficient, balanced, performance)
 - Spot instance preference management
 - Cost and performance constraint enforcement
 
 **Key Annotations:**
+
 - `scheduler.llm-d.io/cost-optimization: "enabled"`
 - `scheduler.llm-d.io/slo-profile: "cost-efficient"`
 - `cost-optimization.llm-d.io/max-cost-per-hour: "50.0"`
@@ -294,19 +315,25 @@ The scheduler seamlessly integrates with individual LLMDeployment resources to p
 The inference-scheduler continuously monitors and optimizes:
 
 #### 1. Real-time SLO Monitoring
+
 The scheduler continuously evaluates Service Level Objectives:
+
 - **SLO violation detection** with configurable thresholds and urgency levels
 - **Weighted scoring system** balancing latency, throughput, and cost objectives
 - **Automatic metric collection** from Prometheus and llm-d instrumentation
 
 #### 2. Cost-Aware Scaling Decisions
+
 Intelligent scaling decisions balance performance and cost:
+
 - **SLO-driven scaling** with weighted violation analysis
 - **Budget constraint enforcement** preventing cost overruns
 - **Performance vs cost trade-offs** with configurable preference weighting
 
 #### 3. Intelligent Request Routing
+
 Complexity-based routing optimizes cost efficiency:
+
 - **Request complexity analysis** using prompt characteristics and expected output
 - **Model capability matching** ensuring quality requirements are met
 - **Cost-efficiency optimization** selecting the most economical capable model
@@ -321,6 +348,7 @@ The prefill/decode disaggregation strategy separates inference into specialized 
 - **Separate Autoscaling**: Independent scaling policies for each phase
 
 **Key Benefits:**
+
 - 30% cost reduction vs monolithic serving
 - 33% throughput increase
 - 25% latency improvement
@@ -341,6 +369,7 @@ All resource specifications in this chapter follow the standard templates define
 Comprehensive GPU optimization includes real-time monitoring, cost anomaly detection, and SLO-driven scaling:
 
 **Key Optimization Features:**
+
 - **GPU Utilization Monitoring**: Alerts for underutilized GPUs (`<50%` utilization)
 - **Memory Waste Detection**: Identifies GPUs with `>40%` idle memory
 - **Cost Anomaly Detection**: Automatic detection of unusual cost spikes
@@ -348,6 +377,7 @@ Comprehensive GPU optimization includes real-time monitoring, cost anomaly detec
 - **Spot Instance Orchestration**: Intelligent use of spot instances for cost savings
 
 **Multi-Tier Node Selection:**
+
 - **Spot Optimized**: Ultra-low cost with 60% savings
 - **Balanced**: Mixed spot/on-demand with 30% savings
 - **Performance**: High-performance on-demand for critical workloads
@@ -357,6 +387,7 @@ Comprehensive GPU optimization includes real-time monitoring, cost anomaly detec
 :::
 
 **Quick Setup:**
+
 ```bash
 kubectl apply -f cost-optimization/gpu-optimization-config.yaml
 ```
@@ -368,18 +399,21 @@ kubectl apply -f cost-optimization/gpu-optimization-config.yaml
 Cost-optimized model serving system that reduces costs through intelligent request routing and dynamic batching:
 
 **Core Cost Optimization Features:**
+
 - **Multi-Tier Model Routing**: Ultra-low-cost to premium tiers based on request characteristics
 - **Intelligent Batching**: Cost-aware batching with configurable wait times
 - **Real-Time Cost Monitoring**: Automatic cost anomaly detection and budget enforcement
 - **Dynamic Tier Selection**: Request complexity analysis for optimal model selection
 
 **Model Tier Strategies:**
+
 - **Ultra-Low-Cost**: Quantized models, large batches, 5-second wait times (90% cost reduction)
 - **Low-Cost**: Quantized models, medium batches, 2-second wait times (80% cost reduction)
 - **Balanced**: FP16 models, dynamic batching, 1-second wait times (50% cost reduction)
 - **High-Performance**: FP16 models, low latency, 500ms wait times (20% cost reduction)
 
 **Key Benefits:**
+
 - Up to 90% cost reduction for batch-compatible workloads
 - Automatic cost budget enforcement ($50/hour default)
 - Real-time cost monitoring and alerting
@@ -740,18 +774,21 @@ if __name__ == "__main__":
 ### OpenShift-Specific Cost Optimizations
 
 **OpenShift Cost Optimization Features:**
+
 - **Route-based failover**: Automatic failover to quantized models during high load
 - **MachineSet spot instances**: Dynamic spot instance provisioning with 60-70% cost savings
 - **Priority classes**: Multi-tier scheduling based on cost sensitivity
 - **Node selector optimization**: Intelligent workload placement across cost tiers
 
 **Key OpenShift Advantages:**
+
 - Integrated spot instance management with graceful failover
 - Advanced routing with HAProxy load balancing optimization
 - Priority-based preemption for cost-sensitive workloads
 - Multi-zone scheduling for cost and reliability balance
 
 **Sample Configuration:**
+
 ```yaml
 # Basic OpenShift cost optimization setup
 apiVersion: route.openshift.io/v1
@@ -835,18 +872,21 @@ data:
 llm-d's dynamic router leverages unique platform features for intelligent cost optimization:
 
 **llm-d Specific Features:**
+
 - **Speculative Decoding**: Uses draft models for latency reduction with expensive base models
 - **Memory Pooling**: Shares GPU memory across multiple model deployments
 - **Request Complexity Analysis**: Routes based on prompt characteristics and output requirements
 - **Cost-Aware Batching**: Optimizes batch sizes based on cost efficiency
 
 **Routing Intelligence:**
+
 - **Complexity Scoring**: Analyzes prompt length, reasoning requirements, and domain specificity
 - **Model Capability Matching**: Ensures request quality requirements are met
 - **Cost-Efficiency Optimization**: Selects most economical model that meets requirements
 - **Dynamic Batch Optimization**: Intelligently groups requests for maximum efficiency
 
 **Key Benefits:**
+
 - 60-80% cost reduction through intelligent routing
 - Automatic speculative decoding for complex requests
 - Memory pooling reduces overall GPU requirements
@@ -857,6 +897,7 @@ llm-d's dynamic router leverages unique platform features for intelligent cost o
 :::
 
 **Quick Usage:**
+
 ```python
 from dynamic_router import LLMDDynamicRouter
 
@@ -870,9 +911,11 @@ batches = await router.optimize_batch_routing(requests)
 These case studies show how real companies reduced costs while scaling their LLM applications. The techniques are proven and you can apply them to your situation.
 
 ### Startup Story: Growing Smart (Not Just Big)
+
 *How an AI startup scaled 10x while keeping costs per request 82% lower*
 
 **Company Profile**: AI-First Analytics Platform
+
 - Initial: 2 engineers, 100 customers, $5K/month
 - Current: 15 engineers, 5,000 customers, $50K/month
 - Growth: 10x in 18 months
@@ -983,9 +1026,11 @@ print("5. Dynamic routing saved 35% by month 12")
 ```
 
 ### Enterprise Story: The $800K/Month Savings
+
 *How a financial services company cut LLM costs by 80% without sacrificing quality*
 
 **Company Profile**: Global Financial Services
+
 - Before: Inefficient cloud deployment, $1M/month
 - After: Optimized hybrid deployment, $200K/month
 - Timeline: 6-month transformation
@@ -1164,18 +1209,21 @@ def analyze_enterprise_transformation():
 ## Your Cost Optimization Roadmap
 
 ### Phase 1: Quick Wins (Week 1) - Target: 50% savings
+
 ✅ **Enable INT8 quantization** - Usually 5% quality impact, 50% cost savings
 ✅ **Add spot instances** - Start with 50% spot, 40-60% cost savings  
 ✅ **Enable autoscaling** - Stop paying for idle resources
 ✅ **Right-size resources** - Don't over-provision memory/CPU
 
 ### Phase 2: Smart Optimizations (Month 1) - Target: 70% total savings
+
 ✅ **Implement caching** - 30-40% of requests are often cacheable
 ✅ **Add request batching** - Improves throughput and reduces costs
 ✅ **Use prefill/decode disaggregation** - llm-d's unique 30-40% savings
 ✅ **Monitor and tune** - Watch for optimization opportunities
 
 ### Phase 3: Advanced Strategies (Month 2-3) - Target: 80%+ total savings
+
 ✅ **Deploy llm-d inference-scheduler** - SLO-driven scaling that understands LLM workloads
 ✅ **Dynamic model routing** - Route simple queries to smaller models
 ✅ **Cost-aware request prioritization** - Use scheduler's complexity analysis
@@ -1201,16 +1249,19 @@ def analyze_enterprise_transformation():
 ### Your Next Actions (Pick One!)
 
 **If you're just getting started:**
+
 1. Enable INT8 quantization on one model
 2. Measure the quality impact (probably less than 5%)
 3. Deploy to production and enjoy 50% cost savings
 
 **If you want to go deeper:**
+
 1. Run `make test-costs` to understand your current costs
 2. Implement prefill/decode disaggregation with llm-d
 3. Set up cost monitoring dashboards
 
 **If you're optimizing at scale:**
+
 1. Use the dynamic routing framework for complexity-based optimization
 2. Consider hybrid infrastructure for predictable workloads
 3. Implement comprehensive SLO-based scaling

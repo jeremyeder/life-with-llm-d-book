@@ -15,5 +15,6 @@
   "MD012": { "maximum": 2 },
   "MD022": { "lines_above": 1, "lines_below": 1 },
   "MD031": { "list_items": true },
-  "MD032": { "list_items": true }
+  "MD032": { "list_items": true },
+  "MD036": false
 }

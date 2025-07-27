@@ -97,6 +97,7 @@ Base Llama 3.1 7B deployment configuration with GitOps management, autoscaling, 
 📎 **Full Example**: [llama-3.1-7b-deployment.yaml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/deployment/llama-3.1-7b-deployment.yaml)
 
 Key features:
+
 - **Resource Allocation**: 1 GPU, 16-20GB memory per replica
 - **Autoscaling**: 2-10 replicas based on GPU utilization
 - **Node Selection**: A100 GPU nodes with inference pool
@@ -110,6 +111,7 @@ Service configuration included with the deployment example above.
 Kustomize overlays provide environment-specific configurations while maintaining a shared base.
 
 Environment differences:
+
 - **Development**: Single replica, T4 GPUs, lower resource limits
 - **Production**: 5+ replicas, A100 GPUs, anti-affinity rules, SLO targets
 - **Cost Tracking**: Environment-specific annotations for billing
@@ -304,6 +306,7 @@ Enterprise-grade 70B model deployment with model parallelism and high-performanc
 📎 **Full Example**: [llama-3.1-70b-deployment.yaml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/deployment/llama-3.1-70b-deployment.yaml)
 
 Enterprise features:
+
 - **Model Parallelism**: Tensor parallelism across 8 GPUs per replica
 - **Premium Hardware**: H100 GPUs with NVLink/InfiniBand interconnects
 - **Resource Intensive**: 256-320GB memory, 32-64 CPU cores per replica
@@ -319,6 +322,7 @@ ArgoCD project configuration with RBAC policies and resource whitelisting for LL
 📎 **Full Example**: [argocd-project.yaml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/deployment/argocd-project.yaml)
 
 Project features:
+
 - **Multi-Environment**: Development, staging, and production namespaces
 - **RBAC Integration**: Role-based access for ML engineers and SRE teams
 - **Resource Control**: Whitelisted Kubernetes resources and CRDs
@@ -361,6 +365,7 @@ Orchestrated deployment workflow that progressively deploys the Llama 3.1 model 
 📎 **Full Example**: [progressive-deployment-workflow.yaml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/deployment/progressive-deployment-workflow.yaml)
 
 Workflow features:
+
 - **Phase-based Deployment**: 7B → 13B → 70B model progression
 - **Validation Gates**: Performance and health checks between phases
 - **Conditional Logic**: Only deploys larger models if smaller ones succeed
@@ -369,11 +374,13 @@ Workflow features:
 - **Python Validation**: Embedded Python scripts for deployment testing
 
 Deployment phases:
+
 1. **Foundation** (7B): Baseline model deployment and validation
 2. **Scale-Up** (13B): Conditional deployment with performance comparison
 3. **Enterprise** (70B): Optional high-resource deployment for premium tier
 
 Usage:
+
 ```bash
 # Deploy the full family
 argo submit workflows/progressive-deployment.yaml -p deploy-enterprise=true

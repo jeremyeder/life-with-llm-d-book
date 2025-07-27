@@ -214,6 +214,7 @@ spec:
 ```
 
 **Cross-references:**
+
 - Chapter 6: [Performance Optimization](../06-performance-optimization.md#scheduler-configuration)
 - Chapter 11: [Cost Optimization](../11-cost-optimization.md#slo-driven-scaling)
 - Chapter 12: [MLOps for SREs](../12-mlops-for-sres.md#scheduling-integration)
@@ -308,6 +309,7 @@ spec:
 ```
 
 **Cross-references:**
+
 - Chapter 3: [Understanding the Architecture](../03-understanding-architecture.md#modelservice-components)
 - Chapter 5: [SRE Operations](../05-sre-operations.md#service-configuration)
 - Chapter 7: [Security and Compliance](../07-security-compliance.md#service-security)
@@ -417,6 +419,7 @@ spec:
 ```
 
 **Cross-references:**
+
 - Chapter 4: [Data Scientist Workflows](../04-data-scientist-workflows.md#resource-profiles)
 - Chapter 6: [Performance Optimization](../06-performance-optimization.md#resource-optimization)
 - Chapter 11: [Cost Optimization](../11-cost-optimization.md#resource-planning)
@@ -491,12 +494,14 @@ kubectl get events -n production --field-selector involvedObject.name=llama-3.1-
 ```
 
 **Cross-references:**
+
 - Chapter 8: [Troubleshooting Guide](../08-troubleshooting/02-common-issues.md)
 - Chapter 12: [MLOps for SREs](../12-mlops-for-sres.md#debugging-deployments)
 
 ---
 
 :::info Next Steps
+
 - Review [Command Reference](./command-reference.md) for practical kubectl operations
 - Check [Configuration Templates](./configuration-templates.md) for ready-to-use examples
 :::

@@ -75,6 +75,7 @@ Istio Gateway and VirtualService configuration for intelligent LLM traffic routi
 📎 **Full Example**: [llm-gateway.yaml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/istio-configs/llm-gateway.yaml)
 
 Routing capabilities:
+
 - **A/B Testing**: Header-based experiment routing with traffic splitting
 - **Canary Deployments**: Beta user routing to new model versions
 - **Tier-based Routing**: Premium/enterprise model selection
@@ -89,6 +90,7 @@ Istio DestinationRules configure load balancing, circuit breaking, and model var
 📎 **Full Example**: [destination-rules.yaml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/istio-configs/destination-rules.yaml)
 
 DestinationRule features:
+
 - **Connection Pooling**: Optimized connection limits per model size
 - **Load Balancing**: Consistent hashing for sticky sessions
 - **Circuit Breaking**: Outlier detection and automatic failover
@@ -105,6 +107,7 @@ Python framework for managing A/B testing experiments with Istio VirtualService 
 📎 **Full Example**: [experiment-manager.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/istio-configs/experiment-manager.py)
 
 Experiment manager features:
+
 - **Dataclass Configuration**: Structured experiment definitions with success/rollback criteria
 - **Kubernetes Integration**: Direct manipulation of Istio VirtualServices via K8s API
 - **Traffic Management**: Dynamic traffic splitting and weight adjustments
@@ -113,6 +116,7 @@ Experiment manager features:
 - **Error Handling**: Comprehensive error reporting and state management
 
 Usage:
+
 ```python
 # Create a model comparison experiment
 experiment = Experiment(
@@ -133,6 +137,7 @@ Intelligent experiment controller that monitors A/B tests and automatically adju
 📎 **Full Example**: [experiment-controller.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/istio-configs/experiment-controller.py)
 
 Controller capabilities:
+
 - **Prometheus Integration**: Real-time metrics collection for all experiment variants
 - **Automated Analysis**: Performance comparison with configurable thresholds
 - **Dynamic Traffic Management**: Gradual traffic shifting based on performance
@@ -141,12 +146,14 @@ Controller capabilities:
 - **Async Monitoring**: Non-blocking experiment monitoring with configurable intervals
 
 Metrics monitored:
+
 - **Latency**: P95 response time comparison
 - **Success Rate**: Error rate monitoring and SLA compliance
 - **Request Rate**: Traffic volume and distribution analysis
 - **Token Generation**: Model-specific performance metrics
 
 Usage:
+
 ```python
 # Run automated experiment with monitoring
 experiment = Experiment(
