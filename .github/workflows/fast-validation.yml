@@ -92,11 +92,11 @@ jobs:
             echo "✅ Branch naming follows guidelines"
           fi
 
-          # Rule 4: Check for forbidden technical terms
+          # Rule 4: Check for forbidden technical terms (only in additions)
           FORBIDDEN_TERMS=("llama-8b" "llama-70b" "mistral-8b")
           for term in "${FORBIDDEN_TERMS[@]}"; do
-            if git diff HEAD~1 HEAD -- '*.md' | grep -q "$term"; then
-              echo "❌ Found forbidden term: $term"
+            if git diff HEAD~1 HEAD -- '*.md' | grep "^+" | grep -q "$term"; then
+              echo "❌ Found forbidden term in additions: $term"
               echo "📝 Use exact names: llama-3.1-8b, llama-3.1-70b"
               exit 1
             fi
