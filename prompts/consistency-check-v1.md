@@ -9,7 +9,7 @@ Review the following content for consistency with existing chapters. Check for:
 
 1. **Technical Terminology**
    - Model names follow exact format: llama-3.1-8b, llama-3.1-70b, mistral-7b
-   - No abbreviations: avoid llama-8b or llama-70b
+   - No abbreviations: avoid shortened forms like llama-3.1-8b → shortened-form
    - Kubernetes terms match established usage
    - Resource specifications align with shared templates
 
