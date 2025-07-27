@@ -138,12 +138,17 @@ jobs:
           VERSION="${{ inputs.version }}"
           
           # Add new release entry to release notes index
-          sed -i "/## Release History/a\\
-\\
-### v${VERSION} - Monthly Release\\
-*Released: ${RELEASE_DATE}*\\
-\\
-- [v${VERSION} Release Notes](./v${VERSION}.md) - Monthly release highlights" docs/release-notes/index.md
+          cat > temp_entry.md << EOF
+          
+          ### v${VERSION} - Monthly Release
+          *Released: ${RELEASE_DATE}*
+          
+          - [v${VERSION} Release Notes](./v${VERSION}.md) - Monthly release highlights
+          EOF
+          
+          # Insert the new entry after "## Release History"
+          sed -i '/## Release History/r temp_entry.md' docs/release-notes/index.md
+          rm temp_entry.md
 
       - name: Create release notes template
         run: |
