@@ -1,0 +1,69 @@
+# Typos configuration for spell checking
+# Custom configuration for technical documentation
+
+[default]
+check-filename = false
+check-file = true
+
+[default.extend-words]
+# LLM and AI terms
+"llm" = "llm"
+"llms" = "llms"
+"llama" = "llama"
+"mistral" = "mistral"
+"codellama" = "codellama"
+"vllm" = "vllm"
+"mlops" = "mlops"
+"gpu" = "gpu"
+"gpus" = "gpus"
+"cuda" = "cuda"
+"nvidia" = "nvidia"
+
+# Kubernetes and container terms
+"kubectl" = "kubectl"
+"kubernetes" = "kubernetes"
+"openshift" = "openshift"
+"yaml" = "yaml"
+"yml" = "yml"
+"namespace" = "namespace"
+"namespaces" = "namespaces"
+"pod" = "pod"
+"pods" = "pods"
+"crd" = "crd"
+"crds" = "crds"
+"rbac" = "rbac"
+
+# Technical terms
+"config" = "config"
+"configs" = "configs"
+"repo" = "repo"
+"repos" = "repos"
+"dockerfile" = "dockerfile"
+"api" = "api"
+"apis" = "apis"
+"json" = "json"
+"toml" = "toml"
+"cpu" = "cpu"
+"cpus" = "cpus"
+"cli" = "cli"
+"url" = "url"
+"urls" = "urls"
+"http" = "http"
+"https" = "https"
+
+# Project-specific terms
+"llm-d" = "llm-d"
+"docusaurus" = "docusaurus"
+"markdownlint" = "markdownlint"
+"cspell" = "cspell"
+
+[files]
+extend-exclude = [
+    "node_modules/",
+    ".git/",
+    "*.lock",
+    "*.json",
+    "*.yaml",
+    "*.yml",
+    ".typos.toml"
+]

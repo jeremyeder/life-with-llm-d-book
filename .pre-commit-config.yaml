@@ -9,7 +9,7 @@ repos:
         name: Fast Co-Authoring Validation
         entry: ./validate
         language: system
-        stages: [commit]
+        stages: [pre-commit]
         verbose: true
         description: "Fast validation for co-authoring consistency (< 30 seconds)"
 
@@ -147,7 +147,7 @@ repos:
 
 # Configuration for pre-commit behavior
 default_install_hook_types: [pre-commit, pre-push]
-default_stages: [commit, push]
+default_stages: [pre-commit, pre-push]
 
 # Fail fast - stop on first failure
 fail_fast: true

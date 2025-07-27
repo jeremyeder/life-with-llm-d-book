@@ -132,7 +132,7 @@ check_python() {
     syntax_errors=false
     for file in $py_files; do
         if [ -f "$file" ]; then
-            if ! python -m py_compile "$file" 2>/dev/null; then
+            if ! python3 -m py_compile "$file" 2>/dev/null; then
                 echo -e "  ${RED}❌ Syntax error in $file${NC}"
                 syntax_errors=true
                 ERRORS=$((ERRORS + 1))
@@ -163,11 +163,11 @@ check_yaml() {
     fi
     
     # Check YAML syntax
-    if command -v python >/dev/null 2>&1; then
+    if command -v python3 >/dev/null 2>&1; then
         yaml_errors=false
         for file in $yaml_files; do
             if [ -f "$file" ]; then
-                if ! python -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null; then
+                if ! python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null; then
                     echo -e "  ${RED}❌ YAML syntax error in $file${NC}"
                     yaml_errors=true
                     ERRORS=$((ERRORS + 1))

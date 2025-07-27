@@ -70,6 +70,10 @@ life-with-llm-d-book/
 # Install dependencies
 npm install
 
+# Install pre-commit hooks (required for all contributors)
+pip install pre-commit
+pre-commit install
+
 # Start development server
 npm start
 
@@ -81,13 +85,14 @@ make validate-chapter docs/[chapter-name].md
 ```
 
 ### Quality Standards
+- **Pre-commit Hooks**: Automated validation before every commit (prevents CI failures)
 - **Validation Scripts**: Automated checks for naming conventions, resource specs, and consistency
 - **Spell Checking**: Technical term validation with custom dictionary
 - **Cross-References**: Verified links between chapters and appendices
 - **Code Examples**: All YAML and commands tested against standards
 
 ### Content Standards
-- Consistent naming conventions throughout (e.g., `llama-3.1-8b`, not `llama-8b`)
+- Consistent naming conventions throughout (e.g., `llama-3.1-8b`, not abbreviated forms)
 - Standard namespaces: `production`, `staging`, `development`, `llm-d-system`
 - Real-world examples with practical guidance
 - Cross-references connecting related concepts across chapters
