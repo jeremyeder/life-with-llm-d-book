@@ -1,5 +1,6 @@
 """
-Tests for inference optimization module in chapter-08-troubleshooting/performance-troubleshooting/inference-optimizer.py
+Tests for inference optimization module in
+chapter-08-troubleshooting/performance-troubleshooting/inference-optimizer.py
 """
 
 import sys

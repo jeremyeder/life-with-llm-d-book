@@ -1,12 +1,14 @@
 """
-Tests for A/B testing experiment manager in chapter-10-mlops/istio-configs/experiment-manager.py
+Tests for A/B testing experiment manager in
+chapter-10-mlops/istio-configs/experiment-manager.py
 """
 
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
@@ -97,7 +99,7 @@ except ImportError:
             routes = []
             for variant, weight in experiment.traffic_split.items():
                 route = {
-                    "destination": {"host": f"llama-3.1-7b-service", "subset": variant},
+                    "destination": {"host": "llama-3.1-7b-service", "subset": variant},
                     "weight": weight,
                     "headers": {
                         "response": {
@@ -334,7 +336,8 @@ except ImportError:
             elif all(analysis["success_criteria_met"].values()):
                 analysis["overall_health"] = "excellent"
                 analysis["recommendations"].append(
-                    "Experiment shows positive results - consider increasing candidate traffic"
+                    "Experiment shows positive results - consider "
+                    "increasing candidate traffic"
                 )
                 analysis["next_actions"].append("increase_candidate_traffic")
             else:

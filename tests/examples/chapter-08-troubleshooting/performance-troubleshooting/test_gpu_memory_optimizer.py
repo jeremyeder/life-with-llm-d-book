@@ -1,5 +1,6 @@
 """
-Tests for GPU memory optimization module in chapter-08-troubleshooting/performance-troubleshooting/gpu-memory-optimizer.py
+Tests for GPU memory optimization module in
+chapter-08-troubleshooting/performance-troubleshooting/gpu-memory-optimizer.py
 """
 
 import sys

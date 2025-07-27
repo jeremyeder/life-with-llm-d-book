@@ -1,5 +1,6 @@
 """
-Tests for GPU memory profiler module in chapter-08-troubleshooting/diagnostic-tools/gpu-memory-profile.py
+Tests for GPU memory profiler module in
+chapter-08-troubleshooting/diagnostic-tools/gpu-memory-profile.py
 """
 
 import sys

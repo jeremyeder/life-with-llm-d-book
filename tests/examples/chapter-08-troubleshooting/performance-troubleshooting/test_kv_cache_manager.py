@@ -1,5 +1,6 @@
 """
-Tests for KV cache manager module in chapter-08-troubleshooting/performance-troubleshooting/kv-cache-manager.py
+Tests for KV cache manager module in
+chapter-08-troubleshooting/performance-troubleshooting/kv-cache-manager.py
 """
 
 import sys

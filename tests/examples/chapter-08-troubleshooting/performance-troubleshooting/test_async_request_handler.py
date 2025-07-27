@@ -1,11 +1,12 @@
 """
-Tests for async request handler module in chapter-08-troubleshooting/performance-troubleshooting/async-request-handler.py
+Tests for async request handler module in
+chapter-08-troubleshooting/performance-troubleshooting/async-request-handler.py
 """
 
 import asyncio
 import sys
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
@@ -76,7 +77,9 @@ except ImportError:
             for i, request in enumerate(batch):
                 results.append(
                     {
-                        "generated_text": f"Generated response for request {request.get('request_id', i)}",
+                        "generated_text": (
+                            f"Generated response for request {request.get('request_id', i)}"
+                        ),
                         "request_id": request.get("request_id", i),
                         "tokens_generated": request.get("max_tokens", 100),
                         "processing_time_ms": 45.2,

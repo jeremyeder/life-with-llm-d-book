@@ -1,13 +1,16 @@
 """
-Tests for the ExperimentManager class in chapter-04-data-scientist/experiment_framework.py
+Tests for the ExperimentManager class in chapter-04-data-scientist/
+experiment_framework.py
 """
 
 import sys
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, call, patch
+from unittest.mock import patch
 
 import pytest
+
+from tests.fixtures.mock_responses import MockLLMResponses
 
 # Add the examples directory to the path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "examples"))
@@ -80,9 +83,6 @@ except (ImportError, ModuleNotFoundError):
         def visualize_results(self):
             """Mock visualization."""
             pass
-
-
-from tests.fixtures.mock_responses import MockLLMResponses
 
 
 class TestExperimentManager:

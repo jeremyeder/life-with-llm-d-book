@@ -13,10 +13,8 @@ Coverage:
 - SLO-based routing optimization
 """
 
-import asyncio
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -291,7 +289,10 @@ class TestLLMDDynamicRouter:
     @pytest.mark.asyncio
     async def test_route_complex_request(self, router):
         """Test routing for complex requests requiring reasoning."""
-        prompt = "Explain quantum computing principles and their applications in cryptography with detailed examples"
+        prompt = (
+            "Explain quantum computing principles and their applications "
+            "in cryptography with detailed examples"
+        )
         slo = {"max_latency_ms": 5000}
 
         model, metadata = await router.route_request(prompt, slo)
@@ -312,7 +313,10 @@ class TestLLMDDynamicRouter:
     @pytest.mark.asyncio
     async def test_route_code_request(self, router):
         """Test routing for code generation requests."""
-        prompt = "Write a complex Python class that implements a binary search tree with explain methods"
+        prompt = (
+            "Write a complex Python class that implements a binary search "
+            "tree with explain methods"
+        )
         slo = {"max_latency_ms": 3000}
 
         model, metadata = await router.route_request(prompt, slo)
@@ -419,7 +423,10 @@ class TestSpeculativeDecodingIntegration:
     @pytest.mark.asyncio
     async def test_speculative_decoding_enabled_for_expensive_models(self, router):
         """Test speculative decoding is enabled for expensive models."""
-        prompt = "Provide a comprehensive analysis of global economic trends with detailed explanations"
+        prompt = (
+            "Provide a comprehensive analysis of global economic trends "
+            "with detailed explanations"
+        )
         slo = {"max_latency_ms": 10000}
 
         model, metadata = await router.route_request(prompt, slo)
@@ -435,7 +442,10 @@ class TestSpeculativeDecodingIntegration:
     @pytest.mark.asyncio
     async def test_speculative_decoding_draft_model_selection(self, router):
         """Test correct draft model selection for speculative decoding."""
-        prompt = "Write a detailed technical document explaining advanced machine learning concepts"
+        prompt = (
+            "Write a detailed technical document explaining advanced "
+            "machine learning concepts"
+        )
         slo = {"max_latency_ms": 10000}
 
         model, metadata = await router.route_request(prompt, slo)
@@ -549,11 +559,17 @@ class TestCostOptimizationScenarios:
         # More complex requests that should use better models
         complex_requests = [
             (
-                "Provide a comprehensive analysis of modern economic theory with detailed explanations of key concepts",
+                (
+                    "Provide a comprehensive analysis of modern economic "
+                    "theory with detailed explanations of key concepts"
+                ),
                 {"max_latency_ms": 10000},
             ),
             (
-                "Write a detailed technical specification for a complex software architecture",
+                (
+                    "Write a detailed technical specification for a "
+                    "complex software architecture"
+                ),
                 {"max_latency_ms": 15000},
             ),
         ]

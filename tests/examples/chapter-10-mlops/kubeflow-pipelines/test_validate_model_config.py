@@ -1,12 +1,12 @@
 """
-Tests for model configuration validation in chapter-10-mlops/kubeflow-pipelines/validate-model-config.py
+Tests for model configuration validation in
+chapter-10-mlops/kubeflow-pipelines/validate-model-config.py
 """
 
 import os
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, mock_open, patch
 
 import pytest
 import yaml
@@ -78,7 +78,8 @@ except ImportError:
             expected_model_name = os.path.basename(os.path.dirname(config_path))
             if config["name"] != expected_model_name:
                 raise ValueError(
-                    f"Model name {config['name']} doesn't match directory {expected_model_name}"
+                    f"Model name {config['name']} doesn't match directory "
+                    f"{expected_model_name}"
                 )
 
             print(f"✅ Configuration valid: {config['name']} v{config['version']}")
@@ -399,7 +400,10 @@ class TestModelConfigValidation:
 
     def test_invalid_yaml_handling(self):
         """Test handling of invalid YAML files."""
-        invalid_yaml = "name: test-model\nversion: 1.0.0\narchitecture: transformer\nresources:\n  memory_gb: 16\n  gpu_count: [\n"  # Malformed YAML
+        invalid_yaml = (
+            "name: test-model\nversion: 1.0.0\narchitecture: transformer\n"
+            "resources:\n  memory_gb: 16\n  gpu_count: [\n"
+        )  # Malformed YAML
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(invalid_yaml)

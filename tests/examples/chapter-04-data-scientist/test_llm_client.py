@@ -2,12 +2,13 @@
 Tests for the LLMDClient class in chapter-04-data-scientist/llm_client.py
 """
 
-import json
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
+
+from tests.fixtures.mock_responses import MockLLMResponses
 
 # Add the examples directory to the path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "examples"))
@@ -46,9 +47,6 @@ except ImportError:
             headers = {"Content-Type": "application/json"}
             response = self.session.post(url, json=payload, headers=headers)
             return response.json()
-
-
-from tests.fixtures.mock_responses import MockLLMResponses
 
 
 class TestLLMDClient:
@@ -116,7 +114,7 @@ class TestLLMDClient:
         client.session = mock_session.return_value
 
         messages = [{"role": "user", "content": "Test"}]
-        response = client.chat_completion(
+        client.chat_completion(
             messages, max_tokens=500, temperature=0.5, top_p=0.95, stream=True
         )
 
@@ -162,7 +160,7 @@ class TestLLMDClient:
 
         input_text = "Test"
         custom_model = "custom-embedding-model"
-        response = client.embeddings(input_text, model=custom_model)
+        client.embeddings(input_text, model=custom_model)
 
         # Verify custom model was used
         call_args = mock_session.return_value.post.call_args

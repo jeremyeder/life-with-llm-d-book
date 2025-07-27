@@ -41,11 +41,7 @@ See: docs/11-cost-optimization.md#model-quantization-your-biggest-cost-saver
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
-
-import numpy as np
-import torch
-import yaml
+from typing import Dict, List
 
 
 class QuantizationType(Enum):

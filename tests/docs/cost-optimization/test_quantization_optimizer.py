@@ -15,10 +15,8 @@ Coverage:
 
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
-import yaml
 
 # Add the docs directory to the path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "docs"))
@@ -115,8 +113,8 @@ except ImportError:
                         "performance_retention_pct": profile.performance_retention_pct,
                         "estimated_monthly_savings_usd": monthly_savings,
                         "cost_reduction_pct": profile.cost_reduction_pct,
-                        "implementation_complexity": self._get_implementation_complexity(
-                            profile.quant_type
+                        "implementation_complexity": (
+                            self._get_implementation_complexity(profile.quant_type)
                         ),
                     }
                 )
@@ -162,8 +160,12 @@ except ImportError:
                         "cost-optimization.llm-d.io/enabled": "true",
                     },
                     "annotations": {
-                        "cost-optimization.llm-d.io/memory-reduction": f"{profile.memory_reduction_pct}%",
-                        "cost-optimization.llm-d.io/expected-savings": f"{profile.cost_reduction_pct}%",
+                        "cost-optimization.llm-d.io/memory-reduction": (
+                            f"{profile.memory_reduction_pct}%"
+                        ),
+                        "cost-optimization.llm-d.io/expected-savings": (
+                            f"{profile.cost_reduction_pct}%"
+                        ),
                     },
                 },
                 "spec": {

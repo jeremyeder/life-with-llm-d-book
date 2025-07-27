@@ -41,9 +41,9 @@ See: docs/11-cost-optimization.md#intelligent-model-serving
 import asyncio
 import time
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 

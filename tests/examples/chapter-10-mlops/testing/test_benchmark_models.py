@@ -2,7 +2,6 @@
 Tests for model benchmarking framework in chapter-10-mlops/testing/benchmark_models.py
 """
 
-import json
 import sys
 import time
 from pathlib import Path

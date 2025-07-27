@@ -1,10 +1,8 @@
 """
-Tests for RDMA performance testing module in chapter-06-performance/benchmarks/rdma-performance-test.py
+Tests for RDMA performance testing module in
+chapter-06-performance/benchmarks/rdma-performance-test.py
 """
 
-import asyncio
-import json
-import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path

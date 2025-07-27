@@ -1,8 +1,8 @@
 """
-Tests for batch size optimization module in chapter-06-performance/optimization/batch-optimizer.py
+Tests for batch size optimization module in
+chapter-06-performance/optimization/batch-optimizer.py
 """
 
-import json
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch

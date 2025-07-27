@@ -5,11 +5,8 @@ Tests for load testing framework in chapter-10-mlops/testing/test_load_performan
 import asyncio
 import statistics
 import sys
-import time
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
-import aiohttp
 import pytest
 
 # Add the examples directory to the path
@@ -61,7 +58,8 @@ except ImportError:
         async def load_test(self, total_requests: int, concurrent_requests: int):
             """Run load test with specified parameters"""
             print(
-                f"🚀 Starting load test: {total_requests} requests, {concurrent_requests} concurrent"
+                f"🚀 Starting load test: {total_requests} requests, "
+                f"{concurrent_requests} concurrent"
             )
 
             results = []
@@ -395,14 +393,16 @@ class TestLoadTester:
             latency_stats = result["latency_stats"]
 
             # P99 latency should not be excessively high
-            assert (
-                latency_stats["p99_ms"] <= 2000
-            ), f"P99 latency {latency_stats['p99_ms']:.0f}ms too high under sustained load"
+            assert latency_stats["p99_ms"] <= 2000, (
+                f"P99 latency {latency_stats['p99_ms']:.0f}ms too high "
+                "under sustained load"
+            )
 
             # Success rate should remain high
-            assert (
-                result["success_rate"] >= 0.9
-            ), f"Success rate {result['success_rate']:.2f} degraded under sustained load"
+            assert result["success_rate"] >= 0.9, (
+                f"Success rate {result['success_rate']:.2f} degraded "
+                "under sustained load"
+            )
 
     def test_percentile_calculation(self, load_tester):
         """Test percentile calculation accuracy."""

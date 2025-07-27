@@ -9,7 +9,7 @@ import random
 import string
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 import yaml
 

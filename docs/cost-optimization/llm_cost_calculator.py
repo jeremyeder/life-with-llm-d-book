@@ -36,7 +36,7 @@ See: docs/11-cost-optimization.md#cost-modeling-framework
 import math
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict
 
 
 class CloudProvider(Enum):

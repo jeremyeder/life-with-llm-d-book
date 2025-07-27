@@ -13,11 +13,8 @@ Coverage:
 - Performance vs cost tradeoff analysis
 """
 
-import asyncio
 import sys
-import time
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -31,8 +28,6 @@ except ImportError:
     # For testing, define minimal versions
     from dataclasses import dataclass
     from enum import Enum
-
-    import numpy as np
 
     class ModelTier(Enum):
         ULTRA_LOW_COST = "ultra-low-cost"

@@ -1,8 +1,8 @@
 """
-Tests for quantization optimization module in chapter-06-performance/optimization/quantization-optimizer.py
+Tests for quantization optimization module in
+chapter-06-performance/optimization/quantization-optimizer.py
 """
 
-import json
 import sys
 import tempfile
 from pathlib import Path

@@ -1,13 +1,13 @@
 """
-Tests for load testing framework in chapter-08-troubleshooting/performance-troubleshooting/load-test.py
+Tests for load testing framework in
+chapter-08-troubleshooting/performance-troubleshooting/load-test.py
 """
 
 import asyncio
 import sys
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import Mock
 
-import aiohttp
 import numpy as np
 import pytest
 
@@ -36,7 +36,7 @@ except ImportError:
             import random
             import time
 
-            payload = {
+            _payload = {
                 "prompt": "Once upon a time",
                 "max_tokens": 100,
                 "temperature": 0.7,
@@ -72,7 +72,8 @@ except ImportError:
         async def run_test(self):
             """Run the load test"""
             print(
-                f"Starting load test: {self.num_requests} requests, {self.concurrency} concurrent"
+                f"Starting load test: {self.num_requests} requests, "
+                f"{self.concurrency} concurrent"
             )
 
             import time
@@ -126,13 +127,13 @@ except ImportError:
 
             latencies_array = np.array(self.latencies)
 
-            print(f"\n=== Load Test Results ===")
+            print("\n=== Load Test Results ===")
             print(f"Total requests: {self.num_requests}")
             print(f"Successful: {len(self.latencies)}")
             print(f"Failed: {self.errors}")
             print(f"Total time: {total_time:.2f}s")
             print(f"Throughput: {len(self.latencies)/total_time:.2f} req/s")
-            print(f"\nLatency Statistics:")
+            print("\nLatency Statistics:")
             print(f"  Min: {np.min(latencies_array):.3f}s")
             print(f"  Max: {np.max(latencies_array):.3f}s")
             print(f"  Mean: {np.mean(latencies_array):.3f}s")
@@ -465,7 +466,7 @@ class TestLoadTester:
     @pytest.mark.asyncio
     async def test_latency_distribution_analysis(self, load_tester):
         """Test latency distribution analysis."""
-        test_results = await load_tester.run_test()
+        await load_tester.run_test()
 
         if load_tester.latencies:
             latencies = np.array(load_tester.latencies)
@@ -593,7 +594,7 @@ class TestLoadTester:
         """Test detection of performance regressions."""
         # Run baseline test
         baseline_results = await load_tester.run_test()
-        baseline_metrics = load_tester.get_detailed_metrics()
+        load_tester.get_detailed_metrics()
 
         # Simulate degraded performance for comparison
         degraded_tester = LoadTester(

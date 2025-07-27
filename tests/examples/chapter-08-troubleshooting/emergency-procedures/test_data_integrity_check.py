@@ -1,9 +1,8 @@
 """
-Tests for data integrity check module in chapter-08-troubleshooting/emergency-procedures/data-integrity-check.py
+Tests for data integrity check module in
+chapter-08-troubleshooting/emergency-procedures/data-integrity-check.py
 """
 
-import json
-import subprocess
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch

@@ -25,7 +25,10 @@ class MockLLMResponses:
                     "index": 0,
                     "message": {
                         "role": "assistant",
-                        "content": "Machine learning is a subset of artificial intelligence...",
+                        "content": (
+                            "Machine learning is a subset of artificial "
+                            "intelligence..."
+                        ),
                     },
                     "finish_reason": "stop",
                 }
@@ -63,7 +66,10 @@ class MockLLMResponses:
     @staticmethod
     def streaming_chunk() -> str:
         """Single chunk from streaming response."""
-        return 'data: {"id":"chatcmpl-test","choices":[{"delta":{"content":"Hello"},"index":0}]}\n\n'
+        return (
+            'data: {"id":"chatcmpl-test","choices":[{"delta":'
+            '{"content":"Hello"},"index":0}]}\\n\\n'
+        )
 
 
 class MockKubernetesResponses:

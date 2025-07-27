@@ -1,5 +1,6 @@
 """
-Tests for GPU selection framework in chapter-06-performance/optimization/gpu-selector.py
+Tests for GPU selection framework in
+chapter-06-performance/optimization/gpu-selector.py
 """
 
 import sys
