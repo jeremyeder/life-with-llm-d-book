@@ -1,0 +1,111 @@
+name: Fast Co-Authoring Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  fast-validation:
+    name: Fast Validation (< 1 minute)
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.npm
+          key: ${{ runner.os }}-deps-${{ hashFiles('package.json', 'requirements-test.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install minimal dependencies
+        run: |
+          pip install PyYAML
+          npm ci --only=production
+
+      - name: Make validate script executable
+        run: chmod +x validate
+
+      - name: Detect changed files and run fast validation
+        run: |
+          echo "🚀 Running fast validation on changed files..."
+          
+          # Get changed files for validation
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # PR: check against base branch
+            CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | tr '\n' ' ')
+          else
+            # Push: check against previous commit
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | tr '\n' ' ')
+          fi
+          
+          echo "📁 Changed files: $CHANGED_FILES"
+          
+          if [ -z "$(echo $CHANGED_FILES | tr -d ' ')" ]; then
+            echo "✅ No changes detected, validation passed"
+            exit 0
+          fi
+          
+          # Run fast validation on changed files
+          ./validate $CHANGED_FILES
+
+      - name: Check co-authoring rules compliance
+        run: |
+          echo "📋 Checking co-authoring rules compliance..."
+          
+          # Rule 1: Check for CLAUDE.md modifications
+          if git diff --name-only HEAD~1 HEAD | grep -q "CLAUDE\.md"; then
+            echo "🤖 CLAUDE.md modified - ensure team approval process followed"
+            echo "📝 Reminder: announce in team chat, wait 24 hours"
+          fi
+          
+          # Rule 2: Check branch naming
+          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          if [[ "$BRANCH_NAME" =~ ^feature/.*-[0-9]+ ]] || [[ "$BRANCH_NAME" =~ ^feature/(jeremy|author)- ]]; then
+            echo "⚠️  Branch name '$BRANCH_NAME' may not follow Rule 2"
+            echo "📝 Prefer: feature/chapter-04-data-scientist over feature/jeremy-chapter-04"
+          else
+            echo "✅ Branch naming follows guidelines"
+          fi
+          
+          # Rule 4: Check for forbidden technical terms
+          FORBIDDEN_TERMS=("llama-8b" "llama-70b" "mistral-8b")
+          for term in "${FORBIDDEN_TERMS[@]}"; do
+            if git diff HEAD~1 HEAD -- '*.md' | grep -q "$term"; then
+              echo "❌ Found forbidden term: $term"
+              echo "📝 Use exact model names: llama-3.1-8b, llama-3.1-70b"
+              exit 1
+            fi
+          done
+          
+          echo "✅ Co-authoring rules compliance check passed"
+
+      - name: Performance summary
+        run: |
+          echo "📊 Fast Validation Summary:"
+          echo "  ⏱️ Target: < 1 minute"
+          echo "  🎯 Focus: Changed files only"
+          echo "  🚀 Rules: Co-authoring compliance enforced"
+          echo "  ✅ Ready for human review"
