@@ -57,6 +57,33 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit standards and GitHub integration
+        run: |
+          echo "🔍 Verifying commit standards and GitHub integration..."
+          
+          # Check if commits are signed (when GPG signing is configured)
+          if git log --show-signature -1 --oneline 2>/dev/null | grep -q "Good signature"; then
+            echo "✅ Latest commit is signed"
+          else
+            echo "⚠️  Latest commit may not be signed (GPG verification unavailable in CI)"
+          fi
+          
+          # Encourage squash commits in commit messages
+          if git log --oneline -5 | grep -q "squash\|Squash"; then
+            echo "✅ Recent commits follow squash commit practices"
+          else
+            echo "ℹ️  Consider using squash commits for cleaner history"
+          fi
+          
+          # Warn about GitHub Actions integration for Claude
+          echo ""
+          echo "⚠️  GitHub Actions Integration Reminder:"
+          echo "   Ensure GitHub Actions integration is installed for Claude Code"
+          echo "   This allows Claude to create PRs and manage workflows"
+          echo "   Install at: https://github.com/apps/claude-code"
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -163,10 +190,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     
-    - name: Install test dependencies
+    - name: Install uv
+      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+    
+    - name: Install test dependencies with uv
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements-test.txt
+        pip install uv
+        uv pip install -r requirements-test.txt --system
     
     - name: Run tests with coverage
       run: |
@@ -174,7 +205,9 @@ jobs:
     
     - name: Lint Python code
       run: |
-        flake8 examples/ tests/ --max-line-length=88
+        black --check examples/ tests/ docs/cost-optimization/ docs/security-configs/
+        isort --check-only examples/ tests/ docs/cost-optimization/ docs/security-configs/
+        flake8 examples/ tests/ docs/cost-optimization/ docs/security-configs/ --max-line-length=88
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4

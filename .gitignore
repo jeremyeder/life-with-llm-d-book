@@ -74,6 +74,11 @@ coverage.xml
 htmlcov/
 .pytest_cache/
 
+# Build artifacts (ensure these are ignored)
+build/
+dist/
+*.egg-info/
+
 # Personal Notes (not for publication)
 /personal-notes/
 
@@ -85,4 +90,7 @@ TODO.md
 RESUME-PLAN.md
 SCRATCH.md
 DRAFT-*.md
-*-DRAFT.mdCLAUDE.md
+*-DRAFT.md
+
+# Claude Configuration (keep tracked)
+# CLAUDE.md
