@@ -26,16 +26,46 @@ if [ ! -f "$WHATS_NEW_FILE" ]; then
     exit 1
 fi
 
-# Update current release info box
-sed -i "s/\*\*llm-d v[0-9.]*\*\* - .*/\*\*llm-d v${VERSION}\*\* - Latest stable release/" "$WHATS_NEW_FILE"
-sed -i "s/Released: .*/Released: ${RELEASE_DATE}/" "$WHATS_NEW_FILE"
+# Use Python for more reliable text processing
+python3 << EOF
+import re
+import sys
+from datetime import datetime
 
-# Update latest release highlights
-FORMATTED_DATE=$(date -d "$RELEASE_DATE" "+%B %d, %Y" 2>/dev/null || echo "$RELEASE_DATE")
+VERSION = "$VERSION"
+RELEASE_DATE = "$RELEASE_DATE"
+WHATS_NEW_FILE = "$WHATS_NEW_FILE"
 
-# Add new release section at the top of highlights
-NEW_SECTION="### llm-d v${VERSION} - Latest Release
-*Released: ${FORMATTED_DATE}*
+try:
+    # Read the file
+    with open(WHATS_NEW_FILE, 'r') as f:
+        content = f.read()
+    
+    # Update current release info box
+    content = re.sub(
+        r'\*\*llm-d v[0-9.]+\*\* - Latest stable release',
+        f'**llm-d v{VERSION}** - Latest stable release',
+        content
+    )
+    
+    # Update release date
+    content = re.sub(
+        r'Released: [^\n]+',
+        f'Released: {RELEASE_DATE}',
+        content
+    )
+    
+    # Format the date nicely
+    try:
+        date_obj = datetime.strptime(RELEASE_DATE, '%Y-%m-%d')
+        formatted_date = date_obj.strftime('%B %d, %Y')
+    except:
+        formatted_date = RELEASE_DATE
+    
+    # Add new release section
+    new_section = f"""
+### llm-d v{VERSION} - Latest Release
+*Released: {formatted_date}*
 
 **🚀 New Features:**
 - Enhanced platform stability and performance
@@ -54,54 +84,74 @@ NEW_SECTION="### llm-d v${VERSION} - Latest Release
 
 ---
 
-"
-
-# Insert the new section after the "Latest Release Highlights" header
-sed -i "/## Latest Release Highlights/a\\
-\\
-${NEW_SECTION}" "$WHATS_NEW_FILE"
-
-# Update the "Next Release" date at bottom
-NEXT_MAJOR=$(echo "$VERSION" | cut -d. -f1)
-NEXT_VERSION="$((NEXT_MAJOR + 1)).0.0"
-
-# Calculate next release date (add one month)
-NEXT_DATE=$(python3 -c "
-from datetime import datetime
-import calendar
-current = datetime.strptime('$RELEASE_DATE', '%Y-%m-%d')
-if current.month == 12:
-    next_month = current.replace(year=current.year + 1, month=1)
-else:
-    next_month = current.replace(month=current.month + 1)
-print(next_month.strftime('%B %d, %Y'))
-" 2>/dev/null || echo "Next month")
-
-NEXT_DATE_ISO=$(python3 -c "
-from datetime import datetime
-import calendar
-current = datetime.strptime('$RELEASE_DATE', '%Y-%m-%d')
-if current.month == 12:
-    next_month = current.replace(year=current.year + 1, month=1)
-else:
-    next_month = current.replace(month=current.month + 1)
-print(next_month.strftime('%Y-%m-%d'))
-" 2>/dev/null || echo "$RELEASE_DATE")
-
-sed -i "s/\*\*Next Release\*\*: llm-d v[0-9.]* expected .*/\*\*Next Release\*\*: llm-d v${NEXT_VERSION} expected ${NEXT_DATE_ISO}/" "$WHATS_NEW_FILE"
-
-# Update last updated date
-CURRENT_DATE=$(date "+%B %d, %Y")
-sed -i "s/\*\*Last Updated\*\*: .*/\*\*Last Updated\*\*: $(date "+%B %d, %Y")/" "$WHATS_NEW_FILE"
-
-# Update recent announcements
-ANNOUNCEMENT_MONTH=$(date -d "$RELEASE_DATE" "+%B %Y" 2>/dev/null || echo "Current month")
-NEW_ANNOUNCEMENT="- **${ANNOUNCEMENT_MONTH}**: llm-d v${VERSION} released with enhanced stability and performance"
-
-# Add new announcement to the top of the list
-sed -i "/### Recent Announcements/a\\
-${NEW_ANNOUNCEMENT}" "$WHATS_NEW_FILE"
+"""
+    
+    # Insert after "Latest Release Highlights"
+    content = re.sub(
+        r'(## Latest Release Highlights\n)',
+        f'\\1{new_section}',
+        content
+    )
+    
+    # Calculate next version and date
+    version_parts = VERSION.split('.')
+    next_major = int(version_parts[0]) + 1
+    next_version = f"{next_major}.0.0"
+    
+    # Calculate next month
+    try:
+        current_date = datetime.strptime(RELEASE_DATE, '%Y-%m-%d')
+        if current_date.month == 12:
+            next_month = current_date.replace(year=current_date.year + 1, month=1)
+        else:
+            next_month = current_date.replace(month=current_date.month + 1)
+        next_date_formatted = next_month.strftime('%B %d, %Y')
+        next_date_iso = next_month.strftime('%Y-%m-%d')
+    except:
+        next_date_formatted = "Next month"
+        next_date_iso = RELEASE_DATE
+    
+    # Update next release info
+    content = re.sub(
+        r'\*\*Next Release\*\*: llm-d v[0-9.]+ expected [^\n]+',
+        f'**Next Release**: llm-d v{next_version} expected {next_date_iso}',
+        content
+    )
+    
+    # Update last updated date
+    current_date_str = datetime.now().strftime('%B %d, %Y')
+    content = re.sub(
+        r'\*\*Last Updated\*\*: [^\n]+',
+        f'**Last Updated**: {current_date_str}',
+        content
+    )
+    
+    # Add new announcement
+    try:
+        announcement_month = datetime.strptime(RELEASE_DATE, '%Y-%m-%d').strftime('%B %Y')
+    except:
+        announcement_month = "Current month"
+    
+    new_announcement = f"- **{announcement_month}**: llm-d v{VERSION} released with enhanced stability and performance"
+    
+    # Add after "Recent Announcements"
+    content = re.sub(
+        r'(### Recent Announcements\n)',
+        f'\\1{new_announcement}\n',
+        content
+    )
+    
+    # Write the updated content
+    with open(WHATS_NEW_FILE, 'w') as f:
+        f.write(content)
+    
+    print(f"✅ Successfully updated {WHATS_NEW_FILE}")
+    print(f"  - Current release: v{VERSION} ({RELEASE_DATE})")
+    print(f"  - Next release: v{next_version} ({next_date_iso})")
+    
+except Exception as e:
+    print(f"❌ Error updating file: {e}", file=sys.stderr)
+    sys.exit(1)
+EOF
 
 echo -e "${GREEN}✅ What's New section updated successfully${NC}"
-echo -e "${BLUE}  - Current release: v${VERSION} (${RELEASE_DATE})${NC}"
-echo -e "${BLUE}  - Next release: v${NEXT_VERSION} (${NEXT_DATE_ISO})${NC}"
