@@ -112,7 +112,28 @@ echo ""
 
 VALIDATION_COUNT=$((VALIDATION_COUNT + 2))
 
-echo -e "${BLUE}🔍 Phase 4: Code Example Validation${NC}"
+echo -e "${BLUE}🔍 Phase 4: Persona Validation${NC}"
+echo "=============================================="
+
+# Run persona validation
+echo -e "${BLUE}📋 [PERSONA] Content validation for target personas${NC}"
+echo "   Running: python3 scripts/generate-persona-report.py"
+local start_time=$(date +%s)
+if python3 scripts/generate-persona-report.py --output /tmp/persona-validation-report.txt > /dev/null 2>&1; then
+    local end_time=$(date +%s)
+    local duration=$((end_time - start_time))
+    echo -e "${GREEN}   ✅ PASSED${NC} (${duration}s)"
+    echo "   📄 Report generated: /tmp/persona-validation-report.txt"
+else
+    local end_time=$(date +%s)
+    local duration=$((end_time - start_time))
+    echo -e "${RED}   ❌ FAILED${NC} (${duration}s)"
+    TOTAL_ERRORS=$((TOTAL_ERRORS + 1))
+fi
+VALIDATION_COUNT=$((VALIDATION_COUNT + 1))
+echo ""
+
+echo -e "${BLUE}🔍 Phase 5: Code Example Validation${NC}"
 echo "=============================================="
 
 # Run pytest for code examples
@@ -152,6 +173,7 @@ elif [ $TOTAL_ERRORS -eq 0 ]; then
     echo "   - Review technical claims for accuracy"
     echo "   - Check cross-references for completeness"
     echo "   - Validate version consistency across chapters"
+    echo "   - Review persona validation report for content improvements"
     exit 0
 else
     echo -e "${RED}❌ $TOTAL_ERRORS error(s) and $TOTAL_WARNINGS warning(s) found${NC}"
@@ -169,5 +191,6 @@ else
     echo "   ./scripts/validate-yaml-syntax.sh"
     echo "   ./scripts/validate-mathematical-accuracy.sh"
     echo "   ./scripts/validate-consistency-matrix.sh"
+    echo "   ./scripts/validate-personas.sh [chapter-file] [persona]"
     exit 1
 fi
