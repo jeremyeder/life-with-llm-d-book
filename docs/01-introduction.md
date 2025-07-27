@@ -41,7 +41,8 @@ Traditional deployment tools weren't built with LLMs in mind. llm-d addresses un
 
 **Enterprise-Grade Reliability**: Built on proven enterprise Kubernetes platforms, llm-d delivers the "boring reliability" that enterprises require for mission-critical AI workloads.
 
-**Risk Mitigation**: 
+**Risk Mitigation**:
+
 - **No vendor lock-in**: Move between cloud providers or on-premises freely
 - **Regulatory compliance**: Keep sensitive data in your own infrastructure
 - **Open source transparency**: No black box dependencies

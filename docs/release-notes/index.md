@@ -11,6 +11,7 @@ Comprehensive release notes documenting the evolution of llm-d from initial laun
 ## Release History
 
 ### v1.0.x - Foundation Release Series
+
 *Latest: v1.0.22 released July 8, 2025*
 
 - [v1.0.x Release Notes](./v1.0.x.md) - Foundation release series
@@ -18,11 +19,13 @@ Comprehensive release notes documenting the evolution of llm-d from initial laun
 ## Upcoming Releases
 
 ### v2.0.0 - Enhanced Autoscaling
+
 *Expected: July 17, 2025*
 
 Release notes will be available upon release.
 
 ### v3.0.0 - Multi-Model Support  
+
 *Expected: August 14, 2025*
 
 Release notes will be available upon release.
@@ -39,9 +42,11 @@ llm-d follows a monthly major version release cadence:
 ## Version Support
 
 **Current Supported Versions:**
+
 - v1.0.x - Active development and support
 
 **End of Life Policy:**
+
 - Previous major versions supported for 6 months after new major release
 - Security patches provided for supported versions
 - Community support available through GitHub and Slack

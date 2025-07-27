@@ -583,6 +583,7 @@ spec:
 ```
 
 **Key customization points for production:**
+
 - `spec.model.version`: Always pin to specific versions
 - `spec.autoscaling.minReplicas`: Adjust based on traffic patterns
 - `spec.scheduling.sloPolicy.objectives`: Customize SLO targets
@@ -1095,6 +1096,7 @@ Before deploying any template:
 ---
 
 :::tip Template Best Practices
+
 - Always pin model versions in production (`spec.model.version`)
 - Use resource quotas in multi-tenant environments
 - Enable monitoring and alerting for all non-development deployments
@@ -1103,6 +1105,7 @@ Before deploying any template:
 :::
 
 :::info Next Steps
+
 - Review [CRD Reference](./crd-reference.md) for complete field specifications
 - Check [Command Reference](./command-reference.md) for deployment and management commands
 - Reference [Shared Configuration](./shared-config.md) for naming conventions and standards

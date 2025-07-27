@@ -89,6 +89,7 @@ The model validation workflow automatically detects changes to model configurati
 📎 **Full Example**: [model-validation.yml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/github-actions/model-validation.yml)
 
 Key features:
+
 - **Change Detection**: Uses path filters to detect model configuration changes
 - **Parallel Validation**: Validates multiple models concurrently using matrix strategy
 - **Security Scanning**: Integrates Trivy for vulnerability scanning
@@ -101,6 +102,7 @@ The staging deployment workflow automatically deploys validated models to stagin
 📎 **Full Example**: [deploy-staging.yml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/github-actions/deploy-staging.yml)
 
 Key features:
+
 - **Workflow Dependency**: Triggers only after successful validation
 - **Integration Testing**: Comprehensive post-deployment testing
 - **Notification**: Slack integration for deployment status
@@ -113,6 +115,7 @@ The production deployment workflow supports manual deployments with approval gat
 📎 **Full Example**: [deploy-production.yml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/github-actions/deploy-production.yml)
 
 Key features:
+
 - **Manual Trigger**: Uses `workflow_dispatch` for controlled deployments
 - **Approval Gates**: Optional manual approval for production changes
 - **Multiple Strategies**: Supports blue-green and canary deployments
@@ -128,6 +131,7 @@ Validates model YAML configuration against schema and business rules before depl
 📎 **Full Example**: [validate-model-config.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/kubeflow-pipelines/validate-model-config.py)
 
 Key features:
+
 - **Schema Validation**: JSON Schema validation for configuration structure
 - **Business Rules**: Memory-to-GPU ratio validation
 - **Directory Consistency**: Ensures model name matches directory structure
@@ -140,6 +144,7 @@ Triggers model registration pipelines for changed models, integrating GitHub Act
 📎 **Full Example**: [trigger-registration-pipeline.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/kubeflow-pipelines/trigger-registration-pipeline.py)
 
 Key features:
+
 - **Change Detection**: Processes only models that have changed
 - **Configuration Loading**: Reads model.yaml for pipeline parameters
 - **Pipeline Orchestration**: Creates named pipeline runs with GitHub context
@@ -152,6 +157,7 @@ Validates model performance in staging and checks resource capacity before produ
 📎 **Full Example**: [validate-production-readiness.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/kubeflow-pipelines/validate-production-readiness.py)
 
 Key features:
+
 - **SLO Validation**: Checks uptime, latency, and error rate requirements
 - **Prometheus Integration**: Queries staging metrics for performance validation
 - **Resource Capacity**: Validates sufficient GPU and memory resources
@@ -167,6 +173,7 @@ Environment configurations define resource requirements, scaling policies, and d
 📎 **Production Config**: [production-config.yaml](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/deployment/production-config.yaml)
 
 Key differences:
+
 - **Staging**: V100 GPUs, rolling updates, lower resource limits
 - **Production**: A100 GPUs, blue-green deployments, SLO requirements
 - **Autoscaling**: Different replica ranges for cost optimization vs availability
@@ -181,12 +188,14 @@ Comprehensive integration testing framework that validates deployed models acros
 📎 **Full Example**: [run-integration-tests.py](https://github.com/jeremyeder/llm-d-book-examples/tree/main/chapter-10-mlops/testing/run-integration-tests.py)
 
 Test categories:
+
 - **Health Checks**: Validates model endpoint availability
 - **Inference Testing**: Tests basic model functionality and response quality
 - **Load Handling**: Concurrent request testing and performance validation
 - **Environment Discovery**: Auto-detects deployed models for testing
 
 Usage:
+
 ```bash
 # Test staging environment
 python run-integration-tests.py --environment staging

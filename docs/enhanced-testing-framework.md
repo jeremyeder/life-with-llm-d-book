@@ -56,6 +56,7 @@ pytest tests/ -x --tb=short     # Code examples
 **Purpose**: Prevents YAML syntax errors and enforces structural consistency
 
 **Key Features**:
+
 - Extracts YAML blocks from markdown files
 - Validates syntax with `yamllint`
 - Detects duplicate keys (major cause of deployment failures)
@@ -64,6 +65,7 @@ pytest tests/ -x --tb=short     # Code examples
 - Validates namespace references
 
 **Example Issues Caught**:
+
 ```yaml
 # DUPLICATE KEY ERROR - would cause deployment failure
 resources:
@@ -78,6 +80,7 @@ resources:
 **Purpose**: Prevents broken links and maintains reference integrity
 
 **Key Features**:
+
 - Validates internal markdown links
 - Checks chapter cross-references
 - Validates appendix references  
@@ -87,6 +90,7 @@ resources:
 - Verifies fragment references (#section-name)
 
 **Example Issues Caught**:
+
 ```markdown
 # BROKEN REFERENCE - file doesn't exist
 See [Chapter 4](./04-data-scientist-workflows.md) for details.
@@ -102,6 +106,7 @@ See [Chapter 4](./04-data-scientist-workflows.md) for details.
 **Purpose**: Verifies mathematical calculations and technical specifications
 
 **Key Features**:
+
 - SLO percentage calculations (99.9% = 43.2 minutes/month, not 43.8)
 - Memory requirement calculations for model sizes
 - Cost reduction claims validation
@@ -111,6 +116,7 @@ See [Chapter 4](./04-data-scientist-workflows.md) for details.
 - Kubernetes resource relationship validation
 
 **Example Issues Caught**:
+
 ```markdown
 # SLO CALCULATION ERROR
 "99.9% uptime = 43.8 minutes downtime/month"
@@ -126,6 +132,7 @@ See [Chapter 4](./04-data-scientist-workflows.md) for details.
 **Purpose**: Fact-checks technical claims against authoritative sources
 
 **Key Features**:
+
 - Kubernetes version lifecycle validation
 - OpenShift version support validation
 - NVIDIA software version currency
@@ -135,6 +142,7 @@ See [Chapter 4](./04-data-scientist-workflows.md) for details.
 - Security and compliance claim validation
 
 **Example Issues Caught**:
+
 ```markdown
 # DEPRECATED VERSION
 "Kubernetes 1.22+ required"
@@ -150,6 +158,7 @@ See [Chapter 4](./04-data-scientist-workflows.md) for details.
 **Purpose**: Ensures consistency across all chapters
 
 **Key Features**:
+
 - Model name standardization across chapters
 - Namespace usage consistency
 - Port assignment consistency
@@ -159,6 +168,7 @@ See [Chapter 4](./04-data-scientist-workflows.md) for details.
 - Template reference validation
 
 **Example Issues Caught**:
+
 ```markdown
 # INCONSISTENT MODEL NAMING
 Chapter 2: "llama3-8b"
@@ -199,6 +209,7 @@ Comprehensive CI/CD validation with integrated phases:
 ### Main Validation Runner (`scripts/run-all-validations.sh`)
 
 Enhanced comprehensive validation with:
+
 - **12 validation categories** across 4 phases
 - **Performance timing** for each validation
 - **Colored output** with clear categorization
@@ -238,6 +249,7 @@ pre-commit run validate-yaml-syntax --files docs/02-installation-setup.md
 ### CI/CD Integration
 
 The GitHub Actions workflow runs automatically on:
+
 - Push to main/develop branches  
 - Pull requests affecting documentation
 - Manual workflow dispatch with configurable validation levels
@@ -245,19 +257,23 @@ The GitHub Actions workflow runs automatically on:
 ## Validation Standards
 
 ### Model Naming Standards
+
 - ✅ `llama-3.1-8b`, `llama-3.1-70b`
 - ✅ `mistral-7b`, `codellama-13b`
 - ❌ `llama3-8b`, `llama-8b`, `llama-70b`
 
 ### Namespace Standards  
+
 - ✅ `production`, `staging`, `development`, `llm-d-system`
 - ❌ `llm-d`, `sre-monitoring`, `data-science-dev`
 
 ### Port Standards
+
 - ✅ 8080 (HTTP API), 8081 (metrics), 8082 (health), 9090 (gRPC)
 - ❌ Non-standard ports without justification
 
 ### Resource Specifications
+
 - ✅ Small models (7B-8B): 16Gi requests, 24Gi limits
 - ✅ Large models (70B+): 160Gi requests, 200Gi limits  
 - ❌ Duplicate memory keys, inconsistent formats
@@ -274,6 +290,7 @@ The validation framework is designed for efficiency:
 ## Error Classification
 
 ### Critical Errors (Exit Code 1)
+
 - YAML syntax errors
 - Broken file references  
 - Mathematical calculation errors
@@ -281,6 +298,7 @@ The validation framework is designed for efficiency:
 - Deprecated API usage
 
 ### Warnings (Exit Code 0 with notices)
+
 - Non-standard naming conventions
 - Potentially unrealistic claims
 - Missing cross-references
