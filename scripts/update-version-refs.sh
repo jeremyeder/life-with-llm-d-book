@@ -50,32 +50,36 @@ update_file_versions() {
     
     # llm-d version references
     if sed -i "s/llm-d v[0-9]\+\.[0-9]\+\.[0-9]\+/llm-d v${VERSION}/g" "$file" 2>/dev/null; then
-        local count=$(diff "${file}.backup" "$file" | grep -c "^[<>]" 2>/dev/null || echo "0")
-        if [ "$count" -gt 0 ]; then
+        local count=$(diff "${file}.backup" "$file" 2>/dev/null | grep -c "^[<>]" || echo "0")
+        count=$(echo "$count" | head -1 | tr -d '\n')  # Ensure single line, no newlines
+        if [ "${count:-0}" -gt 0 ] 2>/dev/null; then
             updates=$((updates + count / 2))  # Each change shows as 2 lines in diff
         fi
     fi
     
     # Container image tags (if any reference specific versions)
     if sed -i "s/:v[0-9]\+\.[0-9]\+\.[0-9]\+/:v${VERSION}/g" "$file" 2>/dev/null; then
-        local count=$(diff "${file}.backup" "$file" | grep -c "image.*:v" 2>/dev/null || echo "0")
-        if [ "$count" -gt 0 ]; then
+        local count=$(diff "${file}.backup" "$file" 2>/dev/null | grep -c "image.*:v" || echo "0")
+        count=$(echo "$count" | head -1 | tr -d '\n')  # Ensure single line, no newlines
+        if [ "${count:-0}" -gt 0 ] 2>/dev/null; then
             updates=$((updates + count))
         fi
     fi
     
     # Helm chart version references
     if sed -i "s/version: [0-9]\+\.[0-9]\+\.[0-9]\+/version: ${VERSION}/g" "$file" 2>/dev/null; then
-        local count=$(diff "${file}.backup" "$file" | grep -c "version:" 2>/dev/null || echo "0")
-        if [ "$count" -gt 0 ]; then
+        local count=$(diff "${file}.backup" "$file" 2>/dev/null | grep -c "version:" || echo "0")
+        count=$(echo "$count" | head -1 | tr -d '\n')  # Ensure single line, no newlines
+        if [ "${count:-0}" -gt 0 ] 2>/dev/null; then
             updates=$((updates + count))
         fi
     fi
     
     # Release tag references
     if sed -i "s/releases\/tag\/v[0-9]\+\.[0-9]\+\.[0-9]\+/releases\/tag\/v${VERSION}/g" "$file" 2>/dev/null; then
-        local count=$(diff "${file}.backup" "$file" | grep -c "releases/tag" 2>/dev/null || echo "0")
-        if [ "$count" -gt 0 ]; then
+        local count=$(diff "${file}.backup" "$file" 2>/dev/null | grep -c "releases/tag" || echo "0")
+        count=$(echo "$count" | head -1 | tr -d '\n')  # Ensure single line, no newlines
+        if [ "${count:-0}" -gt 0 ] 2>/dev/null; then
             updates=$((updates + count))
         fi
     fi

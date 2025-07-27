@@ -93,8 +93,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yamllint yq
-          sudo apt-get update
-          sudo apt-get install -y bc
+          # bc is pre-installed in GitHub Actions runners
 
       - name: Make scripts executable
         run: chmod +x scripts/validate-*.sh
@@ -135,8 +134,7 @@ jobs:
       - name: Install validation dependencies
         run: |
           pip install yamllint python-markdown pyyaml
-          sudo apt-get update
-          sudo apt-get install -y bc jq
+          # bc and jq are pre-installed in GitHub Actions runners
 
       - name: Setup Node.js for markdown tools
         uses: actions/setup-node@v4
@@ -282,8 +280,7 @@ jobs:
           pip install yamllint python-markdown pyyaml pytest
           pip install -r requirements-test.txt
           npm ci
-          sudo apt-get update
-          sudo apt-get install -y bc jq
+          # bc and jq are pre-installed in GitHub Actions runners
 
       - name: Make scripts executable
         run: chmod +x scripts/validate-*.sh scripts/run-all-validations.sh
@@ -323,8 +320,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yamllint pyyaml
-          sudo apt-get update
-          sudo apt-get install -y bc jq
+          # bc and jq are pre-installed in GitHub Actions runners
 
       - name: Make scripts executable
         run: chmod +x scripts/validate-*.sh
@@ -380,8 +376,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yamllint pyyaml
-          sudo apt-get update
-          sudo apt-get install -y bc jq time
+          # bc and jq are pre-installed in GitHub Actions runners time
 
       - name: Make scripts executable
         run: chmod +x scripts/validate-*.sh
