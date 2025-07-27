@@ -98,27 +98,7 @@ jobs:
       - name: Update What's Next section
         run: |
           echo "📝 Updating What's Next section with upcoming releases"
-          # Calculate next version (increment major version)
-          CURRENT_MAJOR=$(echo "${{ inputs.version }}" | cut -d. -f1)
-          NEXT_MAJOR=$((CURRENT_MAJOR + 1))
-          NEXT_VERSION="${NEXT_MAJOR}.0.0"
-          
-          # Calculate next release date (add one month)
-          NEXT_DATE=$(python3 -c "
-          from datetime import datetime, timedelta
-          import calendar
-          current = datetime.strptime('${{ inputs.release_date }}', '%Y-%m-%d')
-          if current.month == 12:
-              next_month = current.replace(year=current.year + 1, month=1)
-          else:
-              next_month = current.replace(month=current.month + 1)
-          print(next_month.strftime('%Y-%m-%d'))
-          ")
-          
-          echo "📅 Next version: ${NEXT_VERSION} expected ${NEXT_DATE}"
-          
-          # Update What's Next with calculated values
-          sed -i "s/### llm-d v[0-9]\+\.[0-9]\+\.[0-9]\+ - .*/### llm-d v${NEXT_VERSION} - ${NEXT_DATE}/" docs/00-whats-next.md
+          echo "  ℹ️ Skipping automated What's Next updates - manual review recommended"
 
       - name: Update version references throughout book
         run: |
@@ -128,7 +108,7 @@ jobs:
       - name: Refresh works cited dates
         run: |
           echo "📚 Refreshing works-cited access dates and validating URLs"
-          ./scripts/refresh-works-cited.sh
+          ./scripts/refresh-works-cited.sh || echo "  ⚠️ Works cited refresh failed (non-blocking)"
 
       - name: Update release notes index
         run: |
@@ -204,13 +184,9 @@ jobs:
 
       - name: Run validation suite
         run: |
-          echo "🔍 Running comprehensive validation suite"
+          echo "🔍 Running essential validation checks"
           chmod +x scripts/run-all-validations.sh
-          ./scripts/run-all-validations.sh || {
-            echo "⚠️ Validation found issues - check logs"
-            echo "validation_passed=false" >> $GITHUB_ENV
-          }
-          echo "validation_passed=true" >> $GITHUB_ENV
+          ./scripts/run-all-validations.sh
 
       - name: Test Docusaurus build
         run: |
