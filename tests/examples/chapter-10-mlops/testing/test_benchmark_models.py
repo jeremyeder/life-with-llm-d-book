@@ -5,7 +5,6 @@ Tests for model benchmarking framework in chapter-10-mlops/testing/benchmark_mod
 import sys
 import time
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 

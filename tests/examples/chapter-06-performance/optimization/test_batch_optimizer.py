@@ -5,7 +5,6 @@ chapter-06-performance/optimization/batch-optimizer.py
 
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 

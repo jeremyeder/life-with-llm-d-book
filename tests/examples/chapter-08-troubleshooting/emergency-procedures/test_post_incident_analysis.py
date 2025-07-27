@@ -5,7 +5,6 @@ Tests for post-incident analysis module in chapter-08-troubleshooting/emergency-
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
@@ -368,7 +367,7 @@ except ImportError:
                 timestamp_str = log_line.split()[0]
                 log_time = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
                 return self.start_time <= log_time <= self.end_time
-            except:
+            except Exception:
                 return True  # Include if can't parse timestamp
 
         def _analyze_error_patterns(self, errors):
@@ -426,7 +425,7 @@ except ImportError:
                             "source": "application_logs",
                         }
                     )
-                except:
+                except Exception:
                     continue
 
             return timeline

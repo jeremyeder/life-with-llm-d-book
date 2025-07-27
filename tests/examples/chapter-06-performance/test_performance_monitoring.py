@@ -6,7 +6,6 @@ Tests the performance_monitoring.py from chapter-04 in context of chapter-06 opt
 import asyncio
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 

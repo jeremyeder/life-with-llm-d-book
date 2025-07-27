@@ -5,7 +5,6 @@ chapter-08-troubleshooting/diagnostic-tools/gpu-memory-profile.py
 
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
@@ -379,7 +378,7 @@ class TestGPUMemoryProfiler:
                 # If it succeeds, should report no GPUs
                 if "num_gpus" in result:
                     assert result["num_gpus"] == 0
-            except:
+            except Exception:
                 # If it fails, that's also acceptable behavior for no GPU scenario
                 pass
 

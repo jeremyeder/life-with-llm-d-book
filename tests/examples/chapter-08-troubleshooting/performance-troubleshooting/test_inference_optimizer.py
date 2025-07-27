@@ -4,9 +4,7 @@ chapter-08-troubleshooting/performance-troubleshooting/inference-optimizer.py
 """
 
 import sys
-import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 import torch

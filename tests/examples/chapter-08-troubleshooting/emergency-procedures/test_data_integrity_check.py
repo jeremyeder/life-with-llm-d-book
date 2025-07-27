@@ -5,7 +5,6 @@ chapter-08-troubleshooting/emergency-procedures/data-integrity-check.py
 
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
