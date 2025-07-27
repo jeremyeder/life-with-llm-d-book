@@ -44,8 +44,7 @@ jobs:
         run: |
           pip install requests pyyaml python-dateutil
           npm ci
-          sudo apt-get update
-          sudo apt-get install -y jq curl
+          # jq and curl are pre-installed in GitHub Actions runners
 
       - name: Configure Git
         run: |
