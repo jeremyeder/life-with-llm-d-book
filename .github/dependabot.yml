@@ -10,6 +10,9 @@ updates:
     open-pull-requests-limit: 10
     reviewers:
       - "jeremyeder"
+    labels:
+      - "dependencies"
+      - "npm"
     commit-message:
       prefix: "deps"
       include: "scope"
@@ -31,6 +34,50 @@ updates:
         update-types:
           - "minor" 
           - "patch"
+
+  # Enable version updates for pip dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "jeremyeder"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps(python)"
+      include: "scope"
+    groups:
+      testing-deps:
+        patterns:
+          - "pytest*"
+          - "coverage*"
+          - "*test*"
+        update-types:
+          - "minor"
+          - "patch"
+      ml-deps:
+        patterns:
+          - "numpy"
+          - "pandas"
+          - "scikit-learn"
+          - "matplotlib"
+          - "mlflow"
+        update-types:
+          - "minor"
+          - "patch"
+      k8s-deps:
+        patterns:
+          - "kubernetes"
+          - "pyyaml"
+          - "aiohttp"
+        update-types:
+          - "minor"
+          - "patch"
     
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
@@ -42,6 +89,9 @@ updates:
     open-pull-requests-limit: 5
     reviewers:
       - "jeremyeder"
+    labels:
+      - "dependencies"
+      - "github-actions"
     commit-message:
       prefix: "ci"
       include: "scope"
