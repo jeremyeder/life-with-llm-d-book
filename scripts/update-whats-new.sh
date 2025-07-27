@@ -27,7 +27,7 @@ if [ ! -f "$WHATS_NEW_FILE" ]; then
 fi
 
 # Update current release info box
-sed -i "s/\*\*llm-d v[^*]*\*\* - .*/\*\*llm-d v${VERSION}\*\* - Latest stable release/" "$WHATS_NEW_FILE"
+sed -i "s/\\*\\*llm-d v[^*]*\\*\\* - .*/\\*\\*llm-d v${VERSION}\\*\\* - Latest stable release/" "$WHATS_NEW_FILE"
 sed -i "s/Released: .*/Released: ${RELEASE_DATE}/" "$WHATS_NEW_FILE"
 
 # Update latest release highlights
@@ -88,11 +88,11 @@ else:
 print(next_month.strftime('%Y-%m-%d'))
 " 2>/dev/null || echo "$RELEASE_DATE")
 
-sed -i "s/\*\*Next Release\*\*: llm-d v[^*]* expected .*/\*\*Next Release\*\*: llm-d v${NEXT_VERSION} expected ${NEXT_DATE_ISO}/" "$WHATS_NEW_FILE"
+sed -i "s/\\*\\*Next Release\\*\\*: llm-d v[^*]* expected .*/\\*\\*Next Release\\*\\*: llm-d v${NEXT_VERSION} expected ${NEXT_DATE_ISO}/" "$WHATS_NEW_FILE"
 
 # Update last updated date
 CURRENT_DATE=$(date "+%B %d, %Y")
-sed -i "s/\*\*Last Updated\*\*: .*/\*\*Last Updated\*\*: $(date "+%B %d, %Y")/" "$WHATS_NEW_FILE"
+sed -i "s/\\*\\*Last Updated\\*\\*: .*/\\*\\*Last Updated\\*\\*: $(date "+%B %d, %Y")/" "$WHATS_NEW_FILE"
 
 # Update recent announcements
 ANNOUNCEMENT_MONTH=$(date -d "$RELEASE_DATE" "+%B %Y" 2>/dev/null || echo "Current month")
