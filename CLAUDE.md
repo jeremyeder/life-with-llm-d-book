@@ -9,6 +9,7 @@ This is a comprehensive technical book project "Life with llm-d" built with Docu
 ## Development Commands
 
 ### Docusaurus (Primary Development)
+
 ```bash
 # Start development server
 npm start
@@ -24,6 +25,7 @@ npm run clear
 ```
 
 ### Testing
+
 ```bash
 # Run all tests
 pytest
@@ -39,9 +41,16 @@ pytest -m unit
 
 # Run GPU-related tests (mocked)
 pytest -m gpu
+
+# Run tests by category
+pytest -m content    # Content validation tests
+pytest -m accuracy   # Mathematical accuracy tests
+pytest -m consistency # Cross-chapter consistency tests
+pytest -m k8s        # Kubernetes API tests
 ```
 
 ### Content Validation
+
 ```bash
 # Run comprehensive validation
 ./scripts/run-all-validations.sh
@@ -60,9 +69,14 @@ npm run lint:fix
 
 # Spell check
 npm run spell
+
+# Python linting and formatting
+npm run lint:python        # Format, sort imports, and lint Python files
+npm run lint:python:check  # Check Python formatting without modifying files
 ```
 
 ### Cost Optimization Workflow
+
 ```bash
 # Update pricing and validate costs
 make all
@@ -75,17 +89,22 @@ make test-costs
 
 # Generate cost comparison report
 make cost-report
+
+# Install Python dependencies for cost calculations
+make install-deps
 ```
 
 ## Architecture Overview
 
 ### Multi-Language Structure
+
 - **Frontend**: Docusaurus (React/JavaScript) for book website
 - **Examples**: Python scripts with comprehensive testing
 - **Configs**: YAML configurations for Kubernetes/OpenShift
 - **Scripts**: Bash validation and automation tools
 
 ### Key Directories
+
 - `docs/` - Book chapters and content (Markdown)
 - `examples/` - Executable code examples organized by chapter
 - `tests/` - Comprehensive test suite mirroring examples structure
@@ -93,25 +112,30 @@ make cost-report
 - `src/` - Docusaurus React components and theme customizations
 
 ### Testing Architecture
+
 - **pytest** with coverage reporting and HTML output
 - **Test Structure**: Mirrors examples/ directory structure exactly
 - **Mocking**: GPU operations, Kubernetes APIs, cost calculations
 - **Fixtures**: Shared test data in tests/fixtures/
-- **Markers**: unit, integration, gpu, slow, k8s for test categorization
+- **Markers**: unit, integration, gpu, slow, k8s, content, accuracy, consistency, syntax, links, claims for test categorization
+- **Dependencies**: See requirements-test.txt for complete testing framework including ML libraries (pandas, numpy, scikit-learn)
 
 ## Content Standards
 
 ### Model Naming (from docs/appendix/shared-config.md)
+
 - Use exact names: `llama-3.1-8b`, `llama-3.1-70b`, `mistral-7b`
-- Never abbreviate: avoid `llama-8b` or `llama-70b`
+- Never abbreviate: avoid shortened forms
 
 ### Namespace Conventions
+
 - `production` - Production workloads
 - `staging` - Staging environment
 - `development` - Development and testing
 - `llm-d-system` - System components
 
 ### Resource Specifications
+
 - Follow templates in docs/appendix/shared-config.md
 - Small models (7B-8B): 16-24Gi memory, 1 GPU
 - Large models (70B+): 160-200Gi memory, 4 GPUs
@@ -119,6 +143,7 @@ make cost-report
 ## Quality Assurance Framework
 
 ### Automated Validation
+
 - **Model Names**: Consistency across all chapters
 - **Namespaces**: Standard namespace usage
 - **Resource Specs**: Adherence to shared templates
@@ -126,20 +151,38 @@ make cost-report
 - **Shared Config**: References to standardized configurations
 
 ### Content Validation Flow
+
 1. Run `./scripts/run-all-validations.sh` before commits
 2. Individual validation scripts provide specific feedback
 3. Markdown linting ensures consistent formatting
 4. Spell checking with technical term dictionary
 
 ### Cost Calculation Framework
+
 - **Dynamic Pricing**: Scripts update GPU pricing data
 - **Validation**: All cost calculations verified against current market
 - **Testing**: Comprehensive test coverage for cost prediction logic
 - **Forecasting**: Multi-month cost projection capabilities
 
+## Prerequisites
+
+### Node.js and Package Management
+
+- **Node.js**: Version 20.0 or higher (defined in package.json engines)
+- **Package Manager**: npm (for Docusaurus and markdown tooling)
+- **Key Dependencies**: Docusaurus 3.8.1, markdownlint-cli, cspell
+
+### Python Environment
+
+- **Python**: 3.13 (latest supported versions N and N-1)
+- **Virtual Environment**: Always use virtual environments (venv, conda, or uv)
+- **Dependencies**: See requirements-test.txt for complete testing and ML libraries
+- **Testing Framework**: pytest with extensive plugin ecosystem
+
 ## Development Workflow
 
 ### Content Development
+
 1. Write/edit markdown in docs/
 2. Add corresponding code examples in examples/
 3. Create tests in tests/ following same structure
@@ -147,6 +190,7 @@ make cost-report
 5. Test single files for performance: `pytest tests/specific_test.py`
 
 ### Code Example Development
+
 1. Follow existing patterns in examples/chapter-XX/
 2. Add comprehensive tests with realistic mocking
 3. Include fixtures for complex test data
@@ -154,26 +198,32 @@ make cost-report
 5. Ensure 100% test coverage for new utilities
 
 ### Quality Checks
+
 - All validation scripts must pass
-- Markdown linting must be clean
+- Markdown linting must be clean (npm run lint)
+- Python linting must be clean (npm run lint:python)
 - Test coverage maintained
 - Cost calculations must validate against current pricing
 - Model names and namespaces must follow standards
+- Pre-push validation workflow must pass (scripts/pre-push-linting.sh)
 
 ## Project-Specific Considerations
 
 ### Book Structure
+
 - 12 chapters + 3 appendices covering complete llm-d lifecycle
 - Target audiences: Data Scientists, SREs, Platform Engineers
 - Cross-references link related concepts across chapters
 
 ### Technical Validation
+
 - Executable code examples with comprehensive test coverage
 - Real-world configurations validated against best practices
 - Cost optimization with dynamic pricing integration
 - Standards enforcement through automated validation
 
 ### Multi-Audience Content
+
 - Chapter 4: Data Scientist workflows and experimentation
 - Chapter 5: SRE operations and monitoring
 - Chapter 8: Systematic troubleshooting procedures
@@ -182,18 +232,86 @@ make cost-report
 ## Content Management Guidelines
 
 ### Version Control and Content Refresh
+
 - We will attempt to refresh content monthly or as major decisions are reached
 - MUST maintain comprehensive works cited for this book in the book appendix
 
 ## Code Generation Guidelines
 
 ### Validation Practices
+
 - When referencing dates, always validate them. For example:
   - Code copyright should always be the current year
   - Release dates should match reality
   - If uncertain and unable to reliably find out, ask for clarification
 
+## Co-Authoring Rules
+
+### Top 8 Rules for Co-Authoring with Claude
+
+1. **One Shared CLAUDE.md, Zero Exceptions** - All authors use identical CLAUDE.md file and CLAUDE.md is version controlled with this book. No personal modifications.
+
+2. **Branch by Chapter, Never by Author** - Use `feature/chapter-04-data-scientist` not `feature/jeremy-chapter-04`
+
+3. **Claude Validates Before Human Reviews** - Run validation scripts first. Only send clean content for review.
+
+4. **Standardized Technical Terms Only** - Use exact terms from shared glossary: `llama-3.1-8b`, never abbreviated variants.
+
+5. **Cross-Reference Before You Write** - Check existing chapters for related content. Link, don't duplicate.
+
+6. **Same Voice, Same Standards** - Write as one author. Consistent technical depth and formality.
+
+7. **Simple CLAUDE.md Changes** - CLAUDE.md updates: announce in team chat, wait 24 hours, merge if no objections.
+
+8. **Use Standard Prompts for Consistency** - Use shared prompt templates from `/prompts/` directory for common tasks.
+
+### Prompt Template System
+
+#### Template Versioning
+
+- **Templates stored in `/prompts/`** with version numbers: `chapter-intro-v1.md`, `code-example-v2.md`
+- **Lock template versions per chapter** - once chapter approved, freeze template version used
+- **Template metadata** - each chapter documents which template versions were used
+- **Evolution without rework** - new template versions apply to NEW chapters only
+
+#### Standard Templates
+
+- **Chapter Introduction**: `prompts/chapter-intro-v1.md` - consistent openings for target audiences
+- **Code Examples**: `prompts/code-example-v1.md` - following shared utility patterns
+- **Troubleshooting**: `prompts/troubleshooting-v1.md` - systematic approach from Chapter 8
+- **Review Prompts**: `prompts/consistency-check-v1.md` - validate against existing content
+
+#### Template Usage Workflow
+
+1. Choose appropriate template version for new content
+2. Document template version used in chapter metadata
+3. Lock template version once chapter approved
+4. Apply template improvements only to future chapters
+5. Batch regeneration only during major review cycles
+
+### Validation Workflow
+
+- Run `./validate` before committing (< 30 seconds)
+- All validation must pass locally before pushing
+- GitHub Actions enforces same rules in < 1 minute
+- Pre-commit hooks provide instant feedback
+
 ## Development Best Practices
 
 ### Source Control
+
 - When using git, ALWAYS work in feature branches unless told explicitly otherwise.
+
+## CI/CD and Automation
+
+### GitHub Actions Integration
+
+- **Model Validation Workflows**: Located in examples/chapter-10-mlops/github-actions/
+- **Deployment Pipelines**: Separate workflows for staging and production
+- **Pre-commit Hooks**: Run validation scripts before commits
+
+### Automated Validation
+
+- **Monthly Content Refresh**: Scripts update pricing data and version references  
+- **Cross-Reference Validation**: Ensures links between chapters remain valid
+- **Technical Claims Verification**: Validates mathematical accuracy and claims
