@@ -173,7 +173,7 @@ See [Chapter 4](./04-data-scientist-workflows.md) for details.
 # INCONSISTENT MODEL NAMING
 Chapter 2: "llama3-8b"
 Chapter 4: "llama-3.1-8b" 
-Chapter 5: "llama-8b"
+Chapter 5: "shortened-form"
 # ❌ Use consistent naming: "llama-3.1-8b"
 
 # CONFLICTING RESOURCE SPECS
@@ -260,7 +260,7 @@ The GitHub Actions workflow runs automatically on:
 
 - ✅ `llama-3.1-8b`, `llama-3.1-70b`
 - ✅ `mistral-7b`, `codellama-13b`
-- ❌ `llama3-8b`, `llama-8b`, `llama-70b`
+- ❌ `llama3-8b`, `shortened-forms`, `abbreviated-names`
 
 ### Namespace Standards  
 

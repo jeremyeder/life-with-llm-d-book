@@ -2,10 +2,18 @@
 # Prevents documentation drift by running validation before each commit
 
 repos:
-  # Enhanced documentation validation
+  # Fast co-authoring validation (runs first)
   - repo: local
     hooks:
-      # Core consistency validations
+      - id: fast-coauthor-validation
+        name: Fast Co-Authoring Validation
+        entry: ./validate
+        language: system
+        stages: [pre-commit]
+        verbose: true
+        description: "Fast validation for co-authoring consistency (< 30 seconds)"
+
+      # Core consistency validations (lightweight versions)
       - id: validate-model-names
         name: Validate Model Names
         entry: ./scripts/validate-model-names.sh
@@ -139,7 +147,7 @@ repos:
 
 # Configuration for pre-commit behavior
 default_install_hook_types: [pre-commit, pre-push]
-default_stages: [commit, push]
+default_stages: [pre-commit, pre-push]
 
 # Fail fast - stop on first failure
 fail_fast: true

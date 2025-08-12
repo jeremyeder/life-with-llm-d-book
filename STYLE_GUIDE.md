@@ -45,8 +45,8 @@ This chapter focuses on [topic], covering [areas]. You'll learn [outcomes].
 
 - ❌ `llama4`
 - ❌ `Llama-3.1`
-- ❌ `llama-8b` (without version)
-- ❌ `llama-70b` (without version)
+- ❌ `llama-only` (missing size specification)
+- ❌ `model-abbreviated` (missing full version)
 
 ### Namespace Conventions
 
@@ -303,6 +303,24 @@ Before submitting content:
 - [Shared Configuration](./appendix/shared-config.md): Standard specifications
 - [Chapter Template](./templates/chapter-template.md): Standardized structure
 - [Pre-commit config](./.pre-commit-config.yaml): Validation automation
+
+## Pre-commit Setup (Required)
+
+**All contributors must install pre-commit hooks** to prevent CI failures:
+
+```bash
+# One-time setup after cloning repository
+pip install pre-commit
+pre-commit install
+
+# Verify installation
+ls -la .git/hooks/pre-commit
+
+# Test hooks manually (optional)
+pre-commit run --all-files
+```
+
+**Why this matters**: Pre-commit hooks catch issues locally before they reach CI, preventing failed builds and maintaining code quality.
 
 ---
 
