@@ -33,8 +33,8 @@
     "@docusaurus/module-type-aliases": "3.8.1",
     "@docusaurus/tsconfig": "3.8.1",
     "@docusaurus/types": "3.8.1",
-    "cspell": "^9.2.0",
-    "markdownlint-cli": "^0.45.0"
+    "cspell": "^9.3.2",
+    "markdownlint-cli": "^0.46.0"
   },
   "keywords": [
     "llm-d",
